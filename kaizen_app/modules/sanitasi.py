@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 
 from modules import sanitasi_calc as sc
 from modules import sanitasi_excel, sanitasi_html
@@ -139,8 +138,8 @@ def render():
 
     # ---------------------------------------------------------- lembar
     st.markdown("### Lembar Perhitungan Sanitasi dan Air Bersih")
-    components.html(sanitasi_html.render_html(h, data, proyek),
-                    height=sanitasi_html.tinggi_html(h, data), scrolling=True)
+    st.iframe(sanitasi_html.render_html(h, data, proyek),
+              height=sanitasi_html.tinggi_html(h, data))
 
     # ---------------------------------------------------------- unduh
     xlsx = sanitasi_excel.build_excel(h, data, proyek)

@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 
 from modules import ac_calc, ac_excel, ac_html
 from modules.ac_calc import MODE_FULL, MODE_STANDAR
@@ -164,8 +163,8 @@ def render():
 
     # ---- lembar perhitungan
     st.markdown(f"### Lembar Perhitungan Kapasitas AC — {mode}")
-    components.html(ac_html.render_html(hasil, data, proyek, mode, od, fl),
-                    height=ac_html.tinggi_html(hasil, mode), scrolling=True)
+    st.iframe(ac_html.render_html(hasil, data, proyek, mode, od, fl),
+              height=ac_html.tinggi_html(hasil, mode))
 
     # ---- rincian substitusi
     with st.expander("Rincian perhitungan per ruangan (substitusi rumus)"):
