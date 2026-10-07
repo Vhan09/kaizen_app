@@ -1,10 +1,10 @@
-"""Modul 5 - Kebutuhan AC.
+"""Modul 3 - Kebutuhan AC.
 
 Dua metode perhitungan:
   - Standar Calculation : rumus pendekatan dari sheet 'AC STANDART'
   - Full Calculation    : rumus dasar + beban orang, lampu, dan peralatan
 
-Dipanggil dari app.py:  "Modul 5 ❄️ Kebutuhan AC": ac.render
+Dipanggil dari app.py:  "Modul 3 ❄️ Kebutuhan AC": ac.render
 """
 from __future__ import annotations
 
