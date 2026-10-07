@@ -32,6 +32,6 @@ with st.sidebar:
 render = MODUL[pilihan]
 if render is None:
     st.title(pilihan)
-    st.info("Modul ini dikerjakan setelah Modul 1 (Beban Listrik) selesai dan disetujui.")
+    st.info("Modul ini dikerjakan setelah Modul 4 (Sanitasi & Air Bersih) selesai dan disetujui.")
 else:
     render()
