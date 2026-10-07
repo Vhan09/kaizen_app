@@ -1,0 +1,140 @@
+{
+  "proyek": {
+    "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2LANTAI TYPE 55",
+    "lokasi": "KOTA MAKASSAR",
+    "tahun": "2026",
+    "item": "PERHITUNGAN KAPASITAS PENGGUNAAN AC (AIR CONDITIONER) PADA BANGUNAN"
+  },
+  "konversi": {
+    "meter_ke_feet": 3.28,
+    "m2_ke_ft2": 10.7639,
+    "btu_ke_pk": 0.000393014,
+    "pembagi": 60,
+    "watt_ke_btu": 3.412
+  },
+  "ac": [
+    {
+      "label": "1/2 PK",
+      "btu": 5000,
+      "watt": 390
+    },
+    {
+      "label": "3/4 PK",
+      "btu": 7000,
+      "watt": 620
+    },
+    {
+      "label": "1 PK",
+      "btu": 9000,
+      "watt": 750
+    },
+    {
+      "label": "1 1/2 PK",
+      "btu": 12000,
+      "watt": null
+    },
+    {
+      "label": "2 PK",
+      "btu": 18000,
+      "watt": null
+    }
+  ],
+  "orientasi": {
+    "Utara": 16,
+    "Timur": 17,
+    "Selatan": 18,
+    "Barat": 20
+  },
+  "isolasi": {
+    "Ruang relatif terlindung": 10,
+    "Titik tengah insulation": 14,
+    "Ruang panas (atap / terpapar)": 18
+  },
+  "toleransi_n": 0.05,
+  "referensi": [
+    "Ventilasi & Tata Udara",
+    "SNI 03-6572-2001",
+    "Tata Cara Perancangan Sistem Ventilasi dan Pengkondisian Udara",
+    "Beban Pendingin: ASHRAE Handbook Fundamentals"
+  ],
+  "catatan": "Perhitungan AC menggunakan metode pendekatan kebutuhan pendinginan berdasarkan volume ruang dan orientasi panas bangunan.",
+  "full": {
+    "orang_dasar": 2,
+    "faktor_lampu": 1.0,
+    "aktivitas": [
+      {
+        "label": "Duduk istirahat",
+        "total": 100,
+        "sensible": 60,
+        "latent": 40
+      },
+      {
+        "label": "Duduk, kerja sangat ringan",
+        "total": 120,
+        "sensible": 60,
+        "latent": 60
+      },
+      {
+        "label": "Kerja ringan / kantor",
+        "total": 130,
+        "sensible": 60,
+        "latent": 70
+      },
+      {
+        "label": "Aktivitas sedang",
+        "total": 160,
+        "sensible": 68,
+        "latent": 92
+      }
+    ],
+    "sumber_aktivitas": "Metabolic heat gain from persons (acuan ASHRAE/ISO), pada suhu ruangan 26 °C"
+  },
+  "standar": [
+    {
+      "kode": "SNI 03-6572-2001",
+      "judul": "Tata cara perancangan sistem ventilasi dan pengkondisian udara pada bangunan gedung",
+      "peran": "Acuan utama perancangan ventilasi dan AC (dicantumkan pada file Excel Standar Calculation)"
+    },
+    {
+      "kode": "SNI 6390:2020",
+      "judul": "Konservasi energi sistem tata udara pada bangunan gedung",
+      "peran": "Efisiensi energi sistem AC / tata udara; acuan pemilihan dan evaluasi sistem"
+    },
+    {
+      "kode": "SNI 6389:2020",
+      "judul": "Konservasi energi selubung bangunan pada bangunan gedung",
+      "peran": "Pembatasan perolehan panas selubung (OTTV); memengaruhi beban dasar ruangan"
+    },
+    {
+      "kode": "SNI 6197:2020",
+      "judul": "Konservasi energi pada sistem pencahayaan",
+      "peran": "Daya pencahayaan; dasar beban lampu pada Full Calculation"
+    },
+    {
+      "kode": "SNI 03-6575-2001",
+      "judul": "Tata cara perancangan sistem pencahayaan buatan pada bangunan gedung",
+      "peran": "Tingkat pencahayaan ruangan; menentukan jumlah dan daya lampu"
+    },
+    {
+      "kode": "ASHRAE Handbook — Fundamentals",
+      "judul": "Perhitungan beban pendingin dan kenyamanan termal (heat gain penghuni, lampu, peralatan)",
+      "peran": "Acuan beban internal pada Full Calculation"
+    },
+    {
+      "kode": "ASHRAE Standard 55",
+      "judul": "Thermal Environmental Conditions for Human Occupancy",
+      "peran": "Kriteria kenyamanan termal"
+    },
+    {
+      "kode": "ASHRAE Standard 62.1 / 62.2",
+      "judul": "Ventilation and Acceptable Indoor Air Quality",
+      "peran": "Kebutuhan udara segar (belum dihitung di modul ini)"
+    },
+    {
+      "kode": "SNI 8153:2015 · PUIL 2020 (SNI 0225:2020)",
+      "judul": "Persyaratan instalasi listrik (sesuai landasan Modul 2)",
+      "peran": "Sirkuit dan proteksi listrik untuk AC"
+    }
+  ],
+  "catatan_standar": "Pastikan edisi/revisi standar yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
+}
