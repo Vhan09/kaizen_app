@@ -15,7 +15,7 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A3, A4, landscape
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
-from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, PageBreak, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from modules import akli_calc
 from modules.beban_listrik_calc import COL_GRUP, COL_KABEL, COL_LAIN, COL_MCB, COL_NAMA
@@ -36,8 +36,9 @@ def _teks(s) -> str:
 
 
 def _gaya(nama: str, ukuran: float, **kw) -> ParagraphStyle:
-    return ParagraphStyle(nama, fontName=kw.pop("fontName", "Helvetica"), fontSize=ukuran,
-                          leading=ukuran + 1.8, **kw)
+    font_name = kw.pop("fontName", "Helvetica")
+    leading = kw.pop("leading", ukuran + 1.8)
+    return ParagraphStyle(nama, fontName=font_name, fontSize=ukuran, leading=leading, **kw)
 
 
 def _kaki(judul: str):
@@ -281,4 +282,222 @@ def sld_pdf(proyek: dict, sistem: dict, labels: list[str], out: dict,
 
     doc.build(isi, onFirstPage=_kaki("Perhitungan Kebutuhan Listrik (SLD)"),
               onLaterPages=_kaki("Perhitungan Kebutuhan Listrik (SLD)"))
+    return buf.getvalue()
+
+
+# ------------------------------------------------------------------ AC
+def ac_pdf(hasil_standar: pd.DataFrame, hasil_full: pd.DataFrame, data: dict,
+           proyek: dict, orang_dasar: float, faktor_lampu: float) -> bytes:
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=landscape(A3), leftMargin=12 * mm, rightMargin=12 * mm,
+                            topMargin=12 * mm, bottomMargin=16 * mm,
+                            title="Kebutuhan AC", author="Kaizen PBG")
+    judul = _gaya("ac_judul", 16, fontName="Helvetica-Bold", spaceAfter=3)
+    sub = _gaya("ac_sub", 8.5, textColor=colors.HexColor("#555555"), spaceAfter=8)
+    bagian = _gaya("ac_bagian", 11, fontName="Helvetica-Bold", spaceBefore=7, spaceAfter=5)
+    normal = _gaya("ac_normal", 8)
+    kecil = _gaya("ac_kecil", 7, leading=8.5)
+    header = _gaya("ac_header", 7, fontName="Helvetica-Bold", textColor=colors.white,
+                   alignment=TA_CENTER, leading=8)
+
+    def paragraph(value, style=normal):
+        return Paragraph(_teks(value).replace("\n", "<br/>"), style)
+
+    def table(headers, rows, weights, font_size=7, bold_rows=()):
+        widths = [doc.width * weight / sum(weights) for weight in weights]
+        contents = [[paragraph(value, header) for value in headers]]
+        contents.extend([[paragraph(value, kecil) for value in row] for row in rows])
+        result = Table(contents, colWidths=widths, repeatRows=1, hAlign="LEFT")
+        styles = [
+            ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+            ("GRID", (0, 0), (-1, -1), 0.35, GARIS),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (1, 1), (-1, -1), "CENTER"),
+            ("FONTSIZE", (0, 0), (-1, -1), font_size),
+            ("LEFTPADDING", (0, 0), (-1, -1), 3),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ]
+        for index in range(2, len(contents), 2):
+            styles.append(("BACKGROUND", (0, index), (-1, index), ABU))
+        for index in bold_rows:
+            styles.extend([
+                ("BACKGROUND", (0, index + 1), (-1, index + 1), ABU),
+                ("FONTNAME", (0, index + 1), (-1, index + 1), "Helvetica-Bold"),
+            ])
+        result.setStyle(TableStyle(styles))
+        return result
+
+    info_rows = [[paragraph(label, _gaya(f"ac_meta_{i}", 8, fontName="Helvetica-Bold")),
+                  paragraph(proyek.get(key, "") or "-")]
+                 for i, (label, key) in enumerate((
+                     ("Pekerjaan", "pekerjaan"), ("Lokasi", "lokasi"),
+                     ("Tahun", "tahun"), ("Item pekerjaan", "item")))]
+    info = Table(info_rows, colWidths=[32 * mm, doc.width - 32 * mm], hAlign="LEFT")
+    info.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
+                              ("TOPPADDING", (0, 0), (-1, -1), 1),
+                              ("BOTTOMPADDING", (0, 0), (-1, -1), 1)]))
+
+    isi: list[Flowable] = [Paragraph("KEBUTUHAN AC", judul),
+                           Paragraph("Laporan perhitungan Standar dan Full Calculation", sub),
+                           info, Spacer(1, 5)]
+    standar = data.get("standar", [])
+    if standar:
+        isi.append(Paragraph("Landasan Perencanaan / SNI", bagian))
+        isi.append(table(
+            ["Standar", "Judul / Ruang Lingkup", "Peran"],
+            [[s.get("kode", ""), s.get("judul", ""), s.get("peran", "")] for s in standar],
+            [1.2, 3.5, 2.3], 7,
+        ))
+
+    def rows_standar(hasil):
+        rows = []
+        for _, r in hasil.iterrows():
+            rows.append([
+                f"{r['Lantai']}\n{r['Ruangan']}",
+                f"{fmt_id(r['L_m'], 2)} × {fmt_id(r['W_m'], 2)} × {fmt_id(r['H_m'], 2)}",
+                fmt_id(r["I"], 0), fmt_id(r["E"], 0), fmt_id(r["Btu"], 0),
+                r["Jenis AC"], fmt_id(r["Jumlah"], 0), fmt_id(r["N"], 3),
+                r["Status"], r["Rekomendasi"],
+            ])
+        if not hasil.empty:
+            rows.append(["TOTAL", "", "", "", fmt_id(hasil["Btu"].sum(), 0), "",
+                         fmt_id(hasil["Jumlah"].sum(), 0), "", "", ""])
+        return rows
+
+    isi.append(Paragraph("Standar Calculation", bagian))
+    isi.append(Paragraph("Q = (L × W × H × I × E) / pembagi; dimensi dikonversi ke feet.", sub))
+    isi.append(table(
+        ["Lantai / Ruangan", "Dimensi (m)", "I", "E", "Kebutuhan (Btu/h)",
+         "Jenis AC", "Unit", "N (AC)", "Status", "Rekomendasi"],
+        rows_standar(hasil_standar), [2.0, 1.8, 0.45, 0.45, 1.25, 0.9, 0.5, 0.65, 0.8, 1.1],
+    ))
+
+    isi.append(PageBreak())
+    isi.append(Paragraph("Full Calculation", bagian))
+    isi.append(Paragraph(
+        f"Q total = Q dasar + Q orang + Q lampu + Q peralatan. "
+        f"Orang dasar: {fmt_id(orang_dasar, 0)}; faktor lampu: {fmt_id(faktor_lampu, 2)}.", sub))
+    rows_full = []
+    for _, r in hasil_full.iterrows():
+        rows_full.append([
+            f"{r['Lantai']}\n{r['Ruangan']}",
+            f"{fmt_id(r['L_m'], 2)} × {fmt_id(r['W_m'], 2)} × {fmt_id(r['H_m'], 2)}",
+            fmt_id(r["Q_dasar"], 0), fmt_id(r["Orang"], 0), fmt_id(r["Q_orang"], 0),
+            f"{fmt_id(r['N_lampu'], 0)} × {fmt_id(r['W_lampu'], 0)}", fmt_id(r["Q_lampu"], 0),
+            fmt_id(r["W_alat"], 0), fmt_id(r["Q_alat"], 0), fmt_id(r["Btu"], 0),
+            r["Jenis AC"], fmt_id(r["Jumlah"], 0), fmt_id(r["N"], 3),
+            r["Status"], r["Rekomendasi"],
+        ])
+    if not hasil_full.empty:
+        rows_full.append([
+            "TOTAL", "", fmt_id(hasil_full["Q_dasar"].sum(), 0),
+            fmt_id(hasil_full["Orang"].sum(), 0), fmt_id(hasil_full["Q_orang"].sum(), 0), "",
+            fmt_id(hasil_full["Q_lampu"].sum(), 0), fmt_id(hasil_full["W_alat"].sum(), 0),
+            fmt_id(hasil_full["Q_alat"].sum(), 0), fmt_id(hasil_full["Btu"].sum(), 0), "",
+            fmt_id(hasil_full["Jumlah"].sum(), 0), "", "", "",
+        ])
+    isi.append(table(
+        ["Lantai / Ruangan", "Dimensi (m)", "Q Dasar", "Orang", "Q Orang", "Lampu (jml × W)",
+         "Q Lampu", "Alat (W)", "Q Alat", "Total (Btu/h)", "Jenis AC", "Unit", "N", "Status", "Rekomendasi"],
+        rows_full, [2.0, 1.8, 0.9, 0.5, 0.85, 1.0, 0.85, 0.65, 0.8, 1.0, 0.8, 0.45, 0.6, 0.7, 0.95],
+    ))
+    isi.append(Spacer(1, 7))
+    isi.append(Paragraph(
+        "Catatan: estimasi ini mengikuti rumus dan asumsi yang ditampilkan pada aplikasi. "
+        "Periksa kembali data ruangan, beban internal, dan kapasitas unit sebelum digunakan untuk perencanaan.", kecil))
+    doc.build(isi, onFirstPage=_kaki("Kebutuhan AC"), onLaterPages=_kaki("Kebutuhan AC"))
+    return buf.getvalue()
+
+
+# -------------------------------------------------------------- sanitasi
+def sanitasi_pdf(h: dict, data: dict, proyek: dict) -> bytes:
+    from modules import sanitasi_calc
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=landscape(A4), leftMargin=14 * mm, rightMargin=14 * mm,
+                            topMargin=12 * mm, bottomMargin=16 * mm,
+                            title="Sanitasi dan Air Bersih", author="Kaizen PBG")
+    judul = _gaya("san_judul", 16, fontName="Helvetica-Bold", spaceAfter=3)
+    sub = _gaya("san_sub", 8.5, textColor=colors.HexColor("#555555"), spaceAfter=7)
+    bagian = _gaya("san_bagian", 10, fontName="Helvetica-Bold", spaceBefore=7, spaceAfter=4)
+    normal = _gaya("san_normal", 7.5, leading=9)
+    kecil = _gaya("san_kecil", 6.8, leading=8)
+    header = _gaya("san_header", 7, fontName="Helvetica-Bold", textColor=colors.white,
+                   alignment=TA_CENTER, leading=8)
+
+    def paragraph(value, style=normal):
+        return Paragraph(_teks(value).replace("\n", "<br/>"), style)
+
+    isi: list[Flowable] = [Paragraph("SANITASI & AIR BERSIH", judul),
+                           Paragraph("Laporan perhitungan kebutuhan air, air limbah, tangki septik, dan resapan", sub)]
+    meta = [[paragraph(label, _gaya(f"san_meta_{i}", 7.5, fontName="Helvetica-Bold")),
+             paragraph(proyek.get(key, "") or "-")]
+            for i, (label, key) in enumerate((
+                ("Pekerjaan", "pekerjaan"), ("Lokasi", "lokasi"),
+                ("Tahun", "tahun"), ("Item pekerjaan", "item")))]
+    meta_table = Table(meta, colWidths=[30 * mm, doc.width - 30 * mm], hAlign="LEFT")
+    meta_table.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
+                                    ("TOPPADDING", (0, 0), (-1, -1), 1),
+                                    ("BOTTOMPADDING", (0, 0), (-1, -1), 1)]))
+    isi.extend([meta_table, Spacer(1, 5)])
+
+    standards = data.get("standar", [])
+    if standards:
+        isi.append(Paragraph("Landasan Perencanaan / SNI", bagian))
+        standard_rows = [[paragraph("Standar", header), paragraph("Judul", header), paragraph("Peran", header)]]
+        standard_rows.extend([[paragraph(s.get("kode", ""), kecil), paragraph(s.get("judul", ""), kecil),
+                               paragraph(s.get("peran", ""), kecil)] for s in standards])
+        standard_table = Table(standard_rows,
+                               colWidths=[doc.width * 0.18, doc.width * 0.42, doc.width * 0.40],
+                               repeatRows=1, hAlign="LEFT")
+        standard_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("GRID", (0, 0), (-1, -1), 0.35, GARIS),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 3),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 3), ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ]))
+        isi.append(standard_table)
+    if data.get("catatan_standar"):
+        isi.append(Paragraph(_teks(data["catatan_standar"]), kecil))
+
+    for section in sanitasi_calc.susun_seksi(h, data):
+        isi.append(Paragraph(_teks(section["judul"]), bagian))
+        headers = section["kolom"]
+        widths_by_count = {
+            3: [2.2, 1.0, 1.0],
+            4: [1.8, 3.2, 1.2, 0.8],
+            5: [1.6, 3.0, 1.2, 1.2, 0.8],
+            6: [0.4, 2.0, 0.8, 1.2, 1.4, 1.0],
+        }
+        weights = widths_by_count.get(len(headers), [1.0] * len(headers))
+        widths = [doc.width * weight / sum(weights) for weight in weights]
+        rows = [[paragraph(value, header) for value in headers]]
+        rows.extend([[paragraph(value, kecil) for value in row] for row in section["baris"]])
+        tbl = Table(rows, colWidths=widths, repeatRows=1, hAlign="LEFT")
+        styles = [
+            ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("GRID", (0, 0), (-1, -1), 0.35, GARIS),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("ALIGN", (2, 1), (-1, -1), "CENTER"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 3), ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+            ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ]
+        for row_index in range(2, len(rows), 2):
+            styles.append(("BACKGROUND", (0, row_index), (-1, row_index), ABU))
+        for row_index in section.get("tebal", []):
+            styles.extend([
+                ("BACKGROUND", (0, row_index + 1), (-1, row_index + 1), ABU),
+                ("FONTNAME", (0, row_index + 1), (-1, row_index + 1), "Helvetica-Bold"),
+            ])
+        tbl.setStyle(TableStyle(styles))
+        isi.extend([tbl, Spacer(1, 3)])
+
+    for warning in h.get("peringatan", []):
+        isi.append(Paragraph("Peringatan: " + _teks(warning), normal))
+    isi.append(Spacer(1, 5))
+    isi.append(Paragraph(
+        "Catatan: hasil merupakan estimasi perencanaan. Verifikasi kondisi lapangan, uji perkolasi, "
+        "serta persyaratan SNI dan peraturan yang berlaku sebelum pelaksanaan.", kecil))
+    doc.build(isi, onFirstPage=_kaki("Sanitasi & Air Bersih"),
+              onLaterPages=_kaki("Sanitasi & Air Bersih"))
     return buf.getvalue()

@@ -19,8 +19,9 @@ XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 @st.cache_data(show_spinner="Membuat PDF...")
-def _buat_pdf(xlsx_bytes: bytes):
-    return ac_excel.excel_ke_pdf(xlsx_bytes)
+def _buat_pdf(hasil_standar, hasil_full, data: dict, proyek: dict, orang_dasar: float, faktor_lampu: float):
+    from modules import ekspor_pdf
+    return ekspor_pdf.ac_pdf(hasil_standar, hasil_full, data, proyek, orang_dasar, faktor_lampu)
 
 
 def _landasan(data: dict) -> None:
@@ -200,13 +201,13 @@ def render():
     d1.download_button("Unduh Excel (.xlsx)", xlsx, "Kebutuhan_AC.xlsx",
                        mime=XLSX_MIME, on_click="ignore")
     if d2.button("Siapkan PDF"):
-        pdf = _buat_pdf(xlsx)
-        if pdf:
+        try:
+            pdf = _buat_pdf(hs, hf, data, proyek, od, fl)
             d2.download_button("Unduh PDF", pdf, "Kebutuhan_AC.pdf",
                                mime="application/pdf", on_click="ignore")
-        else:
-            d2.warning("PDF butuh LibreOffice terpasang di komputer ini.")
-    st.caption("File Excel dan PDF berisi dua sheet: AC STANDART dan AC FULL.")
+        except Exception as err:
+            d2.error(f"Gagal membuat PDF: {err}")
+    st.caption("File Excel berisi dua sheet: AC STANDART dan AC FULL. PDF merangkum kedua metode.")
 
     # ---- keterangan
     with st.expander("Keterangan faktor dan referensi"):

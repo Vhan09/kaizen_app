@@ -15,8 +15,9 @@ XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 @st.cache_data(show_spinner="Membuat PDF...")
-def _buat_pdf(xlsx_bytes: bytes):
-    return sanitasi_excel.excel_ke_pdf(xlsx_bytes)
+def _buat_pdf(hasil: dict, data: dict, proyek: dict):
+    from modules import ekspor_pdf
+    return ekspor_pdf.sanitasi_pdf(hasil, data, proyek)
 
 
 def _landasan(data: dict) -> None:
@@ -146,11 +147,11 @@ def render():
     d1, d2, _ = st.columns([1, 1, 3])
     d1.download_button("Unduh Excel (.xlsx)", xlsx, "Sanitasi_Air.xlsx", mime=XLSX_MIME, on_click="ignore")
     if d2.button("Siapkan PDF"):
-        pdf = _buat_pdf(xlsx)
-        if pdf:
+        try:
+            pdf = _buat_pdf(h, data, proyek)
             d2.download_button("Unduh PDF", pdf, "Sanitasi_Air.pdf", mime="application/pdf", on_click="ignore")
-        else:
-            d2.warning("PDF butuh LibreOffice terpasang di komputer ini.")
+        except Exception as err:
+            d2.error(f"Gagal membuat PDF: {err}")
     st.caption("File Excel berisi rumus hidup, tabel pemakaian air SNI, dan daftar SNI/peraturan (3 sheet).")
 
     with st.expander("Tabel pemakaian air (SNI 03-7065-2005 Tabel 1)"):
