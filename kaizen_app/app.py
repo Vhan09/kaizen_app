@@ -4,8 +4,7 @@ Jalankan:  streamlit run app.py
 """
 import streamlit as st
 
-from kaizen_app.modules import ac
-from modules import akli, beban_listrik
+from modules import ac, akli, beban_listrik
 from utils.theme import inject_css
 
 st.set_page_config(page_title="Kaizen PBG", page_icon="⚡", layout="wide")
