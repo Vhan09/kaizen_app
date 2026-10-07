@@ -4,7 +4,7 @@ Jalankan:  streamlit run app.py
 """
 import streamlit as st
 
-from modules import ac, akli, beban_listrik
+from modules import ac, akli, beban_listrik, sanitasi
 from utils.theme import inject_css
 
 st.set_page_config(page_title="Kaizen PBG", page_icon="⚡", layout="wide")
@@ -15,7 +15,7 @@ MODUL = {
     "Modul 1📋 Tabel AKLI": akli.render,
     "Modul 2⚡ Beban Listrik (SLD)": beban_listrik.render,
     "Modul 3❄️ Kebutuhan AC": ac.render,
-    "Modul 4💧 Sanitasi": None,
+    "Modul 4🚿 Sanitasi & Air Bersih": sanitasi.render,
     "Modul 5🧯 Kebutuhan APAR": None,
     "Modul 6🌧️ Pipa Air Hujan": None,
     "Modul 7💡 Titik Lampu Ruangan": None,

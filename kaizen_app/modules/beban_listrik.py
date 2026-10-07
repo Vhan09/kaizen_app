@@ -1,4 +1,4 @@
-"""Modul 1 - Perhitungan Kebutuhan Listrik (sheet 'SLD RUCON')."""
+"""Modul 2 - Beban Listrik (SLD), sheet 'SLD RUCON'."""
 from __future__ import annotations
 
 import pandas as pd
@@ -190,7 +190,7 @@ def render() -> None:
     pesan_koreksi = _init()
     ss = st.session_state
 
-    st.title("⚡ Perhitungan Kebutuhan Listrik")
+    st.title("⚡ Beban Listrik (SLD)")
     st.caption("Analisa beban puncak penggunaan - kolom kuning diisi manual, sisanya otomatis.")
     for m in pesan_koreksi:
         st.warning(m)

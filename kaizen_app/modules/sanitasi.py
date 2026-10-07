@@ -1,6 +1,6 @@
-"""Modul 6 - Sanitasi & Air Bersih (air bersih, air limbah, tangki septik, resapan).
+"""Modul 4 - Sanitasi & Air Bersih (air bersih, air limbah, tangki septik, resapan).
 
-Dipanggil dari app.py:  "Modul 6 🚿 Sanitasi & Air Bersih": sanitasi.render
+Dipanggil dari app.py:  "Modul 4 🚿 Sanitasi & Air Bersih": sanitasi.render
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def render():
     data = sc.muat_data()
     P0 = sc.parameter_default(data)
 
-    st.subheader("Modul 6 — Sanitasi & Air Bersih")
+    st.title("🚿 Sanitasi & Air Bersih")
     st.caption("Kebutuhan air bersih, air limbah (grey/black water), tangki septik, dan bidang/sumur resapan. "
                "Rumus yang dipakai ditampilkan di bawah agar bisa dicocokkan dengan Excel.")
     _landasan(data)

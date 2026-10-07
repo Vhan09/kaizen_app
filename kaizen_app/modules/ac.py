@@ -55,7 +55,7 @@ def _rumus(mode: str, data: dict, od: float, fl: float) -> None:
 def render():
     data = ac_calc.muat_data()
 
-    st.subheader("Modul 5 — Kebutuhan AC")
+    st.title("❄️ Kebutuhan AC")
     st.caption("Estimasi kebutuhan pendinginan per ruangan. Pilih metode perhitungan di bawah; "
                "rumus yang dipakai ditampilkan agar bisa dicocokkan dengan Excel.")
     _landasan(data)
