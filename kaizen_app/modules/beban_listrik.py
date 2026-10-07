@@ -6,6 +6,8 @@ import streamlit as st
 
 from modules import akli
 from modules import beban_listrik_calc as calc
+from modules import beban_listrik_calc as calc
+from modules import ekspor_ui
 from modules import kabel_induk
 from modules import standar_listrik as std
 from modules.beban_listrik_html import (
@@ -333,6 +335,10 @@ def render() -> None:
     )
     st.markdown("**Load per sirkuit (W)**")
     st.bar_chart(grafik)
+    
+    # ---- 4. Unduh / ekspor
+    section_title("4. Unduh / Ekspor")
+    ekspor_ui.ekspor_sld(_proyek(), _sistem(), labels, out, induk, catatan_kabel, akli.ambil_tabel())
 
     # ---- simpan otomatis
     ss.bl_cache = {k: ss[k] for k in WIDGET_KEYS}

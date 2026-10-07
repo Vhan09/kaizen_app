@@ -5,6 +5,8 @@ import pandas as pd
 import streamlit as st
 
 from modules import akli_calc as calc
+from modules import akli_calc as calc
+from modules import ekspor_ui
 from utils import storage
 from utils.theme import section_title
 
@@ -82,4 +84,7 @@ def render() -> None:
     ss.akli_df = calc.normalisasi(pd.concat([e1, e3], ignore_index=True))
     storage.save(KEY, {"tabel": storage.df_to_records(ss.akli_df)})
     st.caption("💾 Perubahan tersimpan otomatis di folder data/")
+    
+    section_title("Unduh / Ekspor")
+    ekspor_ui.ekspor_akli(ss.akli_df)
     st.button("↺ Kembalikan ke tabel AKLI bawaan", on_click=_reset, key="akli_reset")

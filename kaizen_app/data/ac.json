@@ -131,9 +131,9 @@
       "peran": "Kebutuhan udara segar (belum dihitung di modul ini)"
     },
     {
-      "kode": "SNI 8153:2015 · PUIL 2020 (SNI 0225:2020)",
-      "judul": "Persyaratan instalasi listrik (sesuai landasan Modul 2)",
-      "peran": "Sirkuit dan proteksi listrik untuk AC"
+      "kode": "PUIL 2020 (SNI 0225:2020)",
+      "judul": "Persyaratan umum instalasi listrik",
+      "peran": "Sirkuit dan proteksi listrik untuk AC (lihat Modul 2)"
     }
   ],
   "catatan_standar": "Pastikan edisi/revisi standar yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
