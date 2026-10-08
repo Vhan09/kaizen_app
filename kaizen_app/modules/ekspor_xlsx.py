@@ -17,6 +17,7 @@ import xlsxwriter
 from xlsxwriter.utility import xl_col_to_name, xl_rowcol_to_cell
 
 from modules import akli_calc
+from modules import standar_listrik as std
 from modules.beban_listrik_calc import COL_GRUP, COL_KABEL, COL_LAIN, COL_MCB, COL_NAMA
 from utils.formatting import bulatkan
 
@@ -130,7 +131,40 @@ def sld_xlsx(proyek: dict, sistem: dict, labels: list[str], out: dict,
     wb = xlsxwriter.Workbook(buf, {"in_memory": True})
     ws = wb.add_worksheet("SLD")
     ws_akli = wb.add_worksheet(NAMA_SHEET_AKLI)
+    ws_standar = wb.add_worksheet("Landasan SNI")
     info_akli = _tulis_akli(wb, ws_akli, tabel_akli, "TABEL AKLI (acuan perhitungan SLD)")
+
+    f_std_title = _fmt(wb, bold=True, font_size=14, font_color="#FFFFFF", bg_color=NAVY, valign="vcenter")
+    f_std_sub = _fmt(wb, italic=True, font_color="#555555", text_wrap=True, valign="top")
+    f_std_head = _fmt(wb, **_kotak(bold=True, font_color="#FFFFFF", bg_color=NAVY, align="center", text_wrap=True))
+    f_std_cell = _fmt(wb, **_kotak(text_wrap=True, valign="top"))
+    f_std_link = _fmt(wb, **_kotak(font_color="#0563C1", underline=True, align="center"))
+    ws_standar.merge_range(0, 0, 0, 4, "LANDASAN PERENCANAAN / SNI KELISTRIKAN — MODUL SLD", f_std_title)
+    ws_standar.merge_range(1, 0, 1, 4, std.CATATAN_LANDASAN_SLD, f_std_sub)
+    headers = ["Kategori", "Nomor", "Judul", "Status dan relevansi untuk SLD", "Sumber"]
+    for col, heading in enumerate(headers):
+        ws_standar.write(3, col, heading, f_std_head)
+    standards = std.LANDASAN_SLD + std.LANDASAN_PELENGKAP_SLD
+    for index, item in enumerate(standards, start=4):
+        ws_standar.write(index, 0, item["kategori"], f_std_cell)
+        ws_standar.write(index, 1, item["kode"], f_std_cell)
+        ws_standar.write(index, 2, item["judul"], f_std_cell)
+        ws_standar.write(index, 3, f"{item['status']}\n{item['relevansi']}", f_std_cell)
+        ws_standar.write_url(index, 4, item["url"], f_std_link, string="Buka sumber")
+        ws_standar.set_row(index, 48 if item["kategori"] == "SNI PUIL" else 64)
+    ws_standar.set_column("A:A", 20)
+    ws_standar.set_column("B:B", 26)
+    ws_standar.set_column("C:C", 62)
+    ws_standar.set_column("D:D", 76)
+    ws_standar.set_column("E:E", 17)
+    ws_standar.set_row(0, 26)
+    ws_standar.set_row(1, 48)
+    ws_standar.set_row(3, 32)
+    ws_standar.freeze_panes(4, 0)
+    ws_standar.autofilter(3, 0, 3 + len(standards), len(headers) - 1)
+    ws_standar.set_landscape()
+    ws_standar.fit_to_pages(1, 0)
+    ws_standar.repeat_rows(0, 3)
 
     hasil, qcols, watt = out["hasil"], out["qcols"], out["watt"]
     n, m = len(qcols), len(hasil)
@@ -323,6 +357,7 @@ def sld_xlsx(proyek: dict, sistem: dict, labels: list[str], out: dict,
         "- MCB UP dan Cable adalah hasil aplikasi (dipilih dari beban sesuai Tabel AKLI dan nama sirkuit), ditulis sebagai nilai, "
         "bukan rumus, sehingga tidak ikut berubah bila beban diubah di Excel.",
         "- Saran kabel induk dihitung dari Beban Puncak (VA) terhadap kolom VA tabel AKLI 1 fasa pada sheet AKLI.",
+        "- Landasan SNI PUIL dan rujukan pelengkap ada pada sheet Landasan SNI; tabel AKLI bukan SNI.",
     ]):
         ws.write(rc + 1 + i, 0, t, f_teks)
 

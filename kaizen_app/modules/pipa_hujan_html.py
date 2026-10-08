@@ -46,6 +46,7 @@ _CSS = """
  table.t td.hl,table.t th.hl{background:#DDF1F5;color:#0B5A66;font-weight:700}
  table.t th.hl{background:#127A88;color:#fff}
  table.t tr.sel td.hl{background:#FFE9A8}
+ .t17-wrap{overflow-x:auto;margin-top:8px}.t17{min-width:1120px}
  .chip{display:inline-block;border-radius:999px;padding:2px 11px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
  .chip.good{background:var(--good)}.chip.bad{background:var(--bad)}.chip.warn{background:var(--warn)}
  .gauge{height:8px;background:#E6EDF3;border-radius:4px;overflow:hidden;min-width:90px}
@@ -62,7 +63,7 @@ _CSS = """
 </style>
 """
 
-_TONE = {OK: "good", TIDAK: "bad", "BELUM DICEK": "warn"}
+_TONE = {OK: "good", TIDAK: "bad", "BELUM DICEK": "warn", "DI LUAR TABEL": "warn"}
 
 
 def _chip(status: str) -> str:
@@ -116,11 +117,10 @@ def _sek_debit(h, data) -> str:
              f'<tr><td>Koef. Limpasan (C){" (rata-rata tertimbang)" if len(z) > 1 else ""}</td><td class="n">{fmt_id(h["C_rata"])}</td><td class="c">–</td></tr>'
              f'<tr><td>Luas Atap (A)</td><td class="n">{fmt_id(h["A_tot"])}</td><td class="c">m²</td></tr>'
              f'<tr><td>Luas Atap (A)</td><td class="n">{fmt_id(h["A_tot"] / 10000, 6)}</td><td class="c">Ha</td></tr></table>')
-    if len(z) > 1:
-        o.append('<div class="note">Rincian per bidang atap:</div><table class="t"><tr><th>Bidang Atap</th><th>A (m²)</th>'
-                 '<th>C</th><th>Roof drain</th></tr>' + "".join(
-                     f'<tr><td>{escape(r.Bidang)}</td><td class="n">{fmt_id(r.A)}</td><td class="n">{fmt_id(r.C)}</td>'
-                     f'<td class="c">{r.n}</td></tr>' for r in z.itertuples()) + "</table>")
+    o.append('<div class="note">Rincian per bidang atap:</div><table class="t"><tr><th>Bidang Atap</th>'
+             '<th>Permukaan</th><th>A (m²)</th><th>C</th><th>Roof drain</th></tr>' + "".join(
+                 f'<tr><td>{escape(r.Bidang)}</td><td>{escape(r.Permukaan)}</td><td class="n">{fmt_id(r.A)}</td>'
+                 f'<td class="n">{fmt_id(r.C)}</td><td class="c">{r.n}</td></tr>' for r in z.itertuples()) + "</table>")
 
     o.append(_sec(3, "Analisa Perhitungan Teknis"))
     for r in z.itertuples():
@@ -193,18 +193,42 @@ def _sek_horizontal(h, data) -> str:
     return "".join(o)
 
 
+def _t17(h, data) -> str:
+    tabel = data["tabel17"]
+    intensitas_dipilih = h["tegak"]["I_tabel"]
+    kolom_dipilih = tabel["intensitas"].index(intensitas_dipilih) if intensitas_dipilih is not None else None
+    diameter_dipilih = tabel["diameter_inci"].index(h["tegak"]["ukuran"])
+    headers = ["Ukuran pipa hujan", "Debit (L/dt)"]
+    headers.extend(f'{fmt_id(nilai, 1 if not float(nilai).is_integer() else 0)} mm/jam'
+                   for nilai in tabel["intensitas"])
+    rows = ['<tr><th>' + '</th><th>'.join(headers[:2]) + '</th>' + ''.join(
+        f'<th class="{"hl" if i == kolom_dipilih else ""}">{escape(header)}</th>'
+        for i, header in enumerate(headers[2:])) + '</tr>']
+    for i, diameter in enumerate(tabel["diameter_inci"]):
+        cls = ' class="sel"' if i == diameter_dipilih else ""
+        debit = f'{tabel["debit_ls"][i]:g}'.replace(".", ",")
+        values = ''.join(f'<td class="n {"hl" if j == kolom_dipilih else ""}">{fmt_id(area, 0)}</td>'
+                         for j, area in enumerate(tabel["luas_m2"][i]))
+        rows.append(f'<tr{cls}><td class="c"><b>Ø{ink(diameter)}</b></td><td class="n">{debit}</td>{values}</tr>')
+    sumber = escape(tabel["sumber"])
+    catatan = escape(tabel["catatan"])
+    return (f'<div class="note"><b>{sumber}</b> {catatan}</div>'
+            f'<div class="t17-wrap"><table class="t t17">{"".join(rows)}</table></div>')
+
+
 def _sek_tegak(h, data) -> str:
     t, P = h["tegak"], h["P"]
     o = [_sec(6, "Pipa Kolektor Air Hujan Vertikal — SNI 8153:2015 Tabel 17")]
-    kap = (fmt_id(t["kapasitas"], 0) + " m²") if t["kapasitas"] else "belum diisi"
+    kap = (fmt_id(t["kapasitas"], 0) + " m²") if t["kapasitas"] is not None else "di luar rentang tabel"
     o.append('<table class="t"><tr><th>Pipa</th><th>Ø</th><th>Luas dilayani (m²)</th><th>Debit (L/dt)</th>'
              '<th>Kapasitas Tabel 17 (m²)</th><th>Pemakaian kapasitas</th><th>Status</th></tr>'
              f'<tr><td><b>Kolektor vertikal</b></td><td class="c">Ø{ink(t["ukuran"])}</td><td class="n">{fmt_id(t["luas"])}</td>'
              f'<td class="n">{fmt_id(t["q_ls"])}</td><td class="n">{kap}</td><td>{_gauge(t["rasio"])}</td>'
              f'<td class="c">{_chip(t["status"])}</td></tr></table>')
-    o.append('<div class="note">Kapasitas pipa tegak mengacu pada <b>Tabel 17 SNI 8153:2015</b>. Nilainya tidak ada pada file '
-             'Excel, jadi diisi manual dari dokumen SNI pada intensitas hujan rencana. Selama kosong, status ditampilkan '
-             '“BELUM DICEK”.</div>')
+    if t["I_tabel"] is not None:
+        o.append(f'<div class="note">Kolom intensitas yang dipakai: <b>{fmt_id(t["I_tabel"], 1)} mm/jam</b> '
+                 f'(terdekat di atas intensitas rencana {fmt_id(h["I"], 1)} mm/jam). Baris dan kolom terpilih disorot.</div>')
+    o.append(_t17(h, data))
     return "".join(o)
 
 
@@ -255,5 +279,5 @@ def render(h: dict, data: dict, proyek: dict | None, bagian: str) -> str:
 
 def tinggi(h: dict, bagian: str) -> int:
     nz = len(h["zona"])
-    return {"debit": 640 + 48 * nz, "horizontal": 1230 + 40 * nz, "tegak": 330,
+    return {"debit": 640 + 48 * nz, "horizontal": 1230 + 40 * nz, "tegak": 600,
             "ringkasan": 760, "lembar": 2400 + 90 * nz}[bagian]

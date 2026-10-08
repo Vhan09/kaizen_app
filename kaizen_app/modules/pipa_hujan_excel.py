@@ -60,6 +60,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     ws = wb.active
     ws.title = "Pipa Air Hujan"
     wt = wb.create_sheet("Tabel 16 SNI 8153")
+    w17 = wb.create_sheet("Tabel 17 SNI 8153")
     wn = wb.create_sheet("SNI & Peraturan")
     put = lambda *a, **k: _put(ws, *a, **k)
     merge = lambda *a, **k: _merge(ws, *a, **k)
@@ -102,6 +103,42 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     RNG_S = f"{T16}!$B$5:$B${t_end}"
     RNG_U = f"{T16}!$C$5:$C${t_end}"
     RNG_I = f"{T16}!$E$4:$J$4"
+
+    # ======================================================= sheet Tabel 17
+    t17 = data["tabel17"]
+    _merge(w17, "A1:N1", "SNI 8153:2015 — Tabel 17: Ukuran talang atap, pipa utama, dan perpipaan tegak air hujan",
+           font=F_T, fill=_F_FILL, al=_NW, border=False)
+    _merge(w17, "A2:N2", "Luas atap maksimum yang diperbolehkan pada berbagai nilai curah hujan (m²)",
+           font=F_I, al=_NW, border=False)
+    _put(w17, "A4", "Ø pipa (inci)", F_H, _F_FILL)
+    _put(w17, "B4", "Debit (L/dt)", F_H, _F_FILL)
+    intensitas_urut = list(reversed(t17["intensitas"]))
+    kolom_t17 = "CDEFGHIJKLMN"
+    for col, intensitas in zip(kolom_t17, intensitas_urut):
+        _put(w17, f"{col}4", intensitas, F_H, _F_FILL, fmt='0.0" mm/jam"')
+    for row, (diameter, debit, luas) in enumerate(
+        zip(t17["diameter_inci"], t17["debit_ls"], t17["luas_m2"]), start=5
+    ):
+        _put(w17, f"A{row}", diameter, F_B)
+        _put(w17, f"B{row}", debit, F_N, fmt="0.00")
+        for col, nilai in zip(kolom_t17, reversed(luas)):
+            _put(w17, f"{col}{row}", nilai, F_N, fmt="#,##0")
+        if row % 2 == 0:
+            for col in "ABCDEFGHIJKLMN":
+                w17[f"{col}{row}"].fill = _SOFT
+    _merge(w17, "A12:N12", t17["sumber"], font=F_I, al=_LEFT, border=False)
+    _merge(w17, "A13:N13", "Catatan: " + t17["catatan"], font=F_I, al=_LEFT, border=False)
+    w17.row_dimensions[1].height = 30
+    w17.row_dimensions[13].height = 42
+    for col in "AB":
+        w17.column_dimensions[col].width = 16
+    for col in kolom_t17:
+        w17.column_dimensions[col].width = 13
+    w17.freeze_panes = "C5"
+    w17.sheet_view.showGridLines = False
+    w17.page_setup.orientation = "landscape"
+    w17.sheet_properties.pageSetUpPr.fitToPage = True
+    w17.page_setup.fitToWidth, w17.page_setup.fitToHeight = 1, 1
 
     # ======================================================= sheet SNI & peraturan
     _merge(wn, "B1:F1", "LANDASAN PERENCANAAN: SNI & PERATURAN TERKAIT PIPA AIR HUJAN", font=F_T, fill=_F_FILL, al=_NW, border=False)
@@ -193,7 +230,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     r += 1
     z0 = r
     for x in z.itertuples():
-        put(f"C{r}", x.Bidang, F_IN, al=_LEFT)
+        put(f"C{r}", f"{x.Bidang} ({x.Permukaan})", F_IN, al=_LEFT)
         put(f"D{r}", x.A, F_IN, fmt="#,##0.00")
         put(f"E{r}", x.C, F_IN, fmt="0.00")
         put(f"F{r}", x.n, F_IN, fmt="0")
@@ -329,15 +366,15 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     put(f"C{r}", "Debit rencana (L/dt)", al=_LEFT)
     put(f"D{r}", f"={QLS}", fmt="0.00")
     r += 1
-    put(f"C{r}", "Kapasitas Tabel 17 (m²) — isi dari SNI", al=_LEFT)
-    put(f"D{r}", P["cap_tegak"] or 0, F_IN, fmt="#,##0")
+    put(f"C{r}", "Kapasitas Tabel 17 otomatis (m²)", al=_LEFT)
+    put(f"D{r}", f'=IF({RI}>MAX(\'Tabel 17 SNI 8153\'!$C$4:$N$4),0,IFERROR(INDEX(\'Tabel 17 SNI 8153\'!$C$5:$N$10,MATCH(D{rt},\'Tabel 17 SNI 8153\'!$A$5:$A$10,0),MATCH({RI},\'Tabel 17 SNI 8153\'!$C$4:$N$4,-1)),0))', F_B, fmt="#,##0")
     rcap = r
     r += 1
     put(f"C{r}", "Pemakaian kapasitas", al=_LEFT)
     put(f"D{r}", f'=IF(D{rcap}>0,D{rt + 1}/D{rcap},"–")', fmt="0%")
     r += 1
     put(f"C{r}", "Status", F_B, al=_LEFT)
-    put(f"D{r}", f'=IF(D{rcap}>0,IF(D{rt + 1}<=D{rcap},"MEMENUHI","TIDAK MEMENUHI"),"BELUM DICEK")', F_B)
+    put(f"D{r}", f'=IF(D{rcap}>0,IF(D{rt + 1}<=D{rcap},"MEMENUHI","TIDAK MEMENUHI"),"DI LUAR TABEL")', F_B)
     rstat = r
     r += 2
 
@@ -347,7 +384,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
            f'intensitas hujan rencana "&TEXT({RI},"0")&" mm/jam, dan ketentuan SNI 8153:2015. "&'
            f'IF(AND(I{rc}="MEMENUHI",I{rg}="MEMENUHI"),"Hasil evaluasi menunjukkan bahwa pipa cabang Ø"&E{rc}&"″ dan pipa horizontal gabungan Ø"&E{rg}&"″ mampu melayani luas bidang atap rencana.",'
            f'"Hasil evaluasi menunjukkan ada pipa yang belum memenuhi persyaratan kapasitas; lihat kolom Ø minimum.")&'
-           f'IF(D{rstat}="BELUM DICEK"," Kapasitas pipa tegak Ø"&D{rt}&"″ perlu dicek pada Tabel 17 SNI 8153:2015.",'
+           f'IF(D{rstat}="DI LUAR TABEL"," Intensitas hujan berada di luar rentang Tabel 17; kapasitas pipa tegak belum dapat dicek.",'
            f'IF(D{rstat}="MEMENUHI"," Pipa tegak memenuhi kapasitas Tabel 17."," Pipa tegak belum memenuhi kapasitas Tabel 17."))')
     merge(f"C{r}:J{r}", kes, font=F_N, fill=PatternFill("solid", fgColor="F1FAF5"), al=_LEFT)
     ws.row_dimensions[r].height = 78
@@ -359,7 +396,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     # ---- format kondisional
     for rng, col in ((f"I{rc}:I{rg}", "I"), (f"D{rstat}", "D")):
         first = rng.split(":")[0]
-        for teks, warna, fc in [("MEMENUHI", "DDF3E6", "1E8E5A"), ("TIDAK MEMENUHI", "FCE8E6", "C0392B"), ("BELUM DICEK", "FFF1CC", "C77700")]:
+        for teks, warna, fc in [("MEMENUHI", "DDF3E6", "1E8E5A"), ("TIDAK MEMENUHI", "FCE8E6", "C0392B"), ("DI LUAR TABEL", "FFF1CC", "C77700")]:
             ws.conditional_formatting.add(rng, FormulaRule(formula=[f'{first}="{teks}"'],
                                           fill=PatternFill("solid", bgColor=warna, fgColor=warna), font=Font(bold=True, color=fc)))
     ws.conditional_formatting.add(f"H{rc}:H{rg}", DataBarRule(start_type="num", start_value=0, end_type="num", end_value=1.25,

@@ -54,7 +54,7 @@ def _table(rows, widths, header_style, body_style):
             color = GREEN
         elif status == pc.TIDAK:
             color = RED
-        elif status == "BELUM DICEK":
+        elif status in ("BELUM DICEK", "DI LUAR TABEL"):
             color = AMBER
         else:
             continue
@@ -122,11 +122,11 @@ def buat_pdf(h: dict, data: dict, proyek: dict) -> bytes:
     ]))
     story.extend([summary_table, _paragraph("Data bidang atap", section)])
 
-    roof_rows = [["Bidang atap", "Luas (m2)", "C", "Jumlah drain", "Debit (L/dt)", "Luas/drain (m2)"]]
+    roof_rows = [["Bidang atap", "Permukaan", "Luas (m2)", "C", "Jumlah drain", "Debit (L/dt)", "Luas/drain (m2)"]]
     for row in h["zona"].itertuples(index=False):
-        roof_rows.append([row.Bidang, pc.fmt_id(row.A), pc.fmt_id(row.C, 2), str(row.n),
+        roof_rows.append([row.Bidang, row.Permukaan, pc.fmt_id(row.A), pc.fmt_id(row.C, 2), str(row.n),
                           pc.fmt_id(row.Q_Ls, 3), pc.fmt_id(row.A_drain)])
-    story.extend([_table(roof_rows, [45 * mm, 25 * mm, 15 * mm, 25 * mm, 34 * mm, 42 * mm], header, body),
+    story.extend([_table(roof_rows, [28 * mm, 40 * mm, 22 * mm, 12 * mm, 22 * mm, 30 * mm, 31 * mm], header, body),
                   _paragraph(f"Ukuran roof drain yang dipilih: Ø{pc.ink(h['P']['d_roof'])}", small),
                   _paragraph("Pemeriksaan pipa horizontal", section)])
 
@@ -146,10 +146,19 @@ def buat_pdf(h: dict, data: dict, proyek: dict) -> bytes:
     vertical = h["tegak"]
     vertical_rows = [["Diameter", "Area dilayani (m2)", "Kapasitas Tabel 17 (m2)", "Status"],
                      [f"Ø{pc.ink(vertical['ukuran'])}", pc.fmt_id(vertical["luas"]),
-                      pc.fmt_id(vertical["kapasitas"]) if vertical["kapasitas"] is not None else "Belum diisi",
+                      pc.fmt_id(vertical["kapasitas"]) if vertical["kapasitas"] is not None else "Di luar tabel",
                       vertical["status"]]]
     story.extend([_table(vertical_rows, [35 * mm, 48 * mm, 58 * mm, 45 * mm], header, body),
                   _paragraph("Kesimpulan", section), _paragraph(pc.kesimpulan(h, data), body)])
+
+    t17 = data["tabel17"]
+    table17_rows = [["Ø (inci)", "Debit (L/dt)"] +
+                    [pc.fmt_id(value, 1 if not float(value).is_integer() else 0) for value in t17["intensitas"]]]
+    for diameter, debit, luas in zip(t17["diameter_inci"], t17["debit_ls"], t17["luas_m2"]):
+        table17_rows.append([pc.ink(diameter), f"{debit:g}".replace(".", ",")] + [pc.fmt_id(value, 0) for value in luas])
+    story.extend([_paragraph("Tabel referensi Tabel 17 SNI 8153:2015 (luas maksimum m2)", section),
+                  _paragraph(t17["sumber"] + " " + t17["catatan"], small),
+                  _table(table17_rows, [13 * mm, 18 * mm] + [12.9 * mm] * 12, header, small)])
 
     if h["peringatan"]:
         story.append(_paragraph("Catatan pemeriksaan", section))

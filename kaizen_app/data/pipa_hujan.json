@@ -10,6 +10,19 @@
   "intensitas": 150,
   "koef_limpasan": 0.95
  },
+ "koef_limpasan_pilihan": {
+  "sumber": "SNI 2415:2016 Tabel 12: Atap Rumah memiliki rentang koefisien limpasan 0,70-0,95.",
+  "catatan": "SNI memberi rentang umum, bukan nilai khusus per material. Pilihan genteng 0,80 dan beton/dak 0,95 adalah preset di dalam rentang; sesuaikan dengan kondisi permukaan proyek.",
+  "default": "beton_dak_095",
+  "opsi": [
+    {"id": "atap_070", "permukaan": "Atap rumah", "nilai": 0.70},
+   {"id": "atap_075", "permukaan": "Atap rumah", "nilai": 0.75},
+    {"id": "genteng_080", "permukaan": "Genteng", "nilai": 0.80},
+   {"id": "atap_085", "permukaan": "Atap rumah", "nilai": 0.85},
+   {"id": "atap_090", "permukaan": "Atap rumah", "nilai": 0.90},
+    {"id": "beton_dak_095", "permukaan": "Beton/dak", "nilai": 0.95}
+  ]
+ },
  "ukuran_inci": [
   3,
   4,
@@ -276,12 +289,27 @@
   "sumber": "SNI 8153:2015 Tabel 16 — Penentuan ukuran perpipaan air hujan horizontal (luas bidang datar horizontal maksimum yang diperbolehkan pada berbagai curah hujan, m²). Dibaca dari gambar tabel pada pipa_air_hujan.xlsx.",
   "catatan_debit": "Kolom debit pada kemiringan 1% di gambar Excel tampak bergeser satu baris (Ø3\" tertulis 0,06). Nilai yang ditampilkan di sini adalah nilai bergeser kembali (sesuai skala √kemiringan terhadap tabel 2%); Ø15\" tidak tersedia. Pengecekan modul memakai kolom LUAS, bukan debit."
  },
+ "tabel17": {
+  "diameter_inci": [2, 3, 4, 5, 6, 8],
+  "debit_ls": [1.8, 5.52, 11.52, 21.6, 33.78, 72.48],
+  "intensitas": [25.4, 50.8, 76.2, 101.6, 127, 162.4, 178, 203, 229, 254, 279, 305],
+  "luas_m2": [
+   [268, 134, 89, 67, 53, 45, 38, 33, 30, 27, 24, 22],
+   [818, 409, 272, 204, 164, 137, 117, 102, 91, 82, 74, 68],
+   [1709, 855, 569, 427, 342, 285, 244, 214, 190, 171, 156, 142],
+   [3214, 1607, 1071, 804, 643, 536, 459, 402, 357, 321, 292, 268],
+   [5017, 2508, 1672, 1254, 1003, 836, 717, 627, 557, 502, 456, 418],
+   [10776, 5388, 3592, 2694, 2155, 1794, 1539, 1347, 1197, 1078, 980, 892]
+  ],
+  "sumber": "SNI 8153:2015 Tabel 17; sumber tabel: UPC 2012-IAPMO Tabel 1101.11.",
+  "catatan": "Luas atap maksimum yang dilayani pada tiap intensitas hujan. Kapasitas debit diperkirakan untuk tinggi air 44 mm di dalam saluran. Untuk intensitas di antara kolom dipakai kolom berikutnya yang lebih tinggi; intensitas di atas 305 mm/jam berada di luar tabel dan tidak diekstrapolasi."
+ },
  "standar": [
   {
    "kode": "SNI 8153:2015",
    "judul": "Sistem plambing pada bangunan gedung",
    "peran": "Tabel 16: ukuran perpipaan air hujan horizontal (metode luas bidang datar). Tabel 17: kapasitas pipa tegak air hujan.",
-   "catatan": "Kapasitas pipa tegak mengacu Tabel 17 (lihat dokumen resmi)",
+  "catatan": "Kapasitas pipa tegak dihitung otomatis dari Tabel 17 berdasarkan diameter dan intensitas hujan rencana.",
    "tab": [
     "horizontal",
     "tegak"

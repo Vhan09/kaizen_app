@@ -18,6 +18,7 @@ from reportlab.lib.units import mm
 from reportlab.platypus import Flowable, PageBreak, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from modules import akli_calc
+from modules import standar_listrik as std
 from modules.beban_listrik_calc import COL_GRUP, COL_KABEL, COL_LAIN, COL_MCB, COL_NAMA
 from utils.formatting import fmt_id
 
@@ -188,6 +189,41 @@ def sld_pdf(proyek: dict, sistem: dict, labels: list[str], out: dict,
     t_ds.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), NAVY), ("GRID", (0, 0), (-1, -1), 0.4, GARIS),
                               ("TOPPADDING", (0, 0), (-1, -1), 1), ("BOTTOMPADDING", (0, 0), (-1, -1), 1)]))
     isi += [t_ds, Spacer(1, 6)]
+
+    # ---- landasan perencanaan kelistrikan
+    g_sni = _gaya("sni_header", 7, fontName="Helvetica-Bold", alignment=TA_CENTER,
+                  textColor=colors.white, leading=8)
+    g_sni_cell = _gaya("sni_cell", 6.5, leading=8)
+    isi.append(Paragraph("LANDASAN PERENCANAAN / SNI KELISTRIKAN", _gaya("sni_title", 10, fontName="Helvetica-Bold", spaceAfter=4)))
+    sni_rows = [[Paragraph(label, g_sni) for label in ("Kategori", "Nomor", "Judul", "Status dan relevansi untuk SLD")]]
+    for item in std.LANDASAN_SLD + std.LANDASAN_PELENGKAP_SLD:
+        status_relevansi = f"{item['status']}<br/>{_teks(item['relevansi'])}"
+        sni_rows.append([
+            Paragraph(_teks(item["kategori"]), g_sni_cell),
+            Paragraph(_teks(item["kode"]), g_sni_cell),
+            Paragraph(_teks(item["judul"]), g_sni_cell),
+            Paragraph(status_relevansi, g_sni_cell),
+        ])
+    sni_table = Table(sni_rows, colWidths=[25 * mm, 34 * mm, 78 * mm, lebar_tersedia - 137 * mm],
+                      repeatRows=1, hAlign="LEFT")
+    sni_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("GRID", (0, 0), (-1, -1), 0.35, GARIS),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"), ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, ABU]),
+        ("LEFTPADDING", (0, 0), (-1, -1), 3), ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+    isi.extend([
+        sni_table,
+        Spacer(1, 3),
+        Paragraph(
+            f"{_teks(std.CATATAN_LANDASAN_SLD)}<br/>"
+            f'Sumber: <link href="{std.BSN_PUIL_URL}" color="#1F3864">Katalog PUIL BSN</link> · '
+            f'<link href="{std.BSN_41_2025_URL}" color="#1F3864">SNI 0225-4-41:2025</link> · '
+            f'<link href="{std.BSN_9_2020_URL}" color="#1F3864">SNI 0225-9:2020</link> · '
+            f'<link href="{std.AKLI_URL}" color="#1F3864">AKLI</link> · '
+            f'<link href="{std.NEC_URL}" color="#1F3864">NFPA 70/NEC</link>', g_sub),
+        Spacer(1, 6),
+    ])
 
     # ---- tabel utama
     nc = 8 + n  # jumlah kolom

@@ -56,16 +56,27 @@ def render():
         st.markdown("#### Data Atap dan Curah Hujan")
         P["I"] = st.number_input("Intensitas hujan rencana I (mm/jam)", 10.0, 500.0, float(P0["I"]), step=5.0,
                                  key="ph_I", help="Excel kamu memakai 150 mm/jam.")
+        koef_config = data["koef_limpasan_pilihan"]
+        koef_by_id = {item["id"]: item for item in koef_config["opsi"]}
+
+        def format_koef(identifier):
+            item = koef_by_id[identifier]
+            return f"{pc.fmt_id(item['nilai'], 2)} ({item['permukaan']})"
+
         atap_df = st.data_editor(
-            pc.template_atap(data), key="ph_atap", num_rows="dynamic", width="stretch", hide_index=True,
+            pc.template_atap(data), key="ph_atap_koef_v1", num_rows="dynamic", width="stretch", hide_index=True,
             column_config={
                 "Bidang Atap": st.column_config.TextColumn("Bidang Atap", help="Contoh: Atap utama, Atap teras"),
                 "Luas (m²)": st.column_config.NumberColumn("Luas A (m²)", min_value=0.0, step=0.5, format="%.2f"),
-                "Koef. Limpasan (C)": st.column_config.NumberColumn("Koef. Limpasan (C)", min_value=0.0, max_value=1.0,
-                                                                   step=0.05, format="%.2f"),
+                "Koef. Limpasan (C)": st.column_config.SelectboxColumn(
+                    "Koef. Limpasan (C)", options=list(koef_by_id), format_func=format_koef,
+                    default=koef_config["default"], required=True, width="large",
+                    help="Pilih nilai C dan jenis permukaan dari daftar acuan.",
+                ),
                 "Jumlah Roof Drain": st.column_config.NumberColumn("Jumlah Roof Drain", min_value=1, step=1, format="%d"),
             },
         )
+        st.caption(f"Acuan: {koef_config['sumber']} {koef_config['catatan']}")
         st.caption("Beberapa bidang atap boleh diisi terpisah; debit dijumlahkan dan pipa cabang dicek terhadap bidang dengan "
                    "luas per roof drain terbesar.")
 
@@ -87,9 +98,14 @@ def render():
         c1, c2 = st.columns(2)
         P["d_tegak"] = c1.selectbox("Ø pipa kolektor vertikal", ukuran_tegak, index=ukuran_tegak.index(4),
                                     format_func=_INCI, key="ph_dt")
-        P["cap_tegak"] = c2.number_input("Kapasitas pipa tegak dari Tabel 17 SNI 8153:2015 (m²)", 0.0, 1_000_000.0, 0.0,
-                                         step=10.0, key="ph_cap",
-                                         help="Isi dari dokumen SNI untuk Ø dan intensitas rencana. Kosongkan (0) bila belum ada.")
+        kapasitas_tegak, intensitas_tegak = pc.kapasitas_tegak(P["d_tegak"], P["I"], data)
+        if kapasitas_tegak is None:
+            c2.metric("Kapasitas Tabel 17", "Di luar tabel")
+            c2.caption(f"Rentang intensitas Tabel 17: {data['tabel17']['intensitas'][0]:g}–"
+                       f"{data['tabel17']['intensitas'][-1]:g} mm/jam.")
+        elif intensitas_tegak is not None:
+            c2.metric("Kapasitas Tabel 17", f"{pc.fmt_id(kapasitas_tegak, 0)} m²")
+            c2.caption(f"Kolom {pc.fmt_id(intensitas_tegak, 1)} mm/jam (terdekat di atas intensitas rencana).")
 
     with t_sum:
         _landasan(data, None)

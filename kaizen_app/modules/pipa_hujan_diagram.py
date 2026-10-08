@@ -130,7 +130,7 @@ def diagram_png(h: dict, data: dict) -> bytes:
         text(1012, y + 11, label, 14, False, GREY)
         text(1012, y + 33, nilai, 22, True, INK)
         if status:
-            t = "MEMENUHI" if status == OK else ("TIDAK MEMENUHI" if status == "TIDAK MEMENUHI" else "BELUM DICEK")
+            t = "MEMENUHI" if status == OK else ("TIDAK MEMENUHI" if status == "TIDAK MEMENUHI" else status)
             f = _font(12, True)
             wd = d.textlength(t, font=f) / S
             rect(1436 - wd - 20, y + 20, 1436, y + 46, fill=col, r=13)

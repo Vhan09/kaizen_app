@@ -2,7 +2,7 @@
 
 1. Debit hujan (metode rasional, SNI 2415:2016)   Q = 0,00278 x C x I x A      (A dalam Ha, I mm/jam, Q m3/dt)
 2. Pipa horizontal (SNI 8153:2015 Tabel 16)       luas dilayani <= luas maksimum pada kemiringan & intensitas
-3. Pipa tegak / kolektor (SNI 8153:2015 Tabel 17) luas total <= kapasitas Tabel 17 (diisi pengguna)
+3. Pipa tegak / kolektor (SNI 8153:2015 Tabel 17) luas total <= kapasitas Tabel 17
 """
 from __future__ import annotations
 
@@ -35,6 +35,14 @@ def _num(x) -> float:
     return 0.0 if pd.isna(v) else float(v)
 
 
+def _koef_limpasan(pilihan, data: dict) -> tuple[float, str]:
+    if isinstance(pilihan, str):
+        for opsi in data["koef_limpasan_pilihan"]["opsi"]:
+            if opsi["id"] == pilihan:
+                return float(opsi["nilai"]), opsi["permukaan"]
+    return _num(pilihan), "Atap rumah"
+
+
 def _txt(x) -> str:
     return "" if x is None or (not isinstance(x, str) and pd.isna(x)) else str(x).strip()
 
@@ -42,13 +50,14 @@ def _txt(x) -> str:
 def template_atap(data: dict) -> pd.DataFrame:
     """Contoh dari Excel: atap 30,55 m2, C 0,95, 5 titik roof drain."""
     return pd.DataFrame([{"Bidang Atap": "Atap rumah", "Luas (m²)": 30.55,
-                          "Koef. Limpasan (C)": data["rasional"]["koef_limpasan"], "Jumlah Roof Drain": 5}])
+                          "Koef. Limpasan (C)": data["koef_limpasan_pilihan"]["default"],
+                          "Jumlah Roof Drain": 5}])
 
 
 def parameter_default(data: dict) -> dict:
     return {"I": float(data["rasional"]["intensitas"]),
             "d_roof": 3.0, "d_cabang": 3.0, "s_cabang": 1, "d_gabung": 3.0, "s_gabung": 1,
-            "d_tegak": 4.0, "cap_tegak": 0.0}
+            "d_tegak": 4.0}
 
 
 # --------------------------------------------------------------- tabel 16
@@ -79,9 +88,20 @@ def debit_kapasitas(ukuran: float, kemiringan: int, data: dict) -> float | None:
     return t["debit"][data["ukuran_inci"].index(ukuran)]
 
 
+def kapasitas_tegak(ukuran: float, I: float, data: dict) -> tuple[float | None, float | None]:
+    """Kapasitas Tabel 17 pada intensitas tepat atau kolom berikutnya yang lebih tinggi."""
+    tabel = data["tabel17"]
+    if ukuran not in tabel["diameter_inci"] or I > tabel["intensitas"][-1]:
+        return None, None
+    idx = next(i for i, intensitas in enumerate(tabel["intensitas"]) if intensitas >= I)
+    row = tabel["diameter_inci"].index(ukuran)
+    return float(tabel["luas_m2"][row][idx]), float(tabel["intensitas"][idx])
+
+
 def ukuran_minimum(luas: float, kemiringan: int, I: float, data: dict) -> float | None:
     for u in data["ukuran_inci"]:
-        if kapasitas(u, kemiringan, I, data) >= luas:
+        cap = kapasitas(u, kemiringan, I, data)
+        if cap is not None and cap >= luas:
             return u
     return None
 
@@ -101,14 +121,19 @@ def hitung(atap_df: pd.DataFrame, data: dict, P: dict) -> dict:
     I = P["I"]
     zona = []
     for _, r in atap_df.iterrows():
-        nama, A, C, n = _txt(r.get("Bidang Atap")), _num(r.get("Luas (m²)")), _num(r.get("Koef. Limpasan (C)")), int(_num(r.get("Jumlah Roof Drain")))
+        nama = _txt(r.get("Bidang Atap"))
+        A = _num(r.get("Luas (m²)"))
+        C, permukaan = _koef_limpasan(r.get("Koef. Limpasan (C)"), data)
+        n = int(_num(r.get("Jumlah Roof Drain")))
         if not nama or A <= 0 or not 0 < C <= 1 or n < 1:
             continue
         ha = A / 10000
         q_m3 = k * C * I * ha
-        zona.append({"Bidang": nama, "A": A, "Ha": ha, "C": C, "n": n, "Q_m3s": q_m3, "Q_Ls": q_m3 * 1000,
+        zona.append({"Bidang": nama, "Permukaan": permukaan, "A": A, "Ha": ha, "C": C, "n": n,
+                     "Q_m3s": q_m3, "Q_Ls": q_m3 * 1000,
                      "A_drain": A / n, "Q_drain_Ls": q_m3 * 1000 / n})
-    z = pd.DataFrame(zona, columns=["Bidang", "A", "Ha", "C", "n", "Q_m3s", "Q_Ls", "A_drain", "Q_drain_Ls"])
+    z = pd.DataFrame(zona, columns=["Bidang", "Permukaan", "A", "Ha", "C", "n", "Q_m3s", "Q_Ls",
+                                    "A_drain", "Q_drain_Ls"])
 
     A_tot = float(z["A"].sum())
     Q_m3 = float(z["Q_m3s"].sum())
@@ -121,17 +146,20 @@ def hitung(atap_df: pd.DataFrame, data: dict, P: dict) -> dict:
         return {"zona": z, "A_tot": 0.0, "Q_m3": 0.0, "Q_Ls": 0.0, "n_tot": 0, "C_rata": 0.0, "I": I, "I_tabel": I_tabel,
                 "luar": luar, "cabang": None, "gabung": None, "tegak": None, "peringatan": [], "P": P}
 
-    worst = z.loc[z["A_drain"].idxmax()]
+    worst = z.sort_values("A_drain", kind="stable").iloc[-1]
     cabang = _cek(float(worst["A_drain"]), P["d_cabang"], P["s_cabang"], I, float(worst["Q_drain_Ls"]), data)
     cabang["bidang"] = worst["Bidang"]
     gabung = _cek(A_tot, P["d_gabung"], P["s_gabung"], I, Q_Ls, data)
 
-    cap_t = P["cap_tegak"]
-    tegak = {"ukuran": P["d_tegak"], "luas": A_tot, "q_ls": Q_Ls, "kapasitas": cap_t if cap_t > 0 else None,
-             "rasio": A_tot / cap_t if cap_t > 0 else None,
-             "status": (OK if A_tot <= cap_t else TIDAK) if cap_t > 0 else "BELUM DICEK"}
+    cap_t, I_tabel17 = kapasitas_tegak(P["d_tegak"], I, data)
+    tegak = {"ukuran": P["d_tegak"], "luas": A_tot, "q_ls": Q_Ls, "I_tabel": I_tabel17,
+             "kapasitas": cap_t, "rasio": A_tot / cap_t if cap_t else None,
+             "status": (OK if A_tot <= cap_t else TIDAK) if cap_t is not None else "DI LUAR TABEL"}
 
     w = []
+    if cap_t is None:
+        w.append(f"Intensitas {I:g} mm/jam melebihi rentang Tabel 17 (maks. {data['tabel17']['intensitas'][-1]:g}); "
+                 "kapasitas pipa tegak tidak diekstrapolasi.")
     if luar:
         w.append(f"Intensitas {I:g} mm/jam melebihi rentang Tabel 16 (maks. {I_tabel:g}); kapasitas diperkirakan "
                  f"proporsional 1/I (ekstrapolasi, cek ulang ke SNI).")
@@ -149,7 +177,7 @@ def hitung(atap_df: pd.DataFrame, data: dict, P: dict) -> dict:
     return {"zona": z, "A_tot": A_tot, "Q_m3": Q_m3, "Q_Ls": Q_Ls, "n_tot": n_tot, "C_rata": C_rata,
             "I": I, "I_tabel": I_tabel, "idx": idx, "luar": luar,
             "cabang": cabang, "gabung": gabung, "tegak": tegak, "peringatan": w, "P": P,
-            "ok_semua": cabang["status"] == OK and gabung["status"] == OK and tegak["status"] != TIDAK}
+            "ok_semua": cabang["status"] == OK and gabung["status"] == OK and tegak["status"] == OK}
 
 
 def kesimpulan(h: dict, data: dict) -> str:
@@ -171,8 +199,8 @@ def kesimpulan(h: dict, data: dict) -> str:
         if g["status"] != OK:
             bad.append(f"pipa horizontal gabungan Ø{ink(g['ukuran'])} (min. Ø{ink(g['minimum']) if g['minimum'] else '—'})")
         hasil = "Hasil evaluasi menunjukkan " + " dan ".join(bad) + " belum memenuhi persyaratan kapasitas."
-    if t["status"] == "BELUM DICEK":
-        hasil += f" Kapasitas pipa tegak Ø{ink(t['ukuran'])} perlu dicek pada Tabel 17 SNI 8153:2015."
+    if t["status"] == "DI LUAR TABEL":
+        hasil += f" Intensitas hujan berada di luar rentang Tabel 17 untuk pipa tegak Ø{ink(t['ukuran'])}; kapasitas belum dapat dicek."
     elif t["status"] == OK:
         hasil += f" Pipa tegak Ø{ink(t['ukuran'])} memenuhi kapasitas Tabel 17."
     else:

@@ -195,6 +195,38 @@ def render() -> None:
     for m in pesan_koreksi:
         st.warning(m)
 
+    with st.expander("Landasan Perencanaan / SNI Kelistrikan", expanded=True):
+        st.dataframe(
+            pd.DataFrame(std.LANDASAN_SLD)[["kode", "judul", "status", "relevansi"]],
+            column_config={
+                "kode": st.column_config.TextColumn("Nomor standar", width="medium"),
+                "judul": st.column_config.TextColumn("Judul", width="large"),
+                "status": st.column_config.TextColumn("Status katalog BSN", width="medium"),
+                "relevansi": st.column_config.TextColumn("Relevansi untuk SLD", width="large"),
+            },
+            hide_index=True,
+            width="stretch",
+            height=360,
+        )
+        st.caption(std.CATATAN_LANDASAN_SLD)
+        st.markdown(
+            f"Sumber resmi: [Katalog PUIL BSN]({std.BSN_PUIL_URL}) · "
+            f"[Detail SNI 0225-4-41:2025]({std.BSN_41_2025_URL}) · "
+            f"[Detail SNI 0225-9:2020]({std.BSN_9_2020_URL})"
+        )
+        st.dataframe(
+            pd.DataFrame(std.LANDASAN_PELENGKAP_SLD)[["kode", "judul", "status", "relevansi"]],
+            column_config={
+                "kode": st.column_config.TextColumn("Rujukan", width="medium"),
+                "judul": st.column_config.TextColumn("Dokumen", width="large"),
+                "status": st.column_config.TextColumn("Kedudukan", width="large"),
+                "relevansi": st.column_config.TextColumn("Catatan penggunaan", width="large"),
+            },
+            hide_index=True,
+            width="stretch",
+            height=220,
+        )
+
     # ---- 1. Data proyek & sistem (input)
     section_title("1. Data Proyek & Sistem")
     st.markdown(f"{BADGE} Isi data proyek dan parameter sistem", unsafe_allow_html=True)
