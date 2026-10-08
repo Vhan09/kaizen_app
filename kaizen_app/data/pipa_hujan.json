@@ -1,0 +1,332 @@
+{
+ "proyek": {
+  "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2LANTAI TYPE 55",
+  "lokasi": "KOTA MAKASSAR",
+  "tahun": "2026",
+  "item": "PERHITUNGAN KEBUTUHAN TALANG VERTIKAL PADA AIR HUJAN"
+ },
+ "rasional": {
+  "konstanta": 0.00278,
+  "intensitas": 150,
+  "koef_limpasan": 0.95
+ },
+ "ukuran_inci": [
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  15
+ ],
+ "ukuran_tegak_inci": [
+  2,
+  3,
+  4,
+  5,
+  6,
+  8
+ ],
+ "tabel16": {
+  "intensitas": [
+   25.4,
+   50.8,
+   76.2,
+   101.6,
+   127.0,
+   162.4
+  ],
+  "kemiringan": {
+   "1": {
+    "debit": [
+     2.04,
+     4.68,
+     8.34,
+     13.32,
+     28.68,
+     51.6,
+     83.04,
+     null
+    ],
+    "luas": [
+     [
+      305,
+      153,
+      102,
+      76,
+      61,
+      51
+     ],
+     [
+      699,
+      349,
+      233,
+      175,
+      140,
+      116
+     ],
+     [
+      1241,
+      621,
+      414,
+      310,
+      248,
+      207
+     ],
+     [
+      1988,
+      994,
+      663,
+      497,
+      398,
+      331
+     ],
+     [
+      4273,
+      2137,
+      1427,
+      1068,
+      855,
+      713
+     ],
+     [
+      7692,
+      3846,
+      2564,
+      1923,
+      1540,
+      1282
+     ],
+     [
+      12374,
+      6187,
+      4125,
+      3094,
+      2476,
+      2062
+     ],
+     [
+      22110,
+      11055,
+      7370,
+      5528,
+      4422,
+      3683
+     ]
+    ]
+   },
+   "2": {
+    "debit": [
+     2.88,
+     6.6,
+     11.76,
+     18.84,
+     40.62,
+     72.84,
+     117.18,
+     209.46
+    ],
+    "luas": [
+     [
+      431,
+      216,
+      144,
+      108,
+      86,
+      72
+     ],
+     [
+      985,
+      492,
+      328,
+      246,
+      197,
+      164
+     ],
+     [
+      1754,
+      877,
+      585,
+      438,
+      351,
+      292
+     ],
+     [
+      2806,
+      1403,
+      935,
+      701,
+      561,
+      468
+     ],
+     [
+      6057,
+      3029,
+      2019,
+      1514,
+      1211,
+      1012
+     ],
+     [
+      10851,
+      5425,
+      3618,
+      2713,
+      2169,
+      1812
+     ],
+     [
+      17465,
+      8733,
+      5816,
+      4366,
+      3493,
+      2912
+     ],
+     [
+      31214,
+      15607,
+      10405,
+      7804,
+      6248,
+      5202
+     ]
+    ]
+   },
+   "4": {
+    "debit": [
+     4.1,
+     9.4,
+     16.7,
+     26.7,
+     57.4,
+     103.3,
+     166.1,
+     296.8
+    ],
+    "luas": [
+     [
+      611,
+      305,
+      204,
+      153,
+      122,
+      102
+     ],
+     [
+      1397,
+      699,
+      465,
+      349,
+      280,
+      232
+     ],
+     [
+      2482,
+      1241,
+      827,
+      621,
+      494,
+      413
+     ],
+     [
+      3976,
+      1988,
+      1325,
+      994,
+      797,
+      663
+     ],
+     [
+      8547,
+      4273,
+      2847,
+      2137,
+      1709,
+      1423
+     ],
+     [
+      15384,
+      7692,
+      5128,
+      3846,
+      3080,
+      2564
+     ],
+     [
+      24749,
+      12374,
+      8250,
+      6187,
+      4942,
+      4125
+     ],
+     [
+      44220,
+      22110,
+      14743,
+      11055,
+      8844,
+      7367
+     ]
+    ]
+   }
+  },
+  "sumber": "SNI 8153:2015 Tabel 16 — Penentuan ukuran perpipaan air hujan horizontal (luas bidang datar horizontal maksimum yang diperbolehkan pada berbagai curah hujan, m²). Dibaca dari gambar tabel pada pipa_air_hujan.xlsx.",
+  "catatan_debit": "Kolom debit pada kemiringan 1% di gambar Excel tampak bergeser satu baris (Ø3\" tertulis 0,06). Nilai yang ditampilkan di sini adalah nilai bergeser kembali (sesuai skala √kemiringan terhadap tabel 2%); Ø15\" tidak tersedia. Pengecekan modul memakai kolom LUAS, bukan debit."
+ },
+ "standar": [
+  {
+   "kode": "SNI 8153:2015",
+   "judul": "Sistem plambing pada bangunan gedung",
+   "peran": "Tabel 16: ukuran perpipaan air hujan horizontal (metode luas bidang datar). Tabel 17: kapasitas pipa tegak air hujan.",
+   "catatan": "Kapasitas pipa tegak mengacu Tabel 17 (lihat dokumen resmi)",
+   "tab": [
+    "horizontal",
+    "tegak"
+   ]
+  },
+  {
+   "kode": "SNI 2415:2016",
+   "judul": "Tata cara perhitungan debit banjir rencana",
+   "peran": "Dasar perhitungan debit hujan rencana (metode rasional: Q = 0,00278 × C × I × A)",
+   "catatan": "",
+   "tab": [
+    "debit"
+   ]
+  },
+  {
+   "kode": "Permen PU No. 12/PRT/M/2014",
+   "judul": "Penyelenggaraan sistem drainase perkotaan",
+   "peran": "Kerangka drainase perkotaan; tempat sistem air hujan bangunan bermuara",
+   "catatan": "",
+   "tab": [
+    "debit"
+   ]
+  },
+  {
+   "kode": "Permen PU No. 11/PRT/M/2014",
+   "judul": "Pengelolaan air hujan pada bangunan gedung dan persilnya",
+   "peran": "Kewajiban pengelolaan air hujan pada bangunan gedung dan persilnya",
+   "catatan": "",
+   "tab": [
+    "debit",
+    "horizontal",
+    "tegak"
+   ]
+  },
+  {
+   "kode": "PP No. 16 Tahun 2021",
+   "judul": "Peraturan pelaksanaan UU No. 28/2002 tentang Bangunan Gedung",
+   "peran": "Dasar persyaratan teknis bangunan gedung untuk PBG",
+   "catatan": "",
+   "tab": [
+    "debit",
+    "horizontal",
+    "tegak"
+   ]
+  }
+ ],
+ "catatan_standar": "Pastikan edisi/revisi standar dan peraturan yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
+}
