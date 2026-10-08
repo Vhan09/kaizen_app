@@ -4,7 +4,7 @@ Jalankan:  streamlit run app.py
 """
 import streamlit as st
 
-from kaizen_app.modules import pipa_hujan
+from modules import pipa_hujan
 from modules import ac, akli, beban_listrik, sanitasi
 from utils.theme import inject_css
 
