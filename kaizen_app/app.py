@@ -36,13 +36,12 @@ MODUL_KAWASAN = [
 with st.sidebar:
     st.markdown("### Kaizen PBG")
     st.caption("Perhitungan pendukung Persetujuan Bangunan Gedung")
-    st.markdown("### MEP")
-    st.caption("Mechanical Electrical Plumbing")
-    with st.expander("MEP Rumah", expanded=True):
-        pilihan = st.radio("Modul rumah", list(MODUL.keys()), label_visibility="collapsed", key="kaizen_modul_rumah")
-    with st.expander("MEP Kawasan", expanded=False):
-        st.caption("Daftar modul kawasan")
-        st.markdown("\n".join(f"- Modul {i}: {nama} _(belum tersedia)_" for i, nama in enumerate(MODUL_KAWASAN, start=1)))
+    with st.expander("MEP (Mechanical Electrical Plumbing)", expanded=True):
+        with st.expander("MEP Rumah", expanded=True):
+            pilihan = st.radio("Modul rumah", list(MODUL.keys()), label_visibility="collapsed", key="kaizen_modul_rumah")
+        with st.expander("MEP Kawasan", expanded=False):
+            st.caption("Daftar modul kawasan")
+            st.markdown("\n".join(f"- Modul {i}: {nama} _(belum tersedia)_" for i, nama in enumerate(MODUL_KAWASAN, start=1)))
 
 render = MODUL[pilihan]
 if render is None:
