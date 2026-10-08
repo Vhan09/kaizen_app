@@ -30,17 +30,25 @@ def _is_angka(s) -> bool:
     return t.isdigit()
 
 
-def render_html(h: dict, data: dict, proyek: dict) -> str:
-    out = [_CSS, '<div class="wrap"><table class="info">']
+def render_html(h: dict, data: dict, proyek: dict, hanya: list[str] | None = None, kop: bool = True) -> str:
+    """hanya = daftar kunci seksi yang ditampilkan (None = semua); kop=False menyembunyikan identitas proyek."""
+    proyek = proyek or {}
+    out = [_CSS, '<div class="wrap">']
+    if kop:
+        out.append('<table class="info">')
     for k, v in (("PEKERJAAN :", proyek.get("pekerjaan", "")), ("LOKASI :", proyek.get("lokasi", "")),
                  ("TAHUN :", proyek.get("tahun", "")), ("ITEM PEKERJAAN :", proyek.get("item", ""))):
-        out.append(f'<tr><td class="k">{k}</td><td>: {escape(str(v))}</td></tr>')
-    out.append("</table>")
+        if kop:
+            out.append(f'<tr><td class="k">{k}</td><td>: {escape(str(v))}</td></tr>')
+    if kop:
+        out.append("</table>")
 
-    for p in h["peringatan"]:
-        out.append(f'<div class="pr">⚠ {escape(p)}</div>')
+    seksi = [x for x in susun_seksi(h, data) if hanya is None or x["kunci"] in hanya]
+    if hanya is None or "air_kotor" in hanya:
+        for p in h["peringatan"]:
+            out.append(f'<div class="pr">⚠ {escape(p)}</div>')
 
-    for sek in susun_seksi(h, data):
+    for sek in seksi:
         out.append(f'<div class="judul">{escape(sek["judul"])}</div><table class="t"><tr>')
         out.append("".join(f"<th>{escape(k)}</th>" for k in sek["kolom"]) + "</tr>")
         for i, row in enumerate(sek["baris"]):
@@ -52,12 +60,14 @@ def render_html(h: dict, data: dict, proyek: dict) -> str:
             out.append(f"<tr{cls}>" + "".join(cells) + "</tr>")
         out.append("</table>")
 
-    out.append(f'<div class="cat">Sumber tabel pemakaian air: {escape(data["sumber_tabel"])}. '
-               f'{escape(data["catatan_tabel"])}</div>')
-    out.append(f'<div class="cat">{escape(data["catatan_standar"])}</div></div>')
+    if hanya is None or "air_bersih" in hanya:
+        out.append(f'<div class="cat">Sumber tabel pemakaian air: {escape(data["sumber_tabel"])}. '
+                   f'{escape(data["catatan_tabel"])}</div>')
+    out.append("</div>")
     return "".join(out)
 
 
-def tinggi_html(h: dict, data: dict) -> int:
-    baris = sum(len(s["baris"]) + 2 for s in susun_seksi(h, data))
-    return 200 + 26 * baris + (30 * len(h["peringatan"]))
+def tinggi_html(h: dict, data: dict, hanya: list[str] | None = None, kop: bool = True) -> int:
+    baris = sum(len(s["baris"]) + 2 for s in susun_seksi(h, data) if hanya is None or s["kunci"] in hanya)
+    ekstra = (120 if kop else 40) + (30 * len(h["peringatan"]) if hanya is None or "air_kotor" in hanya else 0)
+    return ekstra + 28 * baris

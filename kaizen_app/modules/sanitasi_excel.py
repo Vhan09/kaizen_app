@@ -101,7 +101,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
         merge(f"B{r}:C{r}", lab, font=F_B, al=_NW, border=False)
         merge(f"D{r}:G{r}", f": {proyek.get(key, '')}", font=F_N, al=_NW, border=False)
     merge("B7:G7", "Landasan — Plumbing: SNI 8153:2015 · Tabel pemakaian air: SNI 03-7065-2005 · Tangki septik: SNI 2398:2017 · "
-                   "Resapan: SNI 8456:2017 · Baku mutu: Permen LHK P.68/2016 (lengkap pada sheet 'SNI & Peraturan')",
+                   "Baku mutu: Permen LHK P.68/2016 · SPALD: Permen PUPR 4/2017 (lengkap pada sheet 'SNI & Peraturan')",
           font=F_N, al=_LEFT, border=False)
     ws.row_dimensions[7].height = 30
 
@@ -164,7 +164,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
         return ref
 
     # ---- 2. air limbah
-    judul("2. Perhitungan Air Limbah: Grey Water dan Black Water")
+    judul("2. Air Limbah (Pembagian Grey Water dan Black Water)")
     dasar_ref = QR if P["dasar"].startswith("Q dengan") else QH
     D = baris("Debit dasar perhitungan", f"={dasar_ref}", "L/hari", P["dasar"], fmt="#,##0.0")
     FL = baris("Faktor air limbah (% dari debit dasar)", P["faktor_limbah"], "%",
@@ -176,7 +176,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     r += 1
 
     # ---- 3. tangki septik
-    judul("3. Tangki Septik (SNI 2398:2017)")
+    judul("3. Air Kotor (Black Water) dan Tangki Septik (SNI 2398:2017)")
     sd = data["septik"]
     N = baris("Jumlah pemakai (n)", h["n"], "orang", "dari tabel penggunaan (penghuni/pemakai)", fmt="0", val_font=F_IN)
     TD = baris("Waktu detensi (td)", P["td"], "hari", None, fmt="0.0", val_font=F_IN)
@@ -226,19 +226,8 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     put(f"G{r}", "pembanding terhadap black water pada sistem terpisah", F_I, al=_LEFT)
     r += 2
 
-    # ---- 4. resapan
-    judul("4. Pengolahan Lanjutan: Bidang / Sumur Resapan (SNI 2398:2017)")
-    QE = baris("Debit efluen ke resapan", f"={LT}", "L/hari", "sama dengan total air limbah", fmt="#,##0.0")
-    QS = baris("Daya serap tanah (hasil uji perkolasi)", P["q_serap"] or 0, "L/m²/hari",
-               "ISI dari hasil uji perkolasi lapangan", fmt="0.0", val_font=F_IN)
-    DS = baris("Diameter sumur resapan", P["d_sumur"], "m", "bila memakai sumur", fmt="0.00", val_font=F_IN)
-    LR = baris("Luas bidang resapan", f'=IF({QS}>0,{QE}/{QS},"isi daya serap")', "m²", "Q efluen / daya serap", fmt="0.00")
-    baris("Kedalaman dinding sumur resapan", f'=IF(AND({QS}>0,{DS}>0),{LR}/(PI()*{DS}),"-")', "m",
-          "Luas / (π × D)", fmt="0.00")
-    r += 1
-
-    # ---- 5. rekap
-    judul("5. Rekap")
+    # ---- 4. rekap
+    judul("4. Rekap")
     for col, t in zip("CDE", ["Keterangan", "Jumlah", "Satuan"]):
         put(f"{col}{r}", t, F_B, _GREY)
     r += 1

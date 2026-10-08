@@ -7,7 +7,6 @@
         V air    = Q limbah x waktu detensi
         V lumpur = QL x n x periode pengurasan
         V total  = V air + V lumpur + ambang bebas
-4. Resapan : luas = Q efluen / daya serap tanah (hasil uji perkolasi)
 """
 from __future__ import annotations
 
@@ -66,7 +65,6 @@ def parameter_default(data: dict) -> dict:
         "n_auto": True, "n": 4,
         "td": s["waktu_detensi_hari"], "ql": s["lumpur_l_org_thn"], "pp": s["pengurasan_thn"],
         "ambang": s["ambang_bebas_m"], "h_air": s["kedalaman_air_m"], "rasio": s["rasio_pl"],
-        "q_serap": 0.0, "d_sumur": data["resapan"]["diameter_sumur_m"],
     }
 
 
@@ -116,10 +114,6 @@ def hitung_semua(df: pd.DataFrame, data: dict, P: dict) -> dict:
     tc = _septik(limbah_total, n, P)     # sistem tercampur (grey + black)
     tp = _septik(black, n, P)            # sistem terpisah (black water saja)
 
-    q_efluen = limbah_total
-    luas_res = q_efluen / P["q_serap"] if P["q_serap"] > 0 else None
-    h_sumur = luas_res / (math.pi * P["d_sumur"]) if luas_res and P["d_sumur"] > 0 else None
-
     d = data["septik"]
     peringatan = []
     if not d["detensi_min"] <= P["td"] <= d["detensi_max"]:
@@ -133,7 +127,6 @@ def hitung_semua(df: pd.DataFrame, data: dict, P: dict) -> dict:
         "rinc": rinc, "q_harian": q_harian, "q_rencana": q_rencana, "vol_m3": vol_m3, "vol_rencana": vol_rencana,
         "q_dasar": q_dasar, "limbah_total": limbah_total, "black": black, "grey": grey,
         "n": n, "n_orang": n_orang, "tc": tc, "tp": tp,
-        "q_efluen": q_efluen, "luas_res": luas_res, "h_sumur": h_sumur,
         "cek_black_sni": data["air_limbah"]["black_water_l_org_hari"] * n,
         "peringatan": peringatan, "P": P,
     }
@@ -155,11 +148,11 @@ def susun_seksi(h: dict, data: dict) -> list[dict]:
          f(h["vol_rencana"], 2)],
     ]
     n = len(h["rinc"])
-    s.append({"judul": "1. Kebutuhan Air Bersih (SNI 03-7065-2005 Tabel 1 · SNI 8153:2015)",
+    s.append({"judul": "1. Kebutuhan Air Bersih (SNI 03-7065-2005 Tabel 1 · SNI 8153:2015)", "kunci": "air_bersih",
               "kolom": ["No", "Fungsi Bangunan", "Jumlah", "Satuan", "Standar (L/satuan/hari)", "Q (L/hari)"],
               "baris": rows, "tebal": [n, n + 3]})
 
-    s.append({"judul": "2. Air Limbah: Grey Water dan Black Water",
+    s.append({"judul": "2. Air Limbah (Pembagian Grey Water dan Black Water)", "kunci": "air_limbah",
               "kolom": ["Uraian", "Rumus", "Nilai", "Satuan"],
               "baris": [
                   ["Dasar perhitungan", P["dasar"], f(h["q_dasar"], 0), "L/hari"],
@@ -170,7 +163,7 @@ def susun_seksi(h: dict, data: dict) -> list[dict]:
 
     tc, tp = h["tc"], h["tp"]
     sp = data["septik"]
-    s.append({"judul": "3. Tangki Septik (SNI 2398:2017)",
+    s.append({"judul": "3. Air Kotor (Black Water) dan Tangki Septik (SNI 2398:2017)", "kunci": "air_kotor",
               "kolom": ["Uraian", "Rumus", "Tercampur", "Terpisah", "Satuan"],
               "baris": [
                   ["Jumlah pemakai (n)", "dari tabel / input", f(h["n"], 0), f(h["n"], 0), "orang"],
@@ -186,19 +179,7 @@ def susun_seksi(h: dict, data: dict) -> list[dict]:
                   ["Tinggi total", "kedalaman air + ambang bebas", f(tc["tinggi"], 2), f(tp["tinggi"], 2), "m"],
               ], "tebal": [9]})
 
-    if h["luas_res"]:
-        res = [["Debit efluen ke resapan", "sama dengan total air limbah", f(h["q_efluen"], 1), "L/hari"],
-               ["Daya serap tanah (uji perkolasi)", "input", f(P["q_serap"], 1), "L/m²/hari"],
-               ["Luas bidang resapan", "Q efluen / daya serap", f(h["luas_res"], 2), "m²"],
-               [f"Sumur resapan Ø {P['d_sumur']:g} m: kedalaman dinding", "Luas / (π × D)", f(h["h_sumur"], 2), "m"]]
-    else:
-        res = [["Debit efluen ke resapan", "sama dengan total air limbah", f(h["q_efluen"], 1), "L/hari"],
-               ["Daya serap tanah (uji perkolasi)", "belum diisi", "-", "L/m²/hari"],
-               ["Luas bidang resapan", "Q efluen / daya serap", "-", "m²"]]
-    s.append({"judul": "4. Pengolahan Lanjutan: Bidang / Sumur Resapan (SNI 2398:2017)",
-              "kolom": ["Uraian", "Rumus", "Nilai", "Satuan"], "baris": res, "tebal": [2]})
-
-    s.append({"judul": "5. Rekap",
+    s.append({"judul": "4. Rekap", "kunci": "rekap",
               "kolom": ["Keterangan", "Jumlah", "Satuan"],
               "baris": [
                   ["Penghuni / pemakai", f(h["n"], 0), "orang"],

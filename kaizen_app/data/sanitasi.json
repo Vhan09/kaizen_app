@@ -1,7 +1,7 @@
 {
   "proyek": {
-    "pekerjaan": "ex. Perencanaan Pembangunan Rumah Tinggal xx Lantai Type xx",
-    "lokasi": "ex. Kota Makassar",
+    "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2LANTAI TYPE 55",
+    "lokasi": "KOTA MAKASSAR",
     "tahun": "2026",
     "item": "PERHITUNGAN VOLUME AIR BERSIH DAN DISPOSAL PADAT SERTA CAIR PADA BANGUNAN"
   },
@@ -151,76 +151,88 @@
     "kedalaman_air_m": 1.5,
     "rasio_pl": 2.0
   },
-  "resapan": {
-    "diameter_sumur_m": 1.0
-  },
   "standar": [
     {
       "kode": "SNI 8153:2015",
       "judul": "Sistem plambing pada bangunan gedung",
       "peran": "Acuan utama sistem plambing (air bersih dan air buangan)",
-      "catatan": "Dalam sumber sekunder disebut menggantikan SNI 03-6481-2000 dan SNI 03-7065-2005"
+      "catatan": "Dalam sumber sekunder disebut menggantikan SNI 03-6481-2000 dan SNI 03-7065-2005",
+      "tab": [
+        "air_bersih",
+        "air_limbah",
+        "air_kotor"
+      ]
     },
     {
       "kode": "SNI 03-7065-2005",
       "judul": "Tata cara perencanaan sistem plambing",
       "peran": "Sumber Tabel 1 pemakaian air yang dipakai di Excel (120 L/penghuni/hari rumah tinggal)",
-      "catatan": "Periksa apakah tabel yang sama masih berlaku pada SNI 8153:2015 / ketentuan daerah"
+      "catatan": "Periksa apakah tabel yang sama masih berlaku pada SNI 8153:2015 / ketentuan daerah",
+      "tab": [
+        "air_bersih"
+      ]
     },
     {
       "kode": "SNI 03-6481-2000",
       "judul": "Sistem plambing",
       "peran": "Versi lama sistem plambing",
-      "catatan": "Umumnya sudah digantikan SNI 8153:2015"
+      "catatan": "Umumnya sudah digantikan SNI 8153:2015",
+      "tab": [
+        "air_bersih",
+        "air_limbah",
+        "air_kotor"
+      ]
     },
     {
       "kode": "SNI 2398:2017",
       "judul": "Tata cara perencanaan tangki septik dengan pengolahan lanjutan",
-      "peran": "Dasar perhitungan tangki septik (waktu detensi, lumpur, pengurasan) dan pengolahan lanjutan: sumur/bidang resapan, up flow filter, kolam sanita",
-      "catatan": "Rentang parameter yang dipakai modul: detensi 2–3 hari, lumpur 30–40 L/orang/tahun, pengurasan 2–5 tahun"
-    },
-    {
-      "kode": "SNI 8456:2017",
-      "judul": "Sumur dan parit resapan air hujan",
-      "peran": "Resapan air hujan (terkait Modul 3 dan 4)",
-      "catatan": ""
-    },
-    {
-      "kode": "SNI 03-2453-2002",
-      "judul": "Tata cara perencanaan teknik sumur resapan air hujan untuk lahan pekarangan",
-      "peran": "Penempatan sumur resapan air hujan; jarak ke septic tank 5 m, ke pondasi 1 m, ke sumur air bersih 3 m (dikutip dari sumber sekunder)",
-      "catatan": "Periksa status terhadap SNI 8456:2017"
+      "peran": "Dasar perhitungan tangki septik (waktu detensi, lumpur, pengurasan) dan acuan pengolahan lanjutan air limbah",
+      "catatan": "Rentang parameter yang dipakai modul: detensi 2–3 hari, lumpur 30–40 L/orang/tahun, pengurasan 2–5 tahun",
+      "tab": [
+        "air_limbah",
+        "air_kotor"
+      ]
     },
     {
       "kode": "SNI 03-2399-2002",
       "judul": "Tata cara perencanaan bangunan MCK umum",
       "peran": "Hanya bila bangunan memiliki fasilitas MCK umum",
-      "catatan": ""
+      "catatan": "",
+      "tab": [
+        "air_kotor"
+      ]
     },
     {
       "kode": "Permen LHK P.68/MENLHK/SETJEN/KUM.1/8/2016",
       "judul": "Baku mutu air limbah domestik",
       "peran": "Batas mutu efluen sebelum dibuang ke badan air",
-      "catatan": ""
+      "catatan": "",
+      "tab": [
+        "air_limbah",
+        "air_kotor"
+      ]
     },
     {
       "kode": "Permen PUPR No. 4/PRT/M/2017",
       "judul": "Penyelenggaraan sistem pengelolaan air limbah domestik (SPALD)",
       "peran": "Kerangka pengelolaan air limbah domestik setempat dan terpusat",
-      "catatan": ""
-    },
-    {
-      "kode": "Permen PU No. 11/PRT/M/2014",
-      "judul": "Pengelolaan air hujan pada bangunan gedung dan persilnya",
-      "peran": "Pengelolaan air hujan sebagai bagian sistem sanitasi bangunan",
-      "catatan": ""
+      "catatan": "",
+      "tab": [
+        "air_limbah",
+        "air_kotor"
+      ]
     },
     {
       "kode": "PP No. 16 Tahun 2021",
       "judul": "Peraturan pelaksanaan UU No. 28/2002 tentang Bangunan Gedung",
       "peran": "Dasar persyaratan teknis bangunan gedung (termasuk kesehatan/sanitasi) untuk PBG",
-      "catatan": ""
+      "catatan": "",
+      "tab": [
+        "air_bersih",
+        "air_limbah",
+        "air_kotor"
+      ]
     }
   ],
-  "catatan_standar": "Pastikan edisi/revisi standar dan peraturan yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
+  "catatan_standar": "Pastikan edisi/revisi standar dan peraturan yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing. SNI/peraturan resapan dan air hujan akan dicantumkan pada modul Resapan dan Pipa Air Hujan."
 }

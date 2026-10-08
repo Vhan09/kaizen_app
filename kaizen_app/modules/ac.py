@@ -1,15 +1,16 @@
-"""Modul 3 - Kebutuhan AC.
+"""Kebutuhan AC.
 
 Dua metode perhitungan:
   - Standar Calculation : rumus pendekatan dari sheet 'AC STANDART'
   - Full Calculation    : rumus dasar + beban orang, lampu, dan peralatan
 
-Dipanggil dari app.py:  "Modul 3 ❄️ Kebutuhan AC": ac.render
+Dipanggil dari app.py:  "Modul N ❄️ Kebutuhan AC": ac.render
 """
 from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from modules import ac_calc, ac_excel, ac_html
 from modules.ac_calc import MODE_FULL, MODE_STANDAR
@@ -18,9 +19,8 @@ XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 @st.cache_data(show_spinner="Membuat PDF...")
-def _buat_pdf(hasil_standar, hasil_full, data: dict, proyek: dict, orang_dasar: float, faktor_lampu: float):
-    from modules import ekspor_pdf
-    return ekspor_pdf.ac_pdf(hasil_standar, hasil_full, data, proyek, orang_dasar, faktor_lampu)
+def _buat_pdf(xlsx_bytes: bytes):
+    return ac_excel.excel_ke_pdf(xlsx_bytes)
 
 
 def _landasan(data: dict) -> None:
@@ -55,7 +55,7 @@ def _rumus(mode: str, data: dict, od: float, fl: float) -> None:
 def render():
     data = ac_calc.muat_data()
 
-    st.title("❄️ Kebutuhan AC")
+    st.subheader("Kebutuhan AC")
     st.caption("Estimasi kebutuhan pendinginan per ruangan. Pilih metode perhitungan di bawah; "
                "rumus yang dipakai ditampilkan agar bisa dicocokkan dengan Excel.")
     _landasan(data)
@@ -163,8 +163,8 @@ def render():
 
     # ---- lembar perhitungan
     st.markdown(f"### Lembar Perhitungan Kapasitas AC — {mode}")
-    st.iframe(ac_html.render_html(hasil, data, proyek, mode, od, fl),
-              height=ac_html.tinggi_html(hasil, mode))
+    components.html(ac_html.render_html(hasil, data, proyek, mode, od, fl),
+                    height=ac_html.tinggi_html(hasil, mode), scrolling=True)
 
     # ---- rincian substitusi
     with st.expander("Rincian perhitungan per ruangan (substitusi rumus)"):
@@ -200,13 +200,13 @@ def render():
     d1.download_button("Unduh Excel (.xlsx)", xlsx, "Kebutuhan_AC.xlsx",
                        mime=XLSX_MIME, on_click="ignore")
     if d2.button("Siapkan PDF"):
-        try:
-            pdf = _buat_pdf(hs, hf, data, proyek, od, fl)
+        pdf = _buat_pdf(xlsx)
+        if pdf:
             d2.download_button("Unduh PDF", pdf, "Kebutuhan_AC.pdf",
                                mime="application/pdf", on_click="ignore")
-        except Exception as err:
-            d2.error(f"Gagal membuat PDF: {err}")
-    st.caption("File Excel berisi dua sheet: AC STANDART dan AC FULL. PDF merangkum kedua metode.")
+        else:
+            d2.warning("PDF butuh LibreOffice terpasang di komputer ini.")
+    st.caption("File Excel dan PDF berisi dua sheet: AC STANDART dan AC FULL.")
 
     # ---- keterangan
     with st.expander("Keterangan faktor dan referensi"):
