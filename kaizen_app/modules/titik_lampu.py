@@ -10,14 +10,14 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from modules import titik_lampu_calc as tc
-from modules import titik_lampu_excel, titik_lampu_html
+from modules import titik_lampu_excel, titik_lampu_html, titik_lampu_pdf
 
 XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 @st.cache_data(show_spinner="Membuat PDF...")
-def _buat_pdf(xlsx_bytes: bytes):
-    return titik_lampu_excel.excel_ke_pdf(xlsx_bytes)
+def _buat_pdf(h: dict, data: dict, proyek: dict) -> bytes:
+    return titik_lampu_pdf.buat_pdf(h, data, proyek)
 
 
 def _landasan(data: dict, kunci: str | None = None) -> None:
@@ -125,11 +125,8 @@ def render():
         d1, d2, _ = st.columns([1, 1, 3])
         d1.download_button("Unduh Excel (.xlsx)", xlsx, "Titik_Lampu.xlsx", mime=XLSX_MIME, on_click="ignore")
         if d2.button("Siapkan PDF"):
-            pdf = _buat_pdf(xlsx)
-            if pdf:
-                d2.download_button("Unduh PDF", pdf, "Titik_Lampu.pdf", mime="application/pdf", on_click="ignore")
-            else:
-                d2.warning("PDF butuh LibreOffice terpasang di komputer ini.")
+            pdf = _buat_pdf(h, data, proyek)
+            d2.download_button("Unduh PDF", pdf, "Titik_Lampu.pdf", mime="application/pdf", on_click="ignore")
         st.caption("File Excel berisi rumus hidup, rekap, denah skematik, tabel standar pencahayaan, dan daftar SNI/peraturan (5 sheet).")
         with st.expander("Lembar perhitungan lengkap", expanded=False):
             _html(h, data, proyek, "lembar")

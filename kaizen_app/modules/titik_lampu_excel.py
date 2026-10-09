@@ -1,10 +1,6 @@
 """Modul Titik Lampu - ekspor Excel (rumus hidup, desain konsisten) dan PDF."""
 from __future__ import annotations
 
-import os
-import shutil
-import subprocess
-import tempfile
 from io import BytesIO
 
 from openpyxl import Workbook
@@ -313,34 +309,3 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     return buf.getvalue()
 
 
-# -------------------------------------------------------------------- PDF
-def _cari_soffice() -> str | None:
-    p = shutil.which("soffice") or shutil.which("libreoffice")
-    if p:
-        return p
-    for cand in (r"C:\Program Files\LibreOffice\program\soffice.exe",
-                 r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"):
-        if os.path.exists(cand):
-            return cand
-    return None
-
-
-def excel_ke_pdf(xlsx_bytes: bytes) -> bytes | None:
-    """xlsx -> pdf via LibreOffice. None kalau LibreOffice tidak terpasang / gagal."""
-    exe = _cari_soffice()
-    if not exe:
-        return None
-    with tempfile.TemporaryDirectory() as d:
-        src = os.path.join(d, "laporan.xlsx")
-        with open(src, "wb") as f:
-            f.write(xlsx_bytes)
-        try:
-            subprocess.run([exe, "--headless", "--convert-to", "pdf", "--outdir", d, src],
-                           check=True, timeout=120, capture_output=True)
-        except (subprocess.SubprocessError, OSError):
-            return None
-        out = os.path.join(d, "laporan.pdf")
-        if not os.path.exists(out):
-            return None
-        with open(out, "rb") as f:
-            return f.read()
