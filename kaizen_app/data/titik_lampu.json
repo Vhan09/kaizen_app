@@ -1,0 +1,236 @@
+{
+ "proyek": {
+  "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2LANTAI TYPE 55",
+  "lokasi": "KOTA MAKASSAR",
+  "tahun": "2026",
+  "item": "PERHITUNGAN JUMLAH TITIK LAMPU PADA BANGUNAN"
+ },
+ "parameter": {
+  "llf": 0.8,
+  "llf_min": 0.7,
+  "llf_max": 0.8,
+  "cu": 0.6,
+  "cu_min": 0.5,
+  "cu_max": 0.6,
+  "n": 1
+ },
+ "lampu": [
+  {
+   "label": "DL inbow",
+   "lmw": 100
+  },
+  {
+   "label": "DL outbow",
+   "lmw": 100
+  },
+  {
+   "label": "LED bulb",
+   "lmw": 110
+  }
+ ],
+ "sumber_lampu": "Inlite: DL LED 100 lm/W; LED bulb 110 lm/W (dari Excel). Ganti dengan data lampu yang dipakai pada proyek.",
+ "lux": [
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Teras",
+   "lux": 40,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Ruang tamu",
+   "lux": 150,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Ruang keluarga",
+   "lux": 100,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Ruang makan",
+   "lux": 100,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Ruang kerja",
+   "lux": 350,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Kamar tidur",
+   "lux": 50,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Kamar mandi",
+   "lux": 100,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Laundry",
+   "lux": 200,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Tangga",
+   "lux": 100,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Gudang",
+   "lux": 50,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Dapur",
+   "lux": 250,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Rumah Tinggal",
+   "fungsi": "Garasi",
+   "lux": 50,
+   "ra": 80,
+   "sumber": "SNI 6197:2020 Tabel 1",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang kelas",
+   "lux": 250,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": "rentang 250–300 lux"
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang kerja umum — tugas layar",
+   "lux": 300,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang kerja umum — rata-rata",
+   "lux": 350,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang kerja umum — tugas kertas",
+   "lux": 500,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang rapat",
+   "lux": 300,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang gambar",
+   "lux": 750,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Ruang komputer",
+   "lux": 350,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  },
+  {
+   "kelompok": "Tambahan*",
+   "fungsi": "Gudang arsip",
+   "lux": 150,
+   "ra": null,
+   "sumber": "Artikel klopmart (mengutip SNI 03-6575-2001) — verifikasi",
+   "ket": ""
+  }
+ ],
+ "catatan_lux": "Nilai rumah tinggal dibaca dari gambar Tabel 1 SNI 6197:2020 pada titik_lampu.xlsx (tingkat pencahayaan rata-rata minimum dan renderasi warna minimum Ra 80). Baris bertanda * berasal dari artikel pada Excel dan perlu diverifikasi ke SNI 03-6575-2001 / SNI 6197:2020 sebelum dipakai. Nilai kamar tidur (50 lux) dan kamar mandi (100 lux) mengikuti SNI 6197:2020 dan berbeda dari kutipan artikel (100–250 dan 250 lux).",
+ "standar": [
+  {
+   "kode": "SNI 6197:2020",
+   "judul": "Konservasi energi pada sistem pencahayaan",
+   "peran": "Tabel 1: tingkat pencahayaan rata-rata minimum dan renderasi warna minimum per fungsi ruang; acuan efisiensi daya pencahayaan",
+   "catatan": "Sumber nilai lux rumah tinggal pada modul ini",
+   "tab": [
+    "hitung",
+    "rekap"
+   ]
+  },
+  {
+   "kode": "SNI 03-6575-2001",
+   "judul": "Tata cara perancangan sistem pencahayaan buatan pada bangunan gedung",
+   "peran": "Metode perancangan pencahayaan buatan: N = (E × A) / (Φ × LLF × CU × n)",
+   "catatan": "Faktor LLF dan CU mengikuti rentang pada Excel (LLF 0,7–0,8; CU 50–60%)",
+   "tab": [
+    "hitung"
+   ]
+  },
+  {
+   "kode": "PUIL 2020 (SNI 0225:2020)",
+   "judul": "Persyaratan umum instalasi listrik",
+   "peran": "Sirkuit dan proteksi listrik untuk titik lampu (lihat Modul SLD)",
+   "catatan": "",
+   "tab": [
+    "rekap"
+   ]
+  },
+  {
+   "kode": "PP No. 16 Tahun 2021",
+   "judul": "Peraturan pelaksanaan UU No. 28/2002 tentang Bangunan Gedung",
+   "peran": "Dasar persyaratan teknis bangunan gedung untuk PBG",
+   "catatan": "",
+   "tab": [
+    "hitung",
+    "rekap"
+   ]
+  }
+ ],
+ "catatan_standar": "Pastikan edisi/revisi standar dan peraturan yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
+}

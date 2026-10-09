@@ -69,3 +69,15 @@ def ekspor_akli(tabel) -> None:
         return ekspor_pdf.akli_pdf(tabel)
 
     _tombol("Tabel_AKLI", xlsx, pdf, "dl_akli")
+
+
+def ekspor_apar(proyek, entri, tabel, hasil) -> None:
+    def xlsx():
+        from modules import ekspor_apar_xlsx
+        return ekspor_apar_xlsx.apar_xlsx(proyek, entri, tabel, hasil)
+
+    def pdf():
+        from modules import ekspor_apar_pdf
+        return ekspor_apar_pdf.apar_pdf(proyek, entri, tabel, hasil)
+
+    _tombol("Perhitungan_APAR", xlsx, pdf, "dl_apar")

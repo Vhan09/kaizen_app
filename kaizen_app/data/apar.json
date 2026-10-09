@@ -1,0 +1,42 @@
+{
+  "proyek": {
+    "pekerjaan": "ex. Perencanaan Pembangunan Rumah Tinggal xx Lantai Type xx",
+    "lokasi": "ex. Kota Makassar",
+    "tahun": "2026",
+    "item": "PERHITUNGAN KEBUTUHAN APAR PADA BANGUNAN"
+  },
+  "kelas": "Ringan",
+  "jenis": "APAR DCP",
+  "kapasitas": "3 kg",
+  "rating": "2A:10BC",
+  "jarak": 15.0,
+  "tabel": [
+    {
+      "Kelas": "Ringan",
+      "Daya padam min (A)": 2.0,
+      "Luas per unit A (m²)": 278.0,
+      "Luas maks per APAR (m²)": 100.0,
+      "Jarak tempuh maks (m)": 23.0
+    },
+    {
+      "Kelas": "Sedang",
+      "Daya padam min (A)": 2.0,
+      "Luas per unit A (m²)": 139.0,
+      "Luas maks per APAR (m²)": 100.0,
+      "Jarak tempuh maks (m)": 23.0
+    },
+    {
+      "Kelas": "Berat",
+      "Daya padam min (A)": 4.0,
+      "Luas per unit A (m²)": 93.0,
+      "Luas maks per APAR (m²)": 100.0,
+      "Jarak tempuh maks (m)": 23.0
+    }
+  ],
+  "lantai": [
+    {
+      "Lantai": "Lantai 1",
+      "Luas (m²)": 60.0
+    }
+  ]
+}
