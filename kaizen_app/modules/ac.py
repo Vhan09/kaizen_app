@@ -12,15 +12,10 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-from modules import ac_calc, ac_excel, ac_html
+from modules import ac_calc, ac_excel, ac_html, ekspor_pdf
 from modules.ac_calc import MODE_FULL, MODE_STANDAR
 
 XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-
-
-@st.cache_data(show_spinner="Membuat PDF...")
-def _buat_pdf(xlsx_bytes: bytes):
-    return ac_excel.excel_ke_pdf(xlsx_bytes)
 
 
 def _landasan(data: dict) -> None:
@@ -200,12 +195,9 @@ def render():
     d1.download_button("Unduh Excel (.xlsx)", xlsx, "Kebutuhan_AC.xlsx",
                        mime=XLSX_MIME, on_click="ignore")
     if d2.button("Siapkan PDF"):
-        pdf = _buat_pdf(xlsx)
-        if pdf:
-            d2.download_button("Unduh PDF", pdf, "Kebutuhan_AC.pdf",
-                               mime="application/pdf", on_click="ignore")
-        else:
-            d2.warning("PDF butuh LibreOffice terpasang di komputer ini.")
+        pdf = ekspor_pdf.ac_pdf(hs, hf, data, proyek, od, fl)
+        d2.download_button("Unduh PDF", pdf, "Kebutuhan_AC.pdf",
+                           mime="application/pdf", on_click="ignore")
     st.caption("File Excel dan PDF berisi dua sheet: AC STANDART dan AC FULL.")
 
     # ---- keterangan

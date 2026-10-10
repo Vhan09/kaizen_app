@@ -71,13 +71,33 @@ def ekspor_akli(tabel) -> None:
     _tombol("Tabel_AKLI", xlsx, pdf, "dl_akli")
 
 
-def ekspor_apar(proyek, entri, tabel, hasil) -> None:
+def ekspor_apar(proyek, entri, tabel, h) -> None:
     def xlsx():
         from modules import ekspor_apar_xlsx
-        return ekspor_apar_xlsx.apar_xlsx(proyek, entri, tabel, hasil)
+        return ekspor_apar_xlsx.apar_xlsx(proyek, entri, tabel, h)
 
     def pdf():
         from modules import ekspor_apar_pdf
-        return ekspor_apar_pdf.apar_pdf(proyek, entri, tabel, hasil)
+        return ekspor_apar_pdf.apar_pdf(proyek, entri, tabel, h)
 
-    _tombol("Perhitungan_APAR", xlsx, pdf, "dl_apar")
+    _tombol("Kebutuhan_APAR", xlsx, pdf, "dl_apar")
+    st.caption(
+        "Excel berisi rumus hidup: ubah sel kuning (klasifikasi, rating, jarak, luas lantai, tabel acuan), "
+        "cakupan, jumlah APAR per lantai, dan total menghitung ulang."
+    )
+
+
+def ekspor_ventilasi(proyek, entri, h) -> None:
+    def xlsx():
+        from modules import ekspor_ventilasi_xlsx
+        return ekspor_ventilasi_xlsx.ventilasi_xlsx(proyek, entri, h)
+
+    def pdf():
+        from modules import ekspor_ventilasi_pdf
+        return ekspor_ventilasi_pdf.ventilasi_pdf(proyek, entri, h)
+
+    _tombol("Penghawaan_Alami", xlsx, pdf, "dl_ventilasi")
+    st.caption(
+        "Excel berisi rumus hidup: ubah sel kuning (rasio, ACH minimum, jenis dan metode ruangan, dimensi, "
+        "debit exhaust), lalu Av, Ar, selisih, ACH, status kepatuhan, dan rekap menghitung ulang."
+    )

@@ -44,3 +44,10 @@ def inject_css() -> None:
 
 def section_title(teks: str) -> None:
     st.markdown(f'<div class="sec-title">{teks}</div>', unsafe_allow_html=True)
+
+
+def info_simpan(tersimpan: bool, nama: str) -> None:
+    if tersimpan:
+        st.caption(f"💾 Data {nama} tersimpan otomatis di folder data/")
+    else:
+        st.error(f"Data {nama} belum tersimpan. Periksa izin tulis pada folder data/")

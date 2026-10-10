@@ -1,0 +1,188 @@
+{
+  "proyek": {
+    "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2 LANTAI TYPE 55",
+    "lokasi": "KOTA MAKASSAR",
+    "tahun": "2026",
+    "item": "PERHITUNGAN PENGHAWAAN ALAMI PADA BANGUNAN"
+  },
+  "dasar": "5% - SNI 03-6572-2001 pasal 4.3.2",
+  "kustom": 5.0,
+  "ach": [
+    {
+      "Jenis": "Ruang hunian",
+      "ACH minimum": 0.0
+    },
+    {
+      "Jenis": "Kamar mandi / WC",
+      "ACH minimum": 10.0
+    },
+    {
+      "Jenis": "Dapur",
+      "ACH minimum": 20.0
+    },
+    {
+      "Jenis": "Tangga / koridor",
+      "ACH minimum": 4.0
+    },
+    {
+      "Jenis": "Ruang terbuka",
+      "ACH minimum": 0.0
+    }
+  ],
+  "ruang": [
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Kamar Mandi",
+      "Jenis": "Kamar mandi / WC",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 1.0,
+      "P bukaan (m)": 0.4,
+      "L bukaan (m)": 0.2,
+      "P ruang (m)": 2.0,
+      "L ruang (m)": 1.0,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Ruang Makan & Dapur",
+      "Jenis": "Dapur",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 4.0,
+      "P bukaan (m)": 0.47,
+      "L bukaan (m)": 1.2,
+      "P ruang (m)": 3.3,
+      "L ruang (m)": 2.2,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Ruang Keluarga",
+      "Jenis": "Ruang hunian",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 1.0,
+      "P bukaan (m)": 0.5,
+      "L bukaan (m)": 2.4,
+      "P ruang (m)": 3.3,
+      "L ruang (m)": 2.6,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Tangga",
+      "Jenis": "Tangga / koridor",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 0.0,
+      "P bukaan (m)": 0.0,
+      "L bukaan (m)": 0.0,
+      "P ruang (m)": 3.7,
+      "L ruang (m)": 0.95,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Garasi",
+      "Jenis": "Ruang terbuka",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 0.0,
+      "P bukaan (m)": 0.0,
+      "L bukaan (m)": 0.0,
+      "P ruang (m)": 0.0,
+      "L ruang (m)": 0.0,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Teras Depan",
+      "Jenis": "Ruang terbuka",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 0.0,
+      "P bukaan (m)": 0.0,
+      "L bukaan (m)": 0.0,
+      "P ruang (m)": 0.0,
+      "L ruang (m)": 0.0,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Satu",
+      "Ruangan": "Taman Belakang",
+      "Jenis": "Ruang terbuka",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 0.0,
+      "P bukaan (m)": 0.0,
+      "L bukaan (m)": 0.0,
+      "P ruang (m)": 0.0,
+      "L ruang (m)": 0.0,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Dua",
+      "Ruangan": "Kamar Tidur Kecil",
+      "Jenis": "Ruang hunian",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 1.0,
+      "P bukaan (m)": 1.35,
+      "L bukaan (m)": 0.4,
+      "P ruang (m)": 2.75,
+      "L ruang (m)": 2.0,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Dua",
+      "Ruangan": "Kamar Mandi Kecil",
+      "Jenis": "Kamar mandi / WC",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 1.0,
+      "P bukaan (m)": 0.4,
+      "L bukaan (m)": 0.2,
+      "P ruang (m)": 1.7,
+      "L ruang (m)": 1.4,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    },
+    {
+      "Lantai": "Lantai Dua",
+      "Ruangan": "Kamar Mandi Utama",
+      "Jenis": "Kamar mandi / WC",
+      "Metode": "Exhaust",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 0.0,
+      "P bukaan (m)": 0.0,
+      "L bukaan (m)": 0.0,
+      "P ruang (m)": 1.75,
+      "L ruang (m)": 1.5,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 8.1
+    },
+    {
+      "Lantai": "Lantai Dua",
+      "Ruangan": "Kamar Tidur Utama",
+      "Jenis": "Ruang hunian",
+      "Metode": "Alami",
+      "Bukaan menghadap": "Ruang luar",
+      "Jml bukaan": 4.0,
+      "P bukaan (m)": 0.55,
+      "L bukaan (m)": 1.05,
+      "P ruang (m)": 3.45,
+      "L ruang (m)": 3.15,
+      "T plafon (m)": 3.0,
+      "Q exhaust (m³/menit)": 0.0
+    }
+  ]
+}
