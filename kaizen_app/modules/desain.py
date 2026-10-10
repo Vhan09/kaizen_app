@@ -43,6 +43,7 @@ CSS = """
  table.t th.hl{background:#127A88;color:#fff}
  table.t tr.sel td.hl{background:#FFE9A8}
  .chip{display:inline-block;border-radius:999px;padding:2px 11px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+ .chip.mute{background:#8A99A8}
  .chip.good{background:var(--good)}.chip.bad{background:var(--bad)}.chip.warn{background:var(--warn)}
  .gauge{height:8px;background:#E6EDF3;border-radius:4px;overflow:hidden;min-width:90px}
  .gauge span{display:block;height:100%;border-radius:4px}
@@ -59,7 +60,8 @@ CSS = """
 """
 
 
-TONE = {"MEMENUHI": "good", "TIDAK MEMENUHI": "bad", "KURANG": "bad", "MANUAL": "warn", "BELUM DICEK": "warn"}
+TONE = {"MEMENUHI": "good", "TIDAK MEMENUHI": "bad", "KURANG": "bad", "MANUAL": "warn", "BELUM DICEK": "warn",
+        "TIDAK ADA BUKAAN": "bad", "AREA TERBUKA": "mute"}
 
 
 def chip(status: str) -> str:

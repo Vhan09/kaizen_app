@@ -4,6 +4,7 @@ Jalankan:  streamlit run app.py
 """
 import streamlit as st
 
+from modules import cahaya_alami
 from modules import titik_lampu
 from modules import apar
 from modules import pipa_hujan
@@ -22,7 +23,7 @@ MODUL = {
     "Modul 5 🧯 Kebutuhan APAR": apar.render,
     "Modul 6 🌧️ Pipa Air Hujan": pipa_hujan.render,
     "Modul 7 💡 Titik Lampu Ruangan": titik_lampu.render,
-    "Modul 8 🪟 Kebutuhan Pencahayaan Alami": None,
+    "Modul 8 🪟 Kebutuhan Pencahayaan Alami": cahaya_alami.render,
     "Modul 9 🪟 Kebutuhan Ventilasi": None,
     "Modul 10 💧 Resapan Biopori": None,
 }

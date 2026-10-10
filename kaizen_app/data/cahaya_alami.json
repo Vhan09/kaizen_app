@@ -1,0 +1,86 @@
+{
+ "proyek": {
+  "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2LANTAI TYPE 55",
+  "lokasi": "KOTA MAKASSAR",
+  "tahun": "2026",
+  "item": "PERHITUNGAN PENCAHAYAAN ALAMI PADA BANGUNAN"
+ },
+ "ambang": [
+  {
+   "label": "10% luas lantai — batas bawah pada Excel (rujukan Kepmenkes 829/1999)",
+   "nilai": 0.1
+  },
+  {
+   "label": "12,5% luas lantai — 1/8 (draf Excel)",
+   "nilai": 0.125
+  },
+  {
+   "label": "Kustom",
+   "nilai": null
+  }
+ ],
+ "ambang_default": 0.1,
+ "jenis_ruang": [
+  "Ruang tertutup",
+  "Area terbuka"
+ ],
+ "jenis_bukaan": [
+  "Jendela",
+  "Pintu kaca",
+  "Bouvenlicht / lubang cahaya",
+  "Skylight"
+ ],
+ "faktor_efektif_default": 1.0,
+ "catatan_metode": "Rasio Aj/Ar adalah pemeriksaan awal (aturan praktis). Penilaian formal pencahayaan alami pada SNI 03-2396-2001 memakai faktor langit (FL), faktor refleksi luar (FRL), faktor refleksi dalam (FRD), dan faktor pencahayaan alami siang hari; metode itu belum dihitung pada modul ini.",
+ "standar": [
+  {
+   "kode": "SNI 03-2396-2001",
+   "judul": "Tata cara perancangan sistem pencahayaan alami pada bangunan gedung",
+   "peran": "Acuan formal pencahayaan alami siang hari (faktor langit, FRL, FRD, faktor pencahayaan alami siang hari)",
+   "catatan": "Modul ini memakai rasio Aj/Ar sebagai pemeriksaan awal; metode faktor langit belum dihitung",
+   "tab": [
+    "hitung",
+    "rekap"
+   ]
+  },
+  {
+   "kode": "Kepmenkes No. 829/Menkes/SK/VII/1999",
+   "judul": "Persyaratan kesehatan perumahan",
+   "peran": "Sumber umum batas 10% luas lantai untuk bukaan/ventilasi alamiah dan pencahayaan alami minimal 60 lux",
+   "catatan": "Sumber sekunder menyebut 10% sebagai ventilasi alamiah permanen (sebagian menyebut bukaan); periksa teks resminya",
+   "tab": [
+    "hitung",
+    "rekap"
+   ]
+  },
+  {
+   "kode": "SNI 03-6575-2001",
+   "judul": "Tata cara perancangan sistem pencahayaan buatan pada bangunan gedung",
+   "peran": "Mensyaratkan cahaya alami siang hari dimanfaatkan dan memenuhi SNI 03-2396-2001; pembanding untuk Modul Titik Lampu",
+   "catatan": "",
+   "tab": [
+    "hitung"
+   ]
+  },
+  {
+   "kode": "SNI 6197:2020",
+   "judul": "Konservasi energi pada sistem pencahayaan",
+   "peran": "Konservasi energi pencahayaan; pemanfaatan cahaya alami mengurangi beban pencahayaan buatan",
+   "catatan": "Lihat Modul Titik Lampu",
+   "tab": [
+    "rekap"
+   ]
+  },
+  {
+   "kode": "PP No. 16 Tahun 2021",
+   "judul": "Peraturan pelaksanaan UU No. 28/2002 tentang Bangunan Gedung",
+   "peran": "Dasar persyaratan teknis bangunan gedung (kesehatan dan kenyamanan) untuk PBG",
+   "catatan": "",
+   "tab": [
+    "hitung",
+    "rekap"
+   ]
+  }
+ ],
+ "catatan_standar": "Pastikan edisi/revisi standar dan peraturan yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
+}
