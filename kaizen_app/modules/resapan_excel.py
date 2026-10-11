@@ -10,7 +10,7 @@ from xml.sax.saxutils import escape
 
 from openpyxl import Workbook, load_workbook
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from openpyxl.drawing.image import Image as XLImage
@@ -359,7 +359,7 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     ws.row_dimensions[r].height = 28
 
     ws.sheet_view.showGridLines = False
-    ws.page_setup.orientation = "portrait"
+    ws.page_setup.orientation = "landscape"
     ws.page_setup.paperSize = ws.PAPERSIZE_A4
     ws.sheet_properties.pageSetUpPr.fitToPage = True
     ws.page_setup.fitToWidth, ws.page_setup.fitToHeight = 1, 0
@@ -395,7 +395,7 @@ def _fallback_pdf_from_xlsx(xlsx_bytes: bytes) -> bytes | None:
     buf = BytesIO()
     doc = SimpleDocTemplate(
         buf,
-        pagesize=A4,
+        pagesize=landscape(A4),
         leftMargin=20,
         rightMargin=20,
         topMargin=18,
