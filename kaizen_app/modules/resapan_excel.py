@@ -6,8 +6,12 @@ import shutil
 import subprocess
 import tempfile
 from io import BytesIO
+from xml.sax.saxutils import escape
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 from openpyxl.drawing.image import Image as XLImage
 from openpyxl.formatting.rule import DataBarRule, FormulaRule
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -375,22 +379,56 @@ def _cari_soffice() -> str | None:
     return None
 
 
-def excel_ke_pdf(xlsx_bytes: bytes) -> bytes | None:
-    """xlsx -> pdf via LibreOffice. None kalau LibreOffice tidak terpasang / gagal."""
-    exe = _cari_soffice()
-    if not exe:
+def _fallback_pdf_from_xlsx(xlsx_bytes: bytes) -> bytes | None:
+    """Buat PDF sederhana memakai reportlab bila LibreOffice tidak ada di server."""
+    try:
+        wb = load_workbook(BytesIO(xlsx_bytes), read_only=True, data_only=True)
+    except Exception:
         return None
-    with tempfile.TemporaryDirectory() as d:
-        src = os.path.join(d, "laporan.xlsx")
-        with open(src, "wb") as f:
-            f.write(xlsx_bytes)
-        try:
-            subprocess.run([exe, "--headless", "--convert-to", "pdf", "--outdir", d, src],
-                           check=True, timeout=120, capture_output=True)
-        except (subprocess.SubprocessError, OSError):
-            return None
-        out = os.path.join(d, "laporan.pdf")
-        if not os.path.exists(out):
-            return None
-        with open(out, "rb") as f:
-            return f.read()
+
+    if not wb.sheetnames:
+        return None
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=22, rightMargin=22, topMargin=22, bottomMargin=22)
+    styles = getSampleStyleSheet()
+    story = [
+        Paragraph("Resapan Air Hujan", styles["Title"]),
+        Paragraph("PDF fallback tanpa LibreOffice", styles["Italic"]),
+        Spacer(1, 12),
+    ]
+
+    for ws in wb.worksheets[:3]:
+        story.append(Paragraph(f"Lembar: {ws.title}", styles["Heading2"]))
+        for row in ws.iter_rows(min_row=1, max_row=min(ws.max_row, 40), values_only=True):
+            cells = [escape(str(cell).strip()) if cell is not None else "" for cell in row]
+            text = " | ".join(c for c in cells if c)
+            if text:
+                story.append(Paragraph(text, styles["BodyText"]))
+        story.append(Spacer(1, 8))
+
+    try:
+        doc.build(story)
+    except Exception:
+        return None
+    return buf.getvalue()
+
+
+def excel_ke_pdf(xlsx_bytes: bytes) -> bytes | None:
+    """xlsx -> pdf via LibreOffice bila tersedia; fallback ke reportlab bila tidak."""
+    exe = _cari_soffice()
+    if exe:
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, "laporan.xlsx")
+            with open(src, "wb") as f:
+                f.write(xlsx_bytes)
+            try:
+                subprocess.run([exe, "--headless", "--convert-to", "pdf", "--outdir", d, src],
+                               check=True, timeout=120, capture_output=True)
+            except (subprocess.SubprocessError, OSError):
+                return _fallback_pdf_from_xlsx(xlsx_bytes)
+            out = os.path.join(d, "laporan.pdf")
+            if os.path.exists(out):
+                with open(out, "rb") as f:
+                    return f.read()
+    return _fallback_pdf_from_xlsx(xlsx_bytes)
