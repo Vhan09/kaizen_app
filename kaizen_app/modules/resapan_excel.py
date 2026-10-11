@@ -9,9 +9,10 @@ from io import BytesIO
 from xml.sax.saxutils import escape
 
 from openpyxl import Workbook, load_workbook
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from openpyxl.drawing.image import Image as XLImage
 from openpyxl.formatting.rule import DataBarRule, FormulaRule
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -77,6 +78,8 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     wb = Workbook()
     ws = wb.active
     ws.title = "Resapan"
+    ws.freeze_panes = "B4"
+    ws.sheet_view.showGridLines = False
     wk = wb.create_sheet("Skema")
     wr = wb.create_sheet(REF)
     wn = wb.create_sheet("SNI & Peraturan")
@@ -380,7 +383,7 @@ def _cari_soffice() -> str | None:
 
 
 def _fallback_pdf_from_xlsx(xlsx_bytes: bytes) -> bytes | None:
-    """Buat PDF sederhana memakai reportlab bila LibreOffice tidak ada di server."""
+    """Buat PDF yang lebih rapi dan terstruktur bila LibreOffice tidak ada di server."""
     try:
         wb = load_workbook(BytesIO(xlsx_bytes), read_only=True, data_only=True)
     except Exception:
@@ -390,22 +393,73 @@ def _fallback_pdf_from_xlsx(xlsx_bytes: bytes) -> bytes | None:
         return None
 
     buf = BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=22, rightMargin=22, topMargin=22, bottomMargin=22)
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=A4,
+        leftMargin=20,
+        rightMargin=20,
+        topMargin=18,
+        bottomMargin=18,
+    )
     styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "TitleResapan",
+        parent=styles["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=18,
+        leading=22,
+        textColor=colors.HexColor("#1F3864"),
+        alignment=1,
+        spaceAfter=12,
+    )
+    head_style = ParagraphStyle(
+        "HeadResapan",
+        parent=styles["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=11,
+        leading=13,
+        textColor=colors.HexColor("#0F3D63"),
+        spaceBefore=12,
+        spaceAfter=6,
+    )
     story = [
-        Paragraph("Resapan Air Hujan", styles["Title"]),
-        Paragraph("PDF fallback tanpa LibreOffice", styles["Italic"]),
-        Spacer(1, 12),
+        Paragraph("LAPORAN RESAPAN AIR HUJAN", title_style),
+        Paragraph("Dokumen hasil export dari aplikasi Kaizen PBG", styles["Italic"]),
+        Spacer(1, 10),
     ]
 
-    for ws in wb.worksheets[:3]:
-        story.append(Paragraph(f"Lembar: {ws.title}", styles["Heading2"]))
-        for row in ws.iter_rows(min_row=1, max_row=min(ws.max_row, 40), values_only=True):
-            cells = [escape(str(cell).strip()) if cell is not None else "" for cell in row]
-            text = " | ".join(c for c in cells if c)
-            if text:
-                story.append(Paragraph(text, styles["BodyText"]))
-        story.append(Spacer(1, 8))
+    for ws in wb.worksheets:
+        rows = []
+        for row in ws.iter_rows(min_row=1, max_row=min(ws.max_row, 30), values_only=True):
+            cells = []
+            for value in row[:8]:
+                if value is None:
+                    cells.append("")
+                else:
+                    text = str(value).strip()
+                    cells.append(escape(text) if text else "")
+            if any(cells):
+                rows.append(cells)
+        if not rows:
+            continue
+
+        story.append(Paragraph(f"Lembar: {ws.title}", head_style))
+        table = Table(rows, repeatRows=1)
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F3D63")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 7),
+            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5E1EB")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F7FAFC")]),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 4),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ]))
+        story.append(table)
+        story.append(Spacer(1, 10))
 
     try:
         doc.build(story)
