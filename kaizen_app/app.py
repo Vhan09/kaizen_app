@@ -4,6 +4,7 @@ Jalankan:  streamlit run app.py
 """
 import streamlit as st
 
+from modules import resapan
 from modules import ventilasi
 from modules import cahaya_alami
 from modules import titik_lampu
@@ -26,7 +27,7 @@ MODUL = {
     "Modul 7 💡 Titik Lampu Ruangan": titik_lampu.render,
     "Modul 8 🪟 Kebutuhan Pencahayaan Alami": cahaya_alami.render,
     "Modul 9 🪟 Kebutuhan Ventilasi": ventilasi.render,
-    "Modul 10 💧 Resapan Biopori": None,
+    "Modul 10 💧 Resapan Biopori": resapan.render,
 }
 
 MODUL_KAWASAN = [

@@ -1,0 +1,153 @@
+{
+ "proyek": {
+  "pekerjaan": "PERENCANAAN PEMBANGUNAN RUMAH TINGGAL 2LANTAI TYPE 55",
+  "lokasi": "KOTA MAKASSAR",
+  "tahun": "2026",
+  "item": "PERHITUNGAN PENGELOLAAN AIR HUJAN (SUMUR RESAPAN DAN BIOPORI)"
+ },
+ "permukaan": [
+  {
+   "nama": "Atap genteng",
+   "c": 0.85,
+   "tadah": true
+  },
+  {
+   "nama": "Atap beton",
+   "c": 0.9,
+   "tadah": true
+  },
+  {
+   "nama": "Atap metal",
+   "c": 0.95,
+   "tadah": true
+  },
+  {
+   "nama": "Perkerasan",
+   "c": 0.5,
+   "tadah": true
+  },
+  {
+   "nama": "Taman",
+   "c": 0.2,
+   "tadah": false
+  }
+ ],
+ "catatan_c": "Koefisien limpasan dari tabel pada file Excel (acuan Permen PUPR 11/PRT/M/2014); periksa terhadap lampiran peraturan.",
+ "hujan": {
+  "R24": 120.0,
+  "I_tahunan": 3000,
+  "kota": "Makassar",
+  "catatan": "R = tinggi hujan harian rata-rata (mm/hari) dari Excel. SNI 03-2453-2002 Lampiran C memuat contoh 5 tahunan, a.l. Bonto Sungu 51,3 dan Malino 52,5 mm/hari (Sulawesi Selatan), tidak memuat Makassar; pastikan R sesuai periode ulang yang diminta."
+ },
+ "sni": {
+  "faktor_vab": 0.855,
+  "te_koef": 0.9,
+  "te_pangkat": 0.92,
+  "rasio_kh_kv": 2.0,
+  "k_min_cm_jam": 2.0,
+  "k_default_cm_jam": 2.0,
+  "mat_min": 1.5,
+  "rot_m2_per_m3": 25,
+  "jarak": [
+   {
+    "nama": "Sumur air bersih / sumur resapan air hujan lain",
+    "m": 3
+   },
+   {
+    "nama": "Pondasi bangunan",
+    "m": 1
+   },
+   {
+    "nama": "Bidang resapan / sumur resapan tangki septik",
+    "m": 5
+   }
+  ]
+ },
+ "sumur": {
+  "lingkaran": {
+   "D": 1.0,
+   "H": 1.5
+  },
+  "persegi": {
+   "P": 1.0,
+   "L": 1.0,
+   "H": 1.5
+  }
+ },
+ "biopori": {
+  "d": 0.1016,
+  "t": 2.0,
+  "harga": 120000,
+  "d_min": 0.1,
+  "d_maks": 0.25,
+  "t_acuan": 1.0,
+  "catatan": "Acuan diameter 10–25 cm dan kedalaman sekitar 100 cm (Permen LH 12/2009 dan Brata & Nelistya 2008, dikutip dari sumber sekunder). Pipa 4\" (Ø 0,1016 m) sepanjang 2 m seperti pada Excel melebihi acuan kedalaman 100 cm."
+ },
+ "standar": [
+  {
+   "kode": "SNI 03-2453-2002",
+   "judul": "Tata cara perencanaan sumur resapan air hujan untuk lahan pekarangan",
+   "peran": "Persamaan volume andil banjir (Vab), volume meresap (Vrsp), volume storasi, kedalaman total dan jumlah sumur; syarat permeabilitas, muka air tanah, dan jarak minimum",
+   "catatan": "Teks standar dibaca dari salinan BSN; rumus modul mengikuti pasal 5",
+   "tab": [
+    "vab",
+    "lingkaran",
+    "persegi",
+    "biopori"
+   ]
+  },
+  {
+   "kode": "SNI 8456:2017",
+   "judul": "Sumur dan parit resapan air hujan",
+   "peran": "Standar terbaru sumur dan parit resapan air hujan",
+   "catatan": "Dokumen tidak tersedia pada file; hitungan mengikuti SNI 03-2453-2002. Periksa apakah dinas mensyaratkan metode SNI 8456:2017",
+   "tab": [
+    "lingkaran",
+    "persegi"
+   ]
+  },
+  {
+   "kode": "Permen PU No. 11/PRT/M/2014",
+   "judul": "Pengelolaan air hujan pada bangunan gedung dan persilnya",
+   "peran": "Kewajiban pengelolaan air hujan; volume andil banjir (Vab) dan volume wajib kelola (Vwk)",
+   "catatan": "Bila seluruh persil tertutup, Vab = Vwk; bila ada pekarangan hijau yang menyerap, Vab dihitung dari area bangunan dan perkerasan",
+   "tab": [
+    "vab",
+    "lingkaran",
+    "persegi",
+    "biopori"
+   ]
+  },
+  {
+   "kode": "Permen LH No. 12 Tahun 2009",
+   "judul": "Pemanfaatan air hujan",
+   "peran": "Dasar pemanfaatan air hujan, termasuk lubang resapan biopori",
+   "catatan": "Diameter 10–25 cm dan kedalaman sekitar 100 cm menurut sumber sekunder; periksa teks resminya",
+   "tab": [
+    "biopori"
+   ]
+  },
+  {
+   "kode": "Brata & Nelistya (2008)",
+   "judul": "Lubang Resapan Biopori",
+   "peran": "Rumus jumlah lubang biopori N = I × A / P (intensitas hujan, luas bidang kedap, laju peresapan per lubang)",
+   "catatan": "Bukan SNI; acuan ilmiah. Laju peresapan per lubang harus diukur di lapangan",
+   "tab": [
+    "biopori"
+   ]
+  },
+  {
+   "kode": "PP No. 16 Tahun 2021",
+   "judul": "Peraturan pelaksanaan UU No. 28/2002 tentang Bangunan Gedung",
+   "peran": "Dasar persyaratan teknis bangunan gedung (lingkungan) untuk PBG",
+   "catatan": "",
+   "tab": [
+    "vab",
+    "lingkaran",
+    "persegi",
+    "biopori"
+   ]
+  }
+ ],
+ "catatan_standar": "Pastikan edisi/revisi standar dan peraturan yang dipakai sesuai ketentuan pengajuan PBG di daerah masing-masing."
+}
