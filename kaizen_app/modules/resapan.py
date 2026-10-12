@@ -108,17 +108,33 @@ def render():
         _landasan(data, "biopori")
         st.markdown("#### Parameter Lubang Biopori")
         d1, d2, d3 = st.columns(3)
-        P["d_bio"] = d1.number_input("Diameter lubang d (m)", 0.05, 0.5, float(P0["d_bio"]), step=0.01, format="%.4f", key="rs_d",
-                                     help="Pipa 4 inci = 0,1016 m. Acuan 10–25 cm.")
-        P["t_bio"] = d2.number_input("Kedalaman lubang t (m)", 0.3, 5.0, float(P0["t_bio"]), step=0.1, key="rs_t",
-                                     help="Acuan sekitar 1 m; Excel memakai 2 m.")
-        P["harga"] = d3.number_input("Harga satuan per lubang (Rp)", 0.0, 10_000_000.0, float(P0["harga"]), step=5000.0, key="rs_hrg")
-        e1, e2 = st.columns(2)
-        P["I_jam"] = e1.number_input("Intensitas hujan I (mm/jam) — opsional", 0.0, 500.0, 0.0, step=5.0, key="rs_I",
-                                     help="Untuk metode Brata & Nelistya (N = I × A / P).")
-        P["P_lph"] = e2.number_input("Laju peresapan per lubang P (liter/jam) — opsional", 0.0, 5000.0, 0.0, step=10.0, key="rs_P_l",
-                                     help="Diukur di lapangan; isi bersama intensitas hujan.")
+        ukuran_pipa = list(range(1, 9))
+        P["d_in"] = d1.selectbox(
+            "Ukuran pipa biopori (inci)",
+            options=ukuran_pipa,
+            index=ukuran_pipa.index(int(P0["d_in"])),
+            format_func=lambda ukuran: f'{ukuran}"',
+            key="rs_d_in",
+            help="Pilih ukuran 1–8 inci. Diameter hitung dikonversi otomatis dengan 1 inci = 0,0254 m.",
+        )
+        P["d_bio"] = P["d_in"] * 0.0254
+        d2.metric(
+            "Diameter hitung d",
+            f"{rc.fmt_id(P['d_bio'], 4)} m",
+            help="Konversi langsung dari ukuran inci; belum menyesuaikan diameter dalam/luar atau ketebalan dinding pipa.",
+        )
+        P["t_bio"] = d3.number_input("Kedalaman lubang t (m)", 0.3, 5.0, float(P0["t_bio"]), step=0.1, key="rs_t",
+                                     help="Acuan sekitar 1 m dari sumber sekunder; sesuaikan dengan kondisi tanah dan muka air tanah.")
+        st.caption("Ukuran pipa dipilih, bukan diketik. Nilai diameter di atas adalah konversi matematis inci ke meter; ukuran aktual pipa dapat berbeda menurut standar dan ketebalan dinding.")
         st.caption(data["biopori"]["catatan"])
+
+        st.markdown("#### Metode C — data tambahan (opsional)")
+        st.caption("Metode Brata & Nelistya hanya dihitung jika kedua data tersedia. Nilai 0 berarti belum digunakan; metode A dan B tetap dihitung.")
+        e1, e2 = st.columns(2)
+        P["I_jam"] = e1.number_input("Intensitas hujan rencana I (mm/jam)", 0.0, 500.0, 0.0, step=5.0, key="rs_I",
+                                     help="Masukkan dari analisis hujan jam-jaman/kurva IDF yang dipakai dalam desain. R harian (mm/hari) tidak cukup untuk menurunkan nilai ini secara andal.")
+        P["P_lph"] = e2.number_input("Laju peresapan per lubang P (liter/jam)", 0.0, 5000.0, 0.0, step=10.0, key="rs_P_l",
+                                     help="Masukkan dari pengukuran/uji lapangan per lubang; jangan diisi dengan perkiraan tanpa dasar.")
 
     with t_sum:
         _landasan(data, None)

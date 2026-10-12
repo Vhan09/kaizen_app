@@ -88,6 +88,11 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     yn = lambda b: "Ya" if b else "Tidak"
     dv = DataValidation(type="list", formula1='"Ya,Tidak"', allow_blank=False)
     ws.add_data_validation(dv)
+    dv_pipa = DataValidation(type="list", formula1='"1,2,3,4,5,6,7,8"', allow_blank=False)
+    dv_pipa.errorTitle = "Ukuran pipa tidak valid"
+    dv_pipa.error = "Pilih ukuran pipa dari 1 sampai 8 inci."
+    dv_pipa.showErrorMessage = True
+    ws.add_data_validation(dv_pipa)
 
     # ===================================== Referensi
     _judul(wr, "B1:E1", "REFERENSI: KOEFISIEN LIMPASAN DAN JARAK MINIMUM")
@@ -306,7 +311,9 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     # ---- biopori
     ws.row_breaks.append(Break(id=r - 1))
     sec(5, "Resapan Biopori (Permen LH 12/2009, Brata & Nelistya 2008)")
-    DB = baris("Diameter pipa biopori (d)", P["d_bio"], "m", "acuan 10–25 cm; pipa 4\" = 0,1016 m", fmt="0.0000", inp=True)
+    DB_IN = baris("Ukuran pipa biopori", P["d_in"], "inci", "pilih 1–8 inci; ukuran nominal", fmt="0", inp=True)
+    dv_pipa.add(ws[DB_IN.replace("$", "")])
+    DB = baris("Diameter hitung (d)", f"={DB_IN}*0.0254", "m", "otomatis: ukuran inci × 0,0254; acuan diameter 10–25 cm", fmt="0.0000")
     TB = baris("Kedalaman (t)", P["t_bio"], "m", "acuan ± 100 cm; periksa muka air tanah", fmt="0.00", inp=True)
     VL = baris("Volume satu lubang", f"=PI()*({DB}/2)^2*{TB}", "m³", "π r² t", fmt="0.00000")
     baris("Volume satu lubang", f"={VL}*1000", "liter", "", fmt="0.00")
@@ -317,13 +324,10 @@ def build_excel(h: dict, data: dict, proyek: dict) -> bytes:
     r += 1
     N1 = baris("A. N metode volume (konservatif, seperti Excel)", f"=ROUNDUP(ROUND({VAB}/{VL},9),0)", "lubang", "N = Vab / V lubang", F_B, "0", _SOFT)
     N2 = baris("B. N dengan peresapan (adaptasi SNI)", f"=ROUNDUP(ROUND({VAB}/({VL}+{VRB}),9),0)", "lubang", "N = Vab / (V lubang + Vrsp)", F_B, "0", _SOFT)
-    II = baris("Intensitas hujan jam-jaman (I) — opsional", P["I_jam"], "mm/jam", "untuk metode C; isi bila ada", fmt="0.0", inp=True)
-    PL = baris("Laju peresapan per lubang (P) — opsional", P["P_lph"], "liter/jam", "diukur di lapangan", fmt="0.0", inp=True)
-    N3 = baris("C. N Brata & Nelistya", f'=IF(AND({II}>0,{PL}>0),ROUNDUP(ROUND({II}*{ATD}/{PL},9),0),"isi I dan P")', "lubang", "N = I × A / P", F_B, "0", _SOFT)
+    II = baris("Intensitas hujan rencana (I) — opsional", P["I_jam"], "mm/jam", "data desain/IDF; tidak diturunkan otomatis dari R harian", fmt="0.0", inp=True)
+    PL = baris("Laju peresapan per lubang (P) — opsional", P["P_lph"], "liter/jam", "hasil pengukuran/uji lapangan", fmt="0.0", inp=True)
+    N3 = baris("C. N Brata & Nelistya", f'=IF(AND({II}>0,{PL}>0),ROUNDUP(ROUND({II}*{ATD}/{PL},9),0),"butuh data I dan P")', "lubang", "N = I × A / P; perlu data desain dan uji lapangan", F_B, "0", _SOFT)
     NRT = baris("Pembanding aturan praktis (bukan SNI)", f"=ROUNDUP(ROUND({ROT}/{VL},9),0)", "lubang", "(A/25) / V lubang", fmt="0")
-    HG = baris("Harga satuan pipa biopori", P["harga"], "Rp", "dari Excel; ganti sesuai harga proyek", fmt="#,##0", inp=True)
-    baris("Estimasi biaya metode A", f"={N1}*{HG}", "Rp", "N × harga satuan (memakai N dibulatkan ke atas)", fmt="#,##0")
-    baris("Estimasi biaya metode B", f"={N2}*{HG}", "Rp", "", fmt="#,##0")
     r += 1
 
     # ---- perbandingan

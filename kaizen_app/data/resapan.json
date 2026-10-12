@@ -75,13 +75,12 @@
   }
  },
  "biopori": {
-  "d": 0.1016,
-  "t": 2.0,
-  "harga": 120000,
-  "d_min": 0.1,
-  "d_maks": 0.25,
-  "t_acuan": 1.0,
-  "catatan": "Acuan diameter 10–25 cm dan kedalaman sekitar 100 cm (Permen LH 12/2009 dan Brata & Nelistya 2008, dikutip dari sumber sekunder). Pipa 4\" (Ø 0,1016 m) sepanjang 2 m seperti pada Excel melebihi acuan kedalaman 100 cm."
+ "d_in": 4,
+ "t": 1.0,
+ "d_min": 0.1,
+ "d_maks": 0.25,
+ "t_acuan": 1.0,
+ "catatan": "Acuan diameter 10–25 cm dan kedalaman sekitar 100 cm (Permen LH 12/2009 dan Brata & Nelistya 2008, dikutip dari sumber sekunder). Ukuran inci dikonversi langsung dengan 1 inci = 0,0254 m; ukuran ini belum memperhitungkan diameter dalam/luar dan ketebalan dinding menurut standar pipa."
  },
  "standar": [
   {

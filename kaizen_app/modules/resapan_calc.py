@@ -61,7 +61,8 @@ def parameter_default(data: dict) -> dict:
         "mat": 0.0, "kedap": False,
         "D": data["sumur"]["lingkaran"]["D"], "H1": data["sumur"]["lingkaran"]["H"],
         "P": data["sumur"]["persegi"]["P"], "L": data["sumur"]["persegi"]["L"], "H2": data["sumur"]["persegi"]["H"],
-        "d_bio": data["biopori"]["d"], "t_bio": data["biopori"]["t"], "harga": data["biopori"]["harga"],
+        "d_in": data["biopori"]["d_in"], "d_bio": data["biopori"]["d_in"] * 0.0254,
+        "t_bio": data["biopori"]["t"],
         "I_jam": 0.0, "P_lph": 0.0,
         "cek": {"datar": False, "tak_tercemar": False, "pondasi": False, "sumur_air": False, "septik": False, "perda": False},
     }
@@ -153,9 +154,9 @@ def biopori(vab_m3: float, a_tadah: float, te: float, P: dict, data: dict) -> di
         w.append(f"Kedalaman {_g(t)} m melebihi acuan sekitar {b['t_acuan'] * 100:g} cm; periksa muka air tanah dan kelayakan pemasangan.")
     if P["mat"] > 0 and t >= P["mat"]:
         w.append(f"Kedalaman biopori {t:g} m sama atau lebih dalam dari muka air tanah ({_g(P['mat'])} m).")
-    return {"d": d, "t": t, "v_lubang": v_l, "a_alas": a_alas, "a_dinding": a_dinding, "k_rata": k_rata, "v_rsp": v_rsp,
-            "v_total": v_l + v_rsp, "n1": n1, "n2": n2, "n3": n3, "n_rot": n_rot, "biaya1": n1 * P["harga"],
-            "biaya2": n2 * P["harga"], "harga": P["harga"], "peringatan": w, "luas_serap_1": a_dinding + a_alas}
+    return {"d": d, "d_in": P["d_in"], "t": t, "v_lubang": v_l, "a_alas": a_alas, "a_dinding": a_dinding,
+            "k_rata": k_rata, "v_rsp": v_rsp, "v_total": v_l + v_rsp, "n1": n1, "n2": n2, "n3": n3,
+            "n_rot": n_rot, "peringatan": w, "luas_serap_1": a_dinding + a_alas}
 
 
 # --------------------------------------------------------------- persyaratan
@@ -212,9 +213,9 @@ def opsi_ringkas(h: dict) -> pd.DataFrame:
     baris = [
         ("Sumur resapan lingkaran", sl["dim"], sl["n"], sl["v_tampung"], sl["kap"], sl["kap"] / v["vab"]),
         ("Sumur resapan persegi", sp["dim"], sp["n"], sp["v_tampung"], sp["kap"], sp["kap"] / v["vab"]),
-        ("Biopori — metode volume", f"Ø {fmt_id(bp['d'] * 100, 1)} cm × {_g(bp['t'])} m", bp["n1"], bp["n1"] * bp["v_lubang"],
+        ("Biopori — metode volume", f'{bp["d_in"]}" (Ø {fmt_id(bp["d"], 4)} m) × {_g(bp["t"])} m', bp["n1"], bp["n1"] * bp["v_lubang"],
          bp["n1"] * bp["v_lubang"], bp["n1"] * bp["v_lubang"] / v["vab"]),
-        ("Biopori — dengan peresapan", f"Ø {fmt_id(bp['d'] * 100, 1)} cm × {_g(bp['t'])} m", bp["n2"], bp["n2"] * bp["v_lubang"],
+        ("Biopori — dengan peresapan", f'{bp["d_in"]}" (Ø {fmt_id(bp["d"], 4)} m) × {_g(bp["t"])} m', bp["n2"], bp["n2"] * bp["v_lubang"],
          bp["n2"] * bp["v_total"], bp["n2"] * bp["v_total"] / v["vab"]),
     ]
     return pd.DataFrame(baris, columns=["Opsi", "Dimensi", "N", "V_tampung", "Kapasitas", "Rasio"])

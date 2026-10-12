@@ -217,18 +217,18 @@ def buat_pdf(h: dict, data: dict, proyek: dict) -> bytes:
     story.append(_p("Perhitungan biopori", section))
     bp = h["biopori"]
     bio_rows = [
-        ["Metode", "Dasar hitung", "Jumlah lubang", "Kapasitas total (m3)", "Estimasi biaya"],
+        ["Metode", "Dasar hitung", "Jumlah lubang", "Kapasitas total (m3)"],
         ["A. Metode volume (konservatif)", f"Vab / volume lubang ({rc.fmt_id(bp['v_lubang'], 5)} m3)",
-         str(bp["n1"]), rc.fmt_id(bp["n1"] * bp["v_lubang"], 3), f"Rp {rc.fmt_id(bp['biaya1'], 0)}"],
+         str(bp["n1"]), rc.fmt_id(bp["n1"] * bp["v_lubang"], 3)],
         ["B. Memperhitungkan peresapan", f"Vab / (volume + resap; {rc.fmt_id(bp['v_total'], 5)} m3)",
-         str(bp["n2"]), rc.fmt_id(bp["n2"] * bp["v_total"], 3), f"Rp {rc.fmt_id(bp['biaya2'], 0)}"],
+         str(bp["n2"]), rc.fmt_id(bp["n2"] * bp["v_total"], 3)],
         ["C. Brata & Nelistya", "N = I x A / P" if bp["n3"] is not None else "Isi intensitas hujan dan laju peresapan",
-         str(bp["n3"]) if bp["n3"] is not None else "Belum dihitung", "-", "-"],
+         str(bp["n3"]) if bp["n3"] is not None else "Belum dihitung", "-"],
     ]
-    story.append(_table(bio_rows, [56 * mm, 82 * mm, 32 * mm, 50 * mm, 53 * mm], header, body))
+    story.append(_table(bio_rows, [60 * mm, 105 * mm, 35 * mm, 62 * mm], header, body))
     story.append(_p(
-        f"Parameter biopori: diameter {rc.fmt_id(bp['d'] * 100, 1)} cm, kedalaman {rc.fmt_id(bp['t'], 2)} m, "
-        f"harga satuan Rp {rc.fmt_id(bp['harga'], 0)}.",
+        f'Parameter biopori: ukuran pipa {bp["d_in"]}" (diameter hitung {rc.fmt_id(bp["d"], 4)} m), '
+        f'kedalaman {rc.fmt_id(bp["t"], 2)} m. Konversi inci belum memperhitungkan diameter dalam/luar dan ketebalan dinding pipa.',
         small,
     ))
     if h["peringatan"]:

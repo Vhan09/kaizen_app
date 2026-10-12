@@ -105,7 +105,7 @@ def _sek_sumur(h, data, bentuk: str, no: int) -> str:
 def _sek_biopori(h, data, no: int) -> str:
     b, v, P = h["biopori"], h["vab"], h["P"]
     f = fmt_id
-    o = [sec(no, f"Resapan Biopori — Pipa Ø {f(b['d'] * 100, 1)} cm × {f(b['t'], 2)} m")]
+    o = [sec(no, f'Resapan Biopori — Pipa {b["d_in"]}" (Ø {f(b["d"], 4)} m) × {f(b["t"], 2)} m')]
     o.append(_tbl(["Uraian", "Rumus", "Substitusi", "Hasil", "Satuan"], [
         ["Jari-jari", "r = d / 2", f"{f(b['d'], 4)} / 2", f(b["d"] / 2, 4), "m"],
         ["Volume satu lubang", "V = π r² t", f"π × {f(b['d'] / 2, 4)}² × {f(b['t'])}", f(b["v_lubang"], 5), "m³"],
@@ -117,21 +117,21 @@ def _sek_biopori(h, data, no: int) -> str:
     o.append(sec(no + 1, "Jumlah Lubang Biopori"))
     rows = [
         ["A", "Metode volume (konservatif, seperti Excel)", "N = Vab / V lubang", f"{f(v['vab'], 3)} / {f(b['v_lubang'], 5)}",
-         f"{f(v['vab'] / b['v_lubang'], 1)}", f"<b>{b['n1']}</b>", f"Rp {f(b['biaya1'], 0)}"],
+         f"{f(v['vab'] / b['v_lubang'], 1)}", f"<b>{b['n1']}</b>"],
         ["B", "Dengan peresapan (adaptasi SNI 03-2453-2002)", "N = Vab / (V + Vrsp)", f"{f(v['vab'], 3)} / {f(b['v_total'], 5)}",
-         f"{f(v['vab'] / b['v_total'], 1)}", f"<b>{b['n2']}</b>", f"Rp {f(b['biaya2'], 0)}"],
+         f"{f(v['vab'] / b['v_total'], 1)}", f"<b>{b['n2']}</b>"],
     ]
     if b["n3"]:
         rows.append(["C", "Brata & Nelistya (2008)", "N = I × A / P",
-                     f"{f(P['I_jam'], 1)} × {f(v['A_tadah'])} / {f(P['P_lph'], 1)}", "–", f"<b>{b['n3']}</b>", f"Rp {f(b['n3'] * b['harga'], 0)}"])
+                     f"{f(P['I_jam'], 1)} × {f(v['A_tadah'])} / {f(P['P_lph'], 1)}", "–", f"<b>{b['n3']}</b>"])
     else:
-        rows.append(["C", "Brata & Nelistya (2008)", "N = I × A / P", "isi intensitas hujan (mm/jam) dan laju peresapan (L/jam)", "–", "–", "–"])
+        rows.append(["C", "Brata & Nelistya (2008)", "N = I × A / P", "Masukkan I dan P berdasarkan data desain/lapangan", "–", "Belum dihitung"])
     rows.append(["·", "Pembanding aturan praktis (bukan SNI)", "N = (A/25) / V lubang",
-                 f"({f(v['A_tadah'])}/25) / {f(b['v_lubang'], 5)}", f"{f(v['rot_v'] / b['v_lubang'], 1)}", f"{b['n_rot']}", f"Rp {f(b['n_rot'] * b['harga'], 0)}"])
-    o.append(_tbl(["", "Metode", "Rumus", "Substitusi", "N (hitung)", "N (dibulatkan)", f"Estimasi biaya @ Rp {f(b['harga'], 0)}"], rows,
-                  kelas=[None, None, None, None, "n", "c", "n"]))
+                 f"({f(v['A_tadah'])}/25) / {f(b['v_lubang'], 5)}", f"{f(v['rot_v'] / b['v_lubang'], 1)}", f"{b['n_rot']}"])
+    o.append(_tbl(["", "Metode", "Rumus", "Substitusi", "N (hitung)", "N (dibulatkan)"], rows,
+                  kelas=[None, None, None, None, "n", "c"]))
     o.append('<div class="note">Biopori tidak diatur dalam SNI 03-2453-2002; metode A mengabaikan peresapan sehingga sangat konservatif, '
-             'metode B menerapkan persamaan SNI pada lubang kecil. Biaya adalah estimasi indikatif dari harga satuan yang diisi.</div>')
+             'metode B menerapkan persamaan SNI pada lubang kecil. Metode C memerlukan intensitas hujan rencana dan hasil uji laju peresapan; keduanya tidak diturunkan otomatis dari hujan harian.</div>')
     return "".join(o)
 
 
