@@ -27,3 +27,6 @@ Nilai batas awal pada `data/arsitektur/arsitektur.json` hanya contoh dan harus
 diverifikasi untuk lokasi proyek; pemeriksaan hasil tidak menyatakan kepatuhan hukum.
 Input proyek tersimpan di `data/arsitektur/luas_bangunan_arsitektur.json`, dan
 laporan dapat diunduh dalam format Excel atau PDF.
+
+Menu Arsitektur **Bukaan & Jendela** menggunakan halaman, perhitungan, data
+standar, dan penyimpanan yang sama dengan modul **Kebutuhan Ventilasi** MEP.

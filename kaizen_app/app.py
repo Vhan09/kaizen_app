@@ -38,7 +38,7 @@ MODUL_MEP = {
 MODUL_ARSITEKTUR = {
     "Modul 1 📐 Luas & Intensitas Bangunan": luas_bangunan_view.render,
     "Modul 2 🏠 Rekapitulasi Ruangan": None,
-    "Modul 3 🪟 Bukaan & Jendela": None,
+    "Modul 3 🪟 Bukaan & Jendela": ventilasi.render,
     "Modul 4 ♿ Tangga & Aksesibilitas": None,
     "Modul 5 📊 Quantity Take-Off": None,
 }
