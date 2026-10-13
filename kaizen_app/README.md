@@ -7,8 +7,17 @@
     streamlit run app.py
 
 ## Struktur
-- app.py                         menu + halaman utama
-- modules/beban_listrik*.py      Modul 1 (view, kalkulasi, tabel HTML)
-- modules/akli*.py               Tabel AKLI + aturan kabel otomatis
-- utils/                         format angka, simpan data, tema
-- data/                          data input tersimpan otomatis (JSON)
+- app.py                         halaman utama dan pemilih bidang
+- modules/mep/                   modul perhitungan Mechanical, Electrical, Plumbing
+- modules/sipil/                 modul perhitungan bidang Sipil
+- modules/arsitektur/            modul perhitungan bidang Arsitektur
+- utils/                         fungsi bersama: format angka, penyimpanan, dan tema
+- data/mep/                      data dan input MEP dalam format JSON
+- data/sipil/                    data Sipil dalam format JSON
+- data/arsitektur/               data Arsitektur dalam format JSON
+
+Semua bidang menggunakan satu `app.py`. Untuk penyimpanan bidang baru, gunakan
+`utils.storage.load/save/delete(..., domain="sipil")` atau
+`utils.storage.load/save/delete(..., domain="arsitektur")`. Pemanggilan lama tanpa
+argumen `domain` tetap menggunakan MEP; data MEP lama di `data/` juga tetap dibaca
+sebagai fallback dan akan disimpan ke `data/mep/` pada penyimpanan berikutnya.

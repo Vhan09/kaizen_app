@@ -48,6 +48,6 @@ def section_title(teks: str) -> None:
 
 def info_simpan(tersimpan: bool, nama: str) -> None:
     if tersimpan:
-        st.caption(f"💾 Data {nama} tersimpan otomatis di folder data/")
+        st.caption(f"💾 Data {nama} tersimpan otomatis di folder data/<bidang>/")
     else:
-        st.error(f"Data {nama} belum tersimpan. Periksa izin tulis pada folder data/")
+        st.error(f"Data {nama} belum tersimpan. Periksa izin tulis pada folder data/<bidang>/")
