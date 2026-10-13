@@ -35,6 +35,14 @@ MODUL_MEP = {
     "Modul 10 💧 Resapan Biopori": resapan.render,
 }
 
+MODUL_ARSITEKTUR = {
+    "Modul 1 📐 Luas & Intensitas Bangunan": luas_bangunan_view.render,
+    "Modul 2 🏠 Rekapitulasi Ruangan": None,
+    "Modul 3 🪟 Bukaan & Jendela": None,
+    "Modul 4 ♿ Tangga & Aksesibilitas": None,
+    "Modul 5 📊 Quantity Take-Off": None,
+}
+
 MODUL_KAWASAN = [
     "Listrik underground",
     "Fiber Optic",
@@ -71,7 +79,20 @@ if bidang == "MEP":
             )
     MODUL_MEP[pilihan]()
 elif bidang == "Arsitektur":
-    luas_bangunan_view.render()
+    with st.sidebar:
+        with st.expander("Arsitektur", expanded=True):
+            pilihan = st.radio(
+                "Modul Arsitektur",
+                list(MODUL_ARSITEKTUR.keys()),
+                label_visibility="collapsed",
+                key="kaizen_modul_arsitektur",
+            )
+    render = MODUL_ARSITEKTUR[pilihan]
+    if render is None:
+        st.title(pilihan)
+        st.info("Modul ini belum tersedia.")
+    else:
+        render()
 else:
     st.title(f"Bidang {bidang}")
     st.info(
