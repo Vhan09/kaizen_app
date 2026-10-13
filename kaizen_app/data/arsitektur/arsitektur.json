@@ -1,0 +1,25 @@
+{
+  "module_id": "ARS-01",
+  "module_name": "Luas dan Intensitas Bangunan",
+  "version": "1.0.0",
+  "units": {
+    "area": "m2",
+    "kdb": "%",
+    "klb": "-",
+    "kdh": "%"
+  },
+  "default_floor_areas_m2": [
+    90.0,
+    0.0
+  ],
+  "example_limits": {
+    "max_kdb_percent": 60.0,
+    "max_klb": 1.2,
+    "min_kdh_percent": 10.0
+  },
+  "notes": [
+    "Batas pada example_limits hanya nilai contoh antarmuka, bukan standar universal.",
+    "Verifikasi ketentuan tata ruang yang berlaku untuk lokasi dan jenis bangunan.",
+    "Definisi luas lantai, tapak bangunan, dan area yang dihitung sebagai KDH dapat mengikuti ketentuan setempat."
+  ]
+}
