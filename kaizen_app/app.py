@@ -16,6 +16,7 @@ from modules.mep import (
     titik_lampu,
     ventilasi,
 )
+from modules.arsitektur import luas_bangunan_view
 from utils.theme import inject_css
 
 st.set_page_config(page_title="Kaizen PBG", page_icon="⚡", layout="wide")
@@ -69,6 +70,8 @@ if bidang == "MEP":
                 )
             )
     MODUL_MEP[pilihan]()
+elif bidang == "Arsitektur":
+    luas_bangunan_view.render()
 else:
     st.title(f"Bidang {bidang}")
     st.info(

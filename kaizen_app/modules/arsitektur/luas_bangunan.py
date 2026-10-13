@@ -1,14 +1,16 @@
 
 """Core calculations and validation for ARS-01: Luas & Intensitas Bangunan."""
 
+import math
 from typing import Any
 
 
 def _as_float(value: Any, default: float = 0.0) -> float:
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
         return default
+    return number if math.isfinite(number) else default
 
 
 def validate_inputs(inputs: dict) -> tuple[list[str], list[str]]:

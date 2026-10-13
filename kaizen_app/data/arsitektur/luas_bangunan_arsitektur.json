@@ -1,0 +1,20 @@
+{
+  "project": {
+    "pekerjaan": "",
+    "lokasi": "",
+    "tahun": ""
+  },
+  "land_area_m2": 0.0,
+  "footprint_area_m2": 0.0,
+  "green_area_m2": 0.0,
+  "floor_areas_m2": [
+    90.0,
+    0.0
+  ],
+  "total_floor_area_manual_m2": null,
+  "limits": {
+    "max_kdb_percent": 60.0,
+    "max_klb": 1.2,
+    "min_kdh_percent": 10.0
+  }
+}

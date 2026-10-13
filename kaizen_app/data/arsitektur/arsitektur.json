@@ -1,6 +1,6 @@
 {
   "module_id": "ARS-01",
-  "module_name": "Luas dan Intensitas Bangunan",
+  "module_name": "Luas & Intensitas Bangunan",
   "version": "1.0.0",
   "units": {
     "area": "m2",

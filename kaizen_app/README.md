@@ -10,7 +10,7 @@
 - app.py                         halaman utama dan pemilih bidang
 - modules/mep/                   modul perhitungan Mechanical, Electrical, Plumbing
 - modules/sipil/                 modul perhitungan bidang Sipil
-- modules/arsitektur/            modul perhitungan bidang Arsitektur
+- modules/arsitektur/            modul luas dan intensitas bangunan (ARS-01), ekspor Excel/PDF
 - utils/                         fungsi bersama: format angka, penyimpanan, dan tema
 - data/mep/                      data dan input MEP dalam format JSON
 - data/sipil/                    data Sipil dalam format JSON
@@ -21,3 +21,9 @@ Semua bidang menggunakan satu `app.py`. Untuk penyimpanan bidang baru, gunakan
 `utils.storage.load/save/delete(..., domain="arsitektur")`. Pemanggilan lama tanpa
 argumen `domain` tetap menggunakan MEP; data MEP lama di `data/` juga tetap dibaca
 sebagai fallback dan akan disimpan ke `data/mep/` pada penyimpanan berikutnya.
+
+Modul Arsitektur **Luas & Intensitas Bangunan** menghitung KDB, KLB, dan KDH.
+Nilai batas awal pada `data/arsitektur/arsitektur.json` hanya contoh dan harus
+diverifikasi untuk lokasi proyek; pemeriksaan hasil tidak menyatakan kepatuhan hukum.
+Input proyek tersimpan di `data/arsitektur/luas_bangunan_arsitektur.json`, dan
+laporan dapat diunduh dalam format Excel atau PDF.
