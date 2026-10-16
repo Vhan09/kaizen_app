@@ -1877,6 +1877,68 @@ import streamlit as st
 
 K = "pd_"
 
+NUMERIC_HELP = {
+    "age_min": "Batas bawah rentang usia pembeli yang disasar; bukan syarat umur legal.",
+    "age_max": "Batas atas rentang usia pembeli yang disasar; bukan syarat umur legal.",
+    "hh": "Jumlah seluruh penghuni rumah yang diperkirakan. Dipakai untuk menilai kebutuhan ruang dan luas per orang.",
+    "kids": "Jumlah anak dalam rumah tangga sasaran; membantu memperkirakan kebutuhan kamar anak.",
+    "inc": "Perkiraan pendapatan rumah tangga per bulan. Digunakan sebagai masukan analisis keterjangkauan KPR, bukan verifikasi penghasilan.",
+    "cars": "Jumlah mobil yang perlu ditampung pada hunian; memengaruhi usulan jumlah carport.",
+    "motor": "Jumlah sepeda motor penghuni; memengaruhi estimasi luasan parkir carport.",
+    "price": "Harga jual sasaran per unit rumah. Dipakai untuk menghitung perkiraan batas biaya konstruksi.",
+    "lt": "Luas satu bidang tanah/kavling. Dipakai dalam analisis KDB, KLB, KDH dan envelope bangunan.",
+    "lw": "Lebar kavling pada sisi muka yang menghadap akses/jalan.",
+    "ld": "Panjang kavling dari sisi muka menuju sisi belakang.",
+    "lb": "Target luas lantai kotor bangunan per unit (GFA), sebelum pengurangan komponen sesuai definisi regulasi.",
+    "ntype": "Jumlah varian/tipe rumah yang akan dikembangkan. Wajib diputuskan untuk menyusun brief produk.",
+    "lp": "Perkiraan harga tanah bruto per m² untuk simulasi kelayakan biaya; ganti dengan harga transaksi atau appraisal setempat.",
+    "infra": "Anggaran prasarana per unit, misalnya jalan lingkungan dan jaringan utilitas. Masukkan sesuai estimasi proyek.",
+    "permit": "Anggaran per unit untuk perizinan dan legal. Masukkan estimasi proyek; bukan tarif resmi.",
+    "margin": "Target margin sebagai persentase pendapatan penjualan. Ini asumsi kelayakan proyek, bukan standar teknis atau ketentuan hukum.",
+    "kdb": "Koefisien Dasar Bangunan: batas persentase lahan yang boleh tertutup tapak bangunan. Ambil nilai yang berlaku dari RDTR/KRK/KKPR atau dokumen daerah; bukan angka default aplikasi.",
+    "klb": "Koefisien Lantai Bangunan: rasio batas total luas lantai terhadap luas lahan. Verifikasi nilai setempat pada RDTR/KRK/KKPR.",
+    "kdh": "Koefisien Dasar Hijau minimum: persentase lahan yang harus berupa area hijau sesuai definisi aturan setempat. Verifikasi pada RDTR.",
+    "gsb": "Garis Sempadan Bangunan depan: jarak minimum bangunan dari batas/garis yang ditetapkan aturan. Ukur menurut dokumen tata ruang setempat.",
+    "gsbl": "Jarak bebas bangunan ke batas samping kiri kavling. Ikuti RDTR/Perda; bila belum diketahui, aplikasi dapat memakai asumsi perhitungan saja.",
+    "gsbr": "Jarak bebas bangunan ke batas samping kanan kavling. Ikuti RDTR/Perda; bila belum diketahui, aplikasi dapat memakai asumsi perhitungan saja.",
+    "gsbb": "Jarak bebas bangunan ke batas belakang kavling. Ikuti RDTR/Perda; nilai asumsi aplikasi bukan ketentuan yang berlaku.",
+    "gsj": "Garis Sempadan Jalan diukur dari as/sumbu jalan sesuai ketentuan setempat. Periksa definisi dan jarak pada RDTR/Perda.",
+    "mf": "Jumlah lantai maksimum yang diizinkan (KBG/ketentuan intensitas setempat). Hitung jumlah tingkat sesuai definisi dokumen daerah.",
+    "mh": "Batas tinggi bangunan maksimum dalam meter menurut aturan setempat. Pastikan titik ukur (misalnya ke atap/puncak) mengikuti dokumen yang berlaku.",
+    "dz": "Perkiraan beda elevasi tertinggi dan terendah pada lahan. Gunakan hasil ukur topografi bila tersedia.",
+    "lat": "Lintang lokasi dalam derajat desimal; nilai negatif menunjukkan belahan selatan. Contoh Bandung sekitar -6,9°.",
+    "lon": "Bujur lokasi dalam derajat desimal; nilai timur Greenwich positif. Dipakai untuk analisis orientasi matahari.",
+    "fill": "Ketebalan material timbunan pada lahan, dalam meter. Isi bila kondisi tanah dipilih sebagai timbunan; konfirmasi dengan survei.",
+}
+
+REGULATION_CONFIRMATION_HELP = {
+    "kdb": "Centang setelah nilai KDB dicocokkan dengan dokumen tata ruang resmi yang berlaku untuk lokasi proyek.",
+    "klb": "Centang setelah nilai KLB dicocokkan dengan dokumen tata ruang resmi yang berlaku untuk lokasi proyek.",
+    "gsb": "Centang setelah GSB dan jarak bebas bangunan dicocokkan dengan RDTR/Perda atau dokumen resmi setempat.",
+    "gsj": "Centang setelah jarak sempadan jalan dan acuan pengukuran dari as jalan dicocokkan dengan dokumen resmi.",
+    "ktg": "Centang setelah ketentuan jumlah lantai/tinggi bangunan dicocokkan dengan dokumen resmi setempat.",
+    "kdh": "Centang setelah batas minimum area hijau/KDH dicocokkan dengan dokumen tata ruang resmi setempat.",
+}
+
+ROOM_QUESTION_HELP = {
+    "kt_utama": "Tentukan jumlah kamar tidur utama. Acuan minimum pada katalog: 9 m² (Kepmen Kimpraswil 403/KPTS/M/2002).",
+    "kt_anak": "Tentukan jumlah kamar tidur anak/tamu. Acuan katalog 7,2 m²; konfigurasi ruang tetap perlu memenuhi kebutuhan penghuni.",
+    "km": "Tentukan jumlah dan lokasi kamar mandi. Acuan minimum katalog 1,8 m² (Kepmen Kimpraswil 403/KPTS/M/2002).",
+    "r_tamu": "Putuskan apakah ruang tamu terpisah atau menyatu dengan ruang lain. Acuan luas katalog 7,2 m²; ukuran bukan pengganti pemeriksaan desain.",
+    "r_keluarga": "Putuskan hubungan ruang keluarga dengan ruang tamu. Luas katalog minimum 9 m² adalah acuan praktik.",
+    "r_makan": "Putuskan apakah ruang makan menyatu dengan dapur/ruang keluarga. Luas katalog minimum 4,5 m² adalah acuan praktik.",
+    "dapur": "Putuskan kebutuhan dapur bersih dan/atau kotor. Luas katalog minimum 4,5 m² adalah acuan praktik; katalog menandai ukuran dapur sebagai praktik.",
+    "dapur_kotor": "Tentukan apakah perlu dapur kotor terpisah. Luas katalog minimum 3 m² adalah acuan praktik.",
+    "musholla": "Putuskan apakah perlu ruang ibadah khusus atau area serbaguna. Kebutuhan luas bergantung pada kapasitas dan tata letak.",
+    "carport": "Tentukan jumlah mobil yang ditampung. Acuan satu ruang parkir mobil pada katalog adalah sekitar 2,5 × 5 m; cek kebutuhan bukaan dan sirkulasi.",
+    "taman": "Tentukan kebutuhan area taman/outdoor. Pemenuhan KDH dihitung terpisah menurut definisi aturan setempat.",
+    "r_kerja": "Putuskan apakah perlu ruang kerja khusus atau fungsi ruang lain dapat dipakai. Luas katalog merupakan acuan praktik.",
+    "r_art": "Putuskan kebutuhan ruang ART/servis. Acuan katalog 7,5 m² bersumber dari dimensi ruang servis Kepmen 403; sesuaikan fungsi.",
+    "gudang": "Tentukan kebutuhan penyimpanan dan ukuran minimum. Luas katalog adalah acuan praktik.",
+    "r_cuci": "Putuskan area cuci/jemur terbuka atau tertutup. Luas katalog adalah acuan praktik dan menyesuaikan kebutuhan.",
+    "teras": "Tentukan kebutuhan teras/entrance. Luas katalog adalah acuan praktik; persyaratan pencahayaan mengacu SNI 03-6575.",
+}
+
 
 def _p() -> PreDesignProject:
     if K + "project" not in st.session_state:
@@ -1886,9 +1948,108 @@ def _p() -> PreDesignProject:
     return st.session_state[K + "project"]
 
 
-def _num(label, key, value, **kw):
-    v = st.number_input(label, value=float(value or 0), key=K + key, **kw)
-    return v if v else None
+def _format_id_number(value, decimals: int = 2) -> str:
+    formatted = f"{abs(float(value or 0)):,.{decimals}f}"
+    integer, separator, fraction = formatted.partition(".")
+    integer = integer.replace(",", ".")
+    formatted = f"{integer},{fraction}" if separator else integer
+    return f"-{formatted}" if value is not None and value < 0 else formatted
+
+
+def _parse_id_number(text: str) -> Optional[float]:
+    text = text.strip().replace(" ", "")
+    if not text:
+        return None
+
+    sign = ""
+    if text[:1] in ("+", "-"):
+        sign, text = text[0], text[1:]
+    if not text:
+        return None
+
+    if "," in text:
+        if text.count(",") != 1:
+            return None
+        integer, fraction = text.split(",", 1)
+        if "." in integer:
+            groups = integer.split(".")
+            if not (1 <= len(groups[0]) <= 3 and all(len(group) == 3 for group in groups[1:])):
+                return None
+            integer = "".join(groups)
+        if not integer.isdigit() or (fraction and not fraction.isdigit()):
+            return None
+        normalized = f"{sign}{integer}.{fraction or '0'}"
+    elif "." in text:
+        groups = text.split(".")
+        if (
+            1 <= len(groups[0]) <= 3
+            and all(len(group) == 3 for group in groups[1:])
+        ):
+            normalized = sign + "".join(groups)
+        elif len(groups) == 2 and groups[0].isdigit() and groups[1].isdigit():
+            normalized = f"{sign}{groups[0]}.{groups[1]}"
+        else:
+            return None
+    else:
+        if not text.isdigit():
+            return None
+        normalized = sign + text
+
+    try:
+        return float(normalized)
+    except ValueError:
+        return None
+
+
+def _format_num_input(key: str, decimals: int) -> None:
+    parsed = _parse_id_number(st.session_state[key])
+    if parsed is not None:
+        st.session_state[key] = _format_id_number(parsed, decimals)
+
+
+def _number_help(key: str) -> str:
+    if key.startswith("q_"):
+        room_id = key[2:]
+        return (
+            ROOM_QUESTION_HELP.get(room_id, "Jumlah unit ruang yang dimasukkan ke dalam program.")
+            + " Isi 0 bila tidak diperlukan; jumlah ini menjadi masukan estimasi luas."
+        )
+    try:
+        return NUMERIC_HELP[key]
+    except KeyError as exc:
+        raise KeyError(f"Tooltip angka Pre-Design belum didefinisikan untuk field {key!r}.") from exc
+
+
+def _num(label, key, value, *, container=st, decimals=2, **kw):
+    number_format = kw.pop("format", None)
+    kw.pop("step", None)
+    if number_format and "." in number_format:
+        precision = number_format.rsplit(".", 1)[1]
+        if precision.endswith("f") and precision[:-1].isdigit():
+            decimals = int(precision[:-1])
+    min_value = kw.pop("min_value", None)
+    max_value = kw.pop("max_value", None)
+    widget_key = K + key
+    if widget_key not in st.session_state:
+        st.session_state[widget_key] = _format_id_number(value, decimals)
+    text = container.text_input(
+        label,
+        key=widget_key,
+        on_change=_format_num_input,
+        args=(widget_key, decimals),
+        help=_number_help(key),
+        **kw,
+    )
+    if not text.strip():
+        return None
+    parsed = _parse_id_number(text)
+    if parsed is None:
+        container.warning(f"{label}: masukkan angka dengan format Indonesia, misalnya 1.000.000.000,00.")
+        return value
+    if (min_value is not None and parsed < min_value) or (max_value is not None and parsed > max_value):
+        container.warning(f"{label}: nilai harus antara {min_value or 0} dan {max_value or 'tanpa batas'}.")
+        return value
+    return parsed
 
 
 def _int(v):
@@ -1899,22 +2060,38 @@ def render() -> None:
     p = _p()
     st.subheader("Pre-Design Perumahan Tapak")
     st.caption("Brief produk, parameter regulasi, dan kondisi tapak. Nilai KDB/KLB/GSB/GSJ/KTG/KDH wajib dari RDTR setempat.")
+    st.caption("Format angka: titik untuk pemisah ribuan dan koma untuk desimal, misalnya 1.000.000.000,00.")
     t11, t12, t13, t21, t22, thasil = st.tabs(["1.1 Pembeli", "1.2 Produk", "1.3 Program Ruang", "2.1 Regulasi", "2.2 Tapak", "Hasil"])
 
     with t11:
         pe = p.persona
         c1, c2 = st.columns(2)
-        pe.age_min = _int(_num("Usia min", "age_min", pe.age_min, step=1.0))
-        pe.age_max = _int(_num("Usia maks", "age_max", pe.age_max, step=1.0))
-        pe.household_size = _int(_num("Jumlah penghuni (jiwa)", "hh", pe.household_size, step=1.0))
-        pe.children = _int(_num("Jumlah anak", "kids", pe.children, step=1.0))
-        pe.monthly_income_idr = _num("Penghasilan rumah tangga / bulan (Rp)", "inc", pe.monthly_income_idr, step=500_000.0)
-        pe.cars = _int(_num("Jumlah mobil", "cars", pe.cars, step=1.0))
-        pe.motorcycles = _int(_num("Jumlah motor", "motor", pe.motorcycles, step=1.0))
-        tags = st.text_input("Gaya hidup (pisah koma, mis. wfh, mobilitas tinggi)", ", ".join(pe.lifestyle_tags), key=K + "tags")
+        pe.age_min = _int(_num("Usia min", "age_min", pe.age_min, decimals=0, step=1.0))
+        pe.age_max = _int(_num("Usia maks", "age_max", pe.age_max, decimals=0, step=1.0))
+        pe.household_size = _int(_num("Jumlah penghuni (jiwa)", "hh", pe.household_size, decimals=0, step=1.0))
+        pe.children = _int(_num("Jumlah anak", "kids", pe.children, decimals=0, step=1.0))
+        pe.monthly_income_idr = _num("Penghasilan rumah tangga / bulan (Rp)", "inc", pe.monthly_income_idr, decimals=0, step=500_000.0)
+        pe.cars = _int(_num("Jumlah mobil", "cars", pe.cars, decimals=0, step=1.0))
+        pe.motorcycles = _int(_num("Jumlah motor", "motor", pe.motorcycles, decimals=0, step=1.0))
+        tags = st.text_input(
+            "Gaya hidup (pisah koma, mis. wfh, mobilitas tinggi)",
+            ", ".join(pe.lifestyle_tags),
+            key=K + "tags",
+            help="Masukkan kebutuhan yang memengaruhi ruang, misalnya wfh atau mobilitas tinggi. Pisahkan beberapa tag dengan koma.",
+        )
         pe.lifestyle_tags = [t.strip().lower() for t in tags.split(",") if t.strip()]
-        pe.aesthetic = st.text_input("Preferensi estetika", pe.aesthetic or "", key=K + "aes") or None
-        pe.price_sensitivity = st.text_input("Sensitivitas harga", pe.price_sensitivity or "", key=K + "ps") or None
+        pe.aesthetic = st.text_input(
+            "Preferensi estetika",
+            pe.aesthetic or "",
+            key=K + "aes",
+            help="Catat gaya/karakter desain yang disukai calon pembeli; gunakan sebagai brief, bukan klasifikasi regulasi.",
+        ) or None
+        pe.price_sensitivity = st.text_input(
+            "Sensitivitas harga",
+            pe.price_sensitivity or "",
+            key=K + "ps",
+            help="Ringkas tingkat prioritas harga dibanding luas, lokasi, dan spesifikasi berdasarkan sasaran pasar.",
+        ) or None
 
     with t12:
         pr = p.product
@@ -1925,35 +2102,83 @@ def render() -> None:
         pr.target_gfa_m2 = _num("Luas bangunan target (m²)", "lb", pr.target_gfa_m2, step=1.0)
         pr.num_types = _int(_num("Jumlah tipe (KRITIS)", "ntype", pr.num_types, step=1.0))
         idx = FINISHING.index(pr.finishing_class) if pr.finishing_class in FINISHING else 1
-        pr.finishing_class = st.selectbox("Kelas finishing (KRITIS)", FINISHING, index=idx, key=K + "fin")
+        pr.finishing_class = st.selectbox(
+            "Kelas finishing (KRITIS)",
+            FINISHING,
+            index=idx,
+            key=K + "fin",
+            help="Kelas standar/menengah/atas memilih asumsi luas rekomendasi ruang dan biaya. Ini klasifikasi internal awal, bukan standar mutu bangunan resmi.",
+        )
         st.markdown("**Biaya konstruksi maks./m² (KRITIS)** — hitung mundur dari harga jual")
         a, b, c = st.columns(3)
-        land_price = a.number_input("Harga tanah bruto (Rp/m²)", value=3_000_000.0, step=100_000.0, key=K + "lp")
-        infra = b.number_input("Prasarana per unit (Rp)", value=0.0, step=1_000_000.0, key=K + "infra")
-        permit = c.number_input("Perizinan/legal per unit (Rp)", value=0.0, step=1_000_000.0, key=K + "permit")
-        margin = st.slider("Margin target (% dari pendapatan)", 0.0, 30.0, 12.0, key=K + "margin")
+        land_price = _num("Harga tanah bruto (Rp/m²)", "lp", 3_000_000.0, container=a, decimals=0, step=100_000.0) or 0.0
+        infra = _num("Prasarana per unit (Rp)", "infra", 0.0, container=b, decimals=0, step=1_000_000.0) or 0.0
+        permit = _num("Perizinan/legal per unit (Rp)", "permit", 0.0, container=c, decimals=0, step=1_000_000.0) or 0.0
+        margin = st.slider(
+            "Margin target (% dari pendapatan)",
+            0.0,
+            30.0,
+            12.0,
+            key=K + "margin",
+            help="Asumsi target laba sebagai bagian dari pendapatan penjualan untuk simulasi batas biaya. Bukan standar teknis atau ketentuan hukum.",
+        )
         if pr.target_price_idr and pr.land_area_m2 and (pr.target_gfa_m2 or 0) > 0:
             r = fin.solve_max_construction_cost(fin.CostSolveInputs(
                 price_idr=pr.target_price_idr, gfa_m2=pr.target_gfa_m2, land_area_m2=pr.land_area_m2,
                 land_price_gross_per_m2_idr=land_price, infrastructure_per_unit_idr=infra,
                 permits_legal_per_unit_idr=permit, target_margin_pct=margin))
-            st.metric("Usulan biaya konstruksi maks.", f"Rp {r.max_construction_per_m2_idr:,.0f} / m²".replace(",", "."))
+            st.metric(
+                "Usulan biaya konstruksi maks.",
+                f"Rp {r.max_construction_per_m2_idr:,.0f} / m²".replace(",", "."),
+                help="Hasil simulasi dari harga jual, biaya tanah, prasarana/legal, luas bangunan, dan margin target. Periksa asumsi serta harga lokal sebelum dijadikan keputusan.",
+            )
             st.caption(f"Kelas setara: {fin.classify_cost_per_m2(r.max_construction_per_m2_idr)} · porsi tanah {r.land_share_of_price:.0%}")
             for wmsg in r.warnings:
                 st.warning(wmsg)
-            if st.button("Pakai usulan ini sebagai keputusan", key=K + "usecost"):
+            if st.button(
+                "Pakai usulan ini sebagai keputusan",
+                key=K + "usecost",
+                help="Salin hasil simulasi ke parameter biaya konstruksi maksimum proyek. Nilai tetap perlu ditinjau dan disetujui tim.",
+            ):
                 pr.max_construction_cost_per_m2_idr = float(r.max_construction_per_m2_idr)
         if pr.max_construction_cost_per_m2_idr:
             st.success(f"Keputusan biaya konstruksi maks.: Rp {pr.max_construction_cost_per_m2_idr:,.0f}/m²".replace(",", "."))
 
     with t13:
-        st.caption("Centang = setuju · hilangkan centang = coret. Jumlah unit menjawab pertanyaan 'note' slide.")
+        st.caption("Gunakan tanda tanya pada nama ruang, jumlah, dan jawaban untuk melihat panduan. Centang memasukkan ruang ke estimasi; kosong berarti belum disetujui.")
         for r_ in p.program:
             c1, c2, c3 = st.columns([4, 1, 2])
-            ok = c1.checkbox(f"{r_.name}  ·  {r_.priority}", value=bool(r_.approved), key=K + "ap_" + r_.room_id, help=r_.question)
+            catalog_room = room_catalog().get(r_.room_id, {})
+            room_source = catalog_room.get("source", "")
+            room_minimum = catalog_room.get("min_area_m2")
+            room_help = ROOM_QUESTION_HELP.get(
+                r_.room_id,
+                "Tentukan apakah ruang ini termasuk dalam brief dan estimasi kebutuhan hunian.",
+            )
+            if room_minimum:
+                room_help += f" Minimum katalog {room_minimum:g} m²/unit. "
+            if room_source:
+                room_help += f"Basis katalog: {room_source}. "
+            if r_.question:
+                room_help += f"Pertanyaan keputusan: {r_.question}"
+            ok = c1.checkbox(
+                f"{r_.name}  ·  {r_.priority}",
+                value=bool(r_.approved),
+                key=K + "ap_" + r_.room_id,
+                help=room_help,
+            )
             r_.approved = ok
-            r_.qty = int(c2.number_input("qty", 0, 10, int(r_.qty), key=K + "q_" + r_.room_id, label_visibility="collapsed"))
-            r_.answer = c3.text_input("jawaban", r_.answer, key=K + "an_" + r_.room_id, label_visibility="collapsed", placeholder=r_.question)
+            r_.qty = int(_num(
+                "qty", "q_" + r_.room_id, r_.qty, container=c2, decimals=0,
+                min_value=0, max_value=10,
+            ) or 0)
+            r_.answer = c3.text_input(
+                "Jawaban",
+                r_.answer,
+                key=K + "an_" + r_.room_id,
+                placeholder=r_.question,
+                help=f"Catat keputusan untuk ruang ini. Pertanyaan panduan: {r_.question or 'jelaskan kebutuhan khusus atau asumsi ruang.'}",
+            )
 
     with t21:
         rg = p.regulation
@@ -1971,11 +2196,21 @@ def render() -> None:
             rg.gsj_from_axis_m = _num("GSJ dari as jalan (m)", "gsj", rg.gsj_from_axis_m, step=0.5)
             rg.max_floors = _int(_num("KTG: lantai maks", "mf", rg.max_floors, step=1.0))
             rg.max_height_m = _num("KTG: tinggi maks (m)", "mh", rg.max_height_m, step=0.5)
-        rg.source = st.text_input("Sumber (RDTR/KKPR/PBG)", rg.source, key=K + "src")
+        rg.source = st.text_input(
+            "Sumber (RDTR/KKPR/PBG)",
+            rg.source,
+            key=K + "src",
+            help="Cantumkan nama dokumen, wilayah, nomor/tanggal, dan pasal atau lampiran tempat angka regulasi ditemukan.",
+        )
         st.markdown("**Dikonfirmasi ke RDTR?**")
         cols = st.columns(6)
         for col, k in zip(cols, load("regulation_defaults")["confirmation_keys"]):
-            rg.confirmed[k] = col.checkbox(k.upper(), value=rg.confirmed.get(k, False), key=K + "cf_" + k)
+            rg.confirmed[k] = col.checkbox(
+                k.upper(),
+                value=rg.confirmed.get(k, False),
+                key=K + "cf_" + k,
+                help=REGULATION_CONFIRMATION_HELP[k],
+            )
         if p.product.land_area_m2 and rg.kdb_pct:
             try:
                 e = reg.analyze(p.product, rg, p.site)
@@ -1990,22 +2225,69 @@ def render() -> None:
         c1, c2 = st.columns(2)
         with c1:
             s.front_orientation = st.selectbox("Hadap lahan", COMPASS8, index=COMPASS8.index(s.front_orientation) if s.front_orientation in COMPASS8 else 7, key=K + "fo",
-                                               format_func=lambda c: {"U": "Utara", "TL": "Timur Laut", "T": "Timur", "TG": "Tenggara", "S": "Selatan", "BD": "Barat Daya", "B": "Barat", "BL": "Barat Laut"}[c])
+                                               format_func=lambda c: {"U": "Utara", "TL": "Timur Laut", "T": "Timur", "TG": "Tenggara", "S": "Selatan", "BD": "Barat Daya", "B": "Barat", "BL": "Barat Laut"}[c],
+                                               help="Pilih arah sisi depan kavling. Arah ini membantu analisis orientasi fasad dan paparan matahari.")
             tops = ["datar", "landai", "miring"]
-            s.topography = st.selectbox("Kontur", tops, index=tops.index(s.topography) if s.topography in tops else 0, key=K + "top")
+            s.topography = st.selectbox(
+                "Kontur",
+                tops,
+                index=tops.index(s.topography) if s.topography in tops else 0,
+                key=K + "top",
+                help="Klasifikasikan bentuk permukaan lahan dari survei/topografi. Untuk lahan miring, ukur beda elevasi.",
+            )
             s.level_difference_m = _num("Beda tinggi (m)", "dz", s.level_difference_m, step=0.1)
-            s.best_view = st.text_input("View terbaik", s.best_view, key=K + "view")
+            s.best_view = st.text_input(
+                "View terbaik",
+                s.best_view,
+                key=K + "view",
+                help="Sebutkan objek/pemandangan yang ingin diprioritaskan, misalnya taman atau pegunungan.",
+            )
             s.latitude = _num("Lintang (negatif = selatan)", "lat", s.latitude, step=0.01, format="%.4f")
             s.longitude = _num("Bujur", "lon", s.longitude, step=0.01, format="%.4f")
         with c2:
             soils = ["tanah_asli_baik", "timbunan", "tanah_asli_lunak", "gambut", "tidak_diketahui"]
-            s.soil_condition = st.selectbox("Kondisi tanah", soils, index=soils.index(s.soil_condition) if s.soil_condition in soils else 4, key=K + "soil")
+            s.soil_condition = st.selectbox(
+                "Kondisi tanah",
+                soils,
+                index=soils.index(s.soil_condition) if s.soil_condition in soils else 4,
+                key=K + "soil",
+                format_func=lambda value: value.replace("_", " ").capitalize(),
+                help="Pilih kondisi berdasarkan informasi awal/survei. Klasifikasi ini bukan pengganti penyelidikan geoteknik.",
+            )
             s.fill_thickness_m = _num("Tebal timbunan (m)", "fill", s.fill_thickness_m, step=0.1)
-            s.soil_tested = st.checkbox("Uji tanah (sondir/boring) sudah ada", value=bool(s.soil_tested), key=K + "tested")
+            s.soil_tested = st.checkbox(
+                "Uji tanah (sondir/boring) sudah ada",
+                value=bool(s.soil_tested),
+                key=K + "tested",
+                help="Centang jika tersedia laporan uji tanah lapangan, misalnya sondir atau boring; catat hasilnya pada dokumen teknis proyek.",
+            )
             opt = [None, *COMPASS8]
-            s.vehicle_access_from = st.selectbox("Akses kendaraan dari arah", opt, index=opt.index(s.vehicle_access_from) if s.vehicle_access_from in opt else 0, key=K + "va")
-            s.pln_entry_from = st.selectbox("PLN masuk dari arah", opt, index=opt.index(s.pln_entry_from) if s.pln_entry_from in opt else 0, key=K + "pln")
-            nn = st.text_area("Non-negotiable (satu per baris)", "\n".join(s.non_negotiables), key=K + "nn")
+            compass_label = lambda value: "Belum diketahui" if value is None else {
+                "U": "Utara", "TL": "Timur Laut", "T": "Timur", "TG": "Tenggara",
+                "S": "Selatan", "BD": "Barat Daya", "B": "Barat", "BL": "Barat Laut",
+            }[value]
+            s.vehicle_access_from = st.selectbox(
+                "Akses kendaraan dari arah",
+                opt,
+                index=opt.index(s.vehicle_access_from) if s.vehicle_access_from in opt else 0,
+                key=K + "va",
+                format_func=compass_label,
+                help="Arah sisi kavling yang menjadi akses kendaraan dari jalan. Pilih belum diketahui bila belum disurvei.",
+            )
+            s.pln_entry_from = st.selectbox(
+                "PLN masuk dari arah",
+                opt,
+                index=opt.index(s.pln_entry_from) if s.pln_entry_from in opt else 0,
+                key=K + "pln",
+                format_func=compass_label,
+                help="Perkiraan sisi masuk sambungan listrik ke kavling; konfirmasi posisi dan kapasitas ke penyedia listrik saat perencanaan.",
+            )
+            nn = st.text_area(
+                "Non-negotiable (satu per baris)",
+                "\n".join(s.non_negotiables),
+                key=K + "nn",
+                help="Daftar kebutuhan yang tidak boleh dihilangkan dari brief, satu hal per baris, misalnya akses kursi roda atau kamar di lantai dasar.",
+            )
             s.non_negotiables = [x.strip() for x in nn.splitlines() if x.strip()]
 
     with thasil:

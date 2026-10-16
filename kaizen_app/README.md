@@ -30,7 +30,9 @@ laporan dapat diunduh dalam format Excel atau PDF.
 
 Modul Arsitektur **Pre-Design** menyediakan laporan Excel dan PDF dengan ringkasan,
 parameter proyek, program ruang, kelengkapan form, temuan validasi, dan keputusan
-yang tercatat; berita acara Markdown dan data proyek JSON tetap tersedia.
+yang tercatat; berita acara Markdown dan data proyek JSON tetap tersedia. Kolom
+parameter dan program ruang menyediakan tooltip penjelasan, termasuk acuan katalog;
+angka regulasi tetap harus diverifikasi terhadap dokumen resmi setempat.
 
 Menu Arsitektur **Bukaan & Jendela** menggunakan halaman, perhitungan, data
 standar, dan penyimpanan yang sama dengan modul **Kebutuhan Ventilasi** MEP.
