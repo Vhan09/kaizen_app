@@ -1072,12 +1072,12 @@
                 "type": "enum",
                 "level": "WAJIB",
                 "options": [
-                  "tanah_asli_keras",
-                  "tanah_asli_lunak",
+                  "tanah asli keras",
+                  "tanah asli lunak",
                   "timbunan",
                   "gambut",
                   "berbatu",
-                  "tidak_diketahui"
+                  "tidak diketahui"
                 ],
                 "example": "timbunan"
               },
