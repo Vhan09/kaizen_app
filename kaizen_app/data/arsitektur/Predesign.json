@@ -1,0 +1,3261 @@
+{
+  "building_physics": {
+    "_meta": {
+      "title": "Parameter Fisika Bangunan (selubung, pencahayaan, ventilasi, matahari)",
+      "version": "0.1.0",
+      "status_legend": {
+        "verified_secondary": "dikutip dari sumber sekunder yang dibaca",
+        "practice": "nilai tipikal literatur/ISO/praktik - kalibrasi dengan data produsen",
+        "assumption": "asumsi default penyusun"
+      }
+    },
+    "surface_films_m2k_w": {
+      "Rsi_wall": 0.13,
+      "Rse_wall": 0.04,
+      "Rsi_roof_up": 0.1,
+      "Rse_roof": 0.04,
+      "source": "ISO 6946 (nilai tipikal)",
+      "status": "practice"
+    },
+    "materials": {
+      "bata_merah": {
+        "label": "Bata merah pejal",
+        "lambda_w_mk": 0.72,
+        "density_kg_m3": 1700,
+        "thickness_options_m": [
+          0.1,
+          0.15,
+          0.2
+        ],
+        "status": "practice"
+      },
+      "bata_ringan": {
+        "label": "Bata ringan AAC",
+        "lambda_w_mk": 0.15,
+        "density_kg_m3": 600,
+        "thickness_options_m": [
+          0.075,
+          0.1,
+          0.125
+        ],
+        "status": "practice"
+      },
+      "conblock": {
+        "label": "Batako/conblock berongga",
+        "lambda_w_mk": 0.8,
+        "density_kg_m3": 1300,
+        "thickness_options_m": [
+          0.1,
+          0.15
+        ],
+        "status": "practice"
+      },
+      "plester": {
+        "label": "Plesteran semen",
+        "lambda_w_mk": 0.72,
+        "density_kg_m3": 1800,
+        "thickness_options_m": [
+          0.015,
+          0.02
+        ],
+        "status": "practice"
+      },
+      "beton": {
+        "label": "Beton bertulang",
+        "lambda_w_mk": 1.75,
+        "density_kg_m3": 2400,
+        "status": "practice"
+      },
+      "gypsum": {
+        "label": "Papan gipsum",
+        "lambda_w_mk": 0.25,
+        "density_kg_m3": 900,
+        "status": "practice"
+      },
+      "kayu": {
+        "label": "Kayu/GRC kayu",
+        "lambda_w_mk": 0.15,
+        "density_kg_m3": 600,
+        "status": "practice"
+      },
+      "eps": {
+        "label": "Insulasi EPS",
+        "lambda_w_mk": 0.035,
+        "density_kg_m3": 20,
+        "status": "practice"
+      },
+      "glasswool": {
+        "label": "Glasswool",
+        "lambda_w_mk": 0.04,
+        "density_kg_m3": 16,
+        "status": "practice"
+      },
+      "udara_diam_20mm": {
+        "label": "Rongga udara tertutup 20 mm (setara R)",
+        "r_equiv_m2k_w": 0.15,
+        "status": "practice"
+      }
+    },
+    "wall_presets": {
+      "bata_merah_1_2": {
+        "label": "Bata merah 1/2 bata + plester 2 sisi",
+        "layers": [
+          [
+            "plester",
+            0.015
+          ],
+          [
+            "bata_merah",
+            0.1
+          ],
+          [
+            "plester",
+            0.015
+          ]
+        ],
+        "mass_kg_m2": 250,
+        "status": "practice"
+      },
+      "bata_ringan_10": {
+        "label": "Bata ringan 10 cm + plester 2 sisi",
+        "layers": [
+          [
+            "plester",
+            0.015
+          ],
+          [
+            "bata_ringan",
+            0.1
+          ],
+          [
+            "plester",
+            0.015
+          ]
+        ],
+        "mass_kg_m2": 100,
+        "status": "practice"
+      },
+      "conblock_10": {
+        "label": "Conblock 10 cm + plester 2 sisi",
+        "layers": [
+          [
+            "plester",
+            0.015
+          ],
+          [
+            "conblock",
+            0.1
+          ],
+          [
+            "plester",
+            0.015
+          ]
+        ],
+        "mass_kg_m2": 160,
+        "status": "practice"
+      },
+      "bata_ringan_10_rongga": {
+        "label": "Bata ringan 10 cm + rongga 20 mm + gipsum",
+        "layers": [
+          [
+            "plester",
+            0.015
+          ],
+          [
+            "bata_ringan",
+            0.1
+          ],
+          [
+            "udara_diam_20mm",
+            0.02
+          ],
+          [
+            "gypsum",
+            0.009
+          ]
+        ],
+        "mass_kg_m2": 105,
+        "status": "practice"
+      }
+    },
+    "glazing": {
+      "clear_6mm": {
+        "label": "Kaca bening 6 mm",
+        "U_w_m2k": 5.8,
+        "SC": 0.95,
+        "status": "practice"
+      },
+      "tinted_6mm": {
+        "label": "Kaca tinted 6 mm",
+        "U_w_m2k": 5.7,
+        "SC": 0.65,
+        "status": "practice"
+      },
+      "reflective_6mm": {
+        "label": "Kaca reflektif 6 mm",
+        "U_w_m2k": 5.5,
+        "SC": 0.4,
+        "status": "practice"
+      },
+      "lowe_double": {
+        "label": "Low-E double glazing",
+        "U_w_m2k": 2.0,
+        "SC": 0.45,
+        "status": "practice"
+      }
+    },
+    "solar_absorptance_alpha": {
+      "putih": 0.3,
+      "krem_muda": 0.4,
+      "abu_muda": 0.5,
+      "terracotta": 0.65,
+      "abu_tua": 0.75,
+      "gelap": 0.9,
+      "source": "Nilai tipikal literatur (cool paint / CIBSE)",
+      "status": "practice"
+    },
+    "tdek_k_indicative": {
+      "_note": "TDEk (beda temperatur ekuivalen, K) pada SNI 6389 bergantung berat dinding & absorptansi; tabel resmi tidak tersedia pada sumber yang dibaca. Nilai berikut HANYA indikatif untuk pre-design: ganti dengan tabel SNI 6389:2020.",
+      "ringan_lt_125_kg_m2": 18.0,
+      "sedang_125_to_250_kg_m2": 14.0,
+      "berat_gt_250_kg_m2": 10.0,
+      "status": "assumption"
+    },
+    "delta_t_k": 5.0,
+    "delta_t_note": "ΔT perancangan antara luar-dalam = 5 K (sumber sekunder untuk SNI 6389:2020)",
+    "overhang": {
+      "shading_effective_min_ratio": 0.0,
+      "note": "Hitung SCeff dari geometri dengan climate.overhang_shaded_fraction()",
+      "status": "practice"
+    },
+    "lighting": {
+      "method": "lumen (SNI 03-6575-2001)",
+      "formula": "N = (E x A) / (Phi x UF x MF)",
+      "maintenance_factor": 0.8,
+      "utilization_factor_by_room_index": [
+        [
+          0.6,
+          0.3
+        ],
+        [
+          1.0,
+          0.42
+        ],
+        [
+          1.5,
+          0.5
+        ],
+        [
+          2.0,
+          0.55
+        ],
+        [
+          3.0,
+          0.6
+        ],
+        [
+          5.0,
+          0.64
+        ]
+      ],
+      "luminaires": {
+        "led_9w_lm": 900,
+        "led_12w_lm": 1200,
+        "led_18w_lm": 1800
+      },
+      "lpd_target_w_m2": 7.0,
+      "lpd_note": "Target indikatif daya pencahayaan (W/m2) hunian; nilai batas SNI 6197 tidak terbaca pada sumber, cek dokumen.",
+      "status": "practice"
+    },
+    "ventilation": {
+      "fresh_air_m3_min_per_person": 0.8,
+      "air_volume_m3_per_person": 9.0,
+      "source": "Kepmen 403/KPTS/M/2002",
+      "ach_target_living": [
+        4,
+        6
+      ],
+      "ach_target_wet": [
+        8,
+        12
+      ],
+      "ach_note": "ACH target = praktik ventilasi alami tropis; bukan angka SNI.",
+      "status": "verified_secondary"
+    },
+    "solar_geometry": {
+      "declination_formula": "delta = 23.45° x sin(360/365 x (284 + n))",
+      "solar_time_note": "Waktu surya (bukan jam arloji); koreksi bujur & EoT diabaikan pada pre-design.",
+      "sample_dates": {
+        "21_mar": 80,
+        "21_jun": 172,
+        "23_sep": 266,
+        "22_des": 356
+      }
+    },
+    "orientation_notes": {
+      "_note": "Untuk lintang rendah (|φ| < 10°): matahari tinggi, lintasan dekat zenit; dinding Timur & Barat menerima radiasi horizontal-rendah (sinar pagi/sore) paling sulit dikendalikan; Utara/Selatan lebih mudah diberi overhang.",
+      "U": {
+        "rank_note": "mudah dinaungi overhang horizontal",
+        "advice": "Bukaan utama aman; overhang horizontal efektif."
+      },
+      "TL": {
+        "rank_note": "matahari pagi",
+        "advice": "Boleh bukaan sedang; sirip vertikal/tanaman."
+      },
+      "T": {
+        "rank_note": "matahari pagi rendah",
+        "advice": "Kamar tidur menerima sinar pagi (baik, 1 jam sinar langsung); batasi kaca lebar."
+      },
+      "TG": {
+        "rank_note": "matahari pagi (Jun-Sep)",
+        "advice": "Aman."
+      },
+      "S": {
+        "rank_note": "mudah dinaungi overhang horizontal",
+        "advice": "Bukaan utama aman."
+      },
+      "BD": {
+        "rank_note": "matahari sore",
+        "advice": "Batasi bukaan; zona servis sebagai buffer."
+      },
+      "B": {
+        "rank_note": "matahari sore - terpanas pada banyak kota (SF tertinggi)",
+        "advice": "Hindari ruang tidur/tinggal berkaca besar; gunakan buffer servis, secondary skin, sirip vertikal."
+      },
+      "BL": {
+        "rank_note": "matahari sore (Okt-Feb), SF tinggi",
+        "advice": "Muka depan menghadap BL = beban termal besar: minimalkan WWR, overhang dalam, vegetasi, warna cerah (alpha rendah)."
+      }
+    }
+  },
+  "financial_params": {
+    "_meta": {
+      "title": "Parameter Keuangan & Keterjangkauan",
+      "version": "0.1.0",
+      "CRITICAL_NOTE": "Seluruh tarif pajak/suku bunga adalah DEFAULT yang harus diverifikasi ke aturan yang berlaku saat transaksi. Modul tidak memberi nasihat pajak.",
+      "status_legend": {
+        "V0": "belum diverifikasi",
+        "assumption": "asumsi default",
+        "practice": "praktik perbankan/pengembang"
+      }
+    },
+    "taxes": {
+      "ppn_effective_pct": 11.0,
+      "ppn_note": "Tarif efektif PPN penyerahan rumah (cek DPP & fasilitas PPN DTP/pembebasan rumah sederhana yang berlaku).",
+      "ppn_status": "V0",
+      "bphtb_pct": 5.0,
+      "bphtb_note": "BPHTB (pembeli) maks 5% dari NPOP dikurangi NPOPTKP daerah (UU 1/2022 HKPD) - hitung lanjut di luar modul.",
+      "bphtb_status": "V0",
+      "pph_final_seller_pct": 2.5,
+      "pph_final_rs_pct": 1.0,
+      "pph_note": "PPh final pengalihan hak tanah/bangunan (PP 34/2016: 2,5%; rumah sederhana 1%).",
+      "pph_status": "V0"
+    },
+    "developer_cost_structure_typical_pct_of_price": {
+      "tanah_dan_pematangan": [
+        20,
+        35
+      ],
+      "prasarana_kawasan": [
+        6,
+        12
+      ],
+      "konstruksi_bangunan": [
+        35,
+        50
+      ],
+      "perizinan_legal_sertifikat": [
+        1,
+        3
+      ],
+      "overhead_proyek": [
+        3,
+        6
+      ],
+      "pemasaran_komisi": [
+        2,
+        5
+      ],
+      "biaya_keuangan": [
+        1,
+        4
+      ],
+      "margin_target": [
+        10,
+        20
+      ],
+      "status": "assumption"
+    },
+    "net_to_gross_land_ratio": {
+      "typical_range": [
+        0.55,
+        0.7
+      ],
+      "default": 0.62,
+      "note": "Porsi lahan jual (kavling) terhadap lahan bruto setelah jalan/fasum/fasos/RTH/pond. Dari master plan.",
+      "status": "assumption"
+    },
+    "contingency_default_pct": 7.0,
+    "kpr": {
+      "dsr_max_default": 0.3,
+      "dsr_max_range": [
+        0.3,
+        0.4
+      ],
+      "dsr_note": "Rasio angsuran/penghasilan umum 30-40% (praktik bank).",
+      "down_payment_pct_default": 15.0,
+      "tenor_years_default": 20,
+      "interest_pct_default": 9.0,
+      "admin_fee_pct": 1.0,
+      "interest_note": "Suku bunga default hanya contoh; isi sesuai penawaran bank.",
+      "status": "practice"
+    },
+    "sensitivity_grid": {
+      "price_delta_pct": [
+        -10,
+        -5,
+        0,
+        5,
+        10
+      ],
+      "cost_delta_pct": [
+        -10,
+        -5,
+        0,
+        5,
+        10
+      ]
+    }
+  },
+  "finishing_classes": {
+    "_meta": {
+      "title": "Kelas Finishing & Benchmark Biaya Konstruksi (Standar / Menengah / Atas)",
+      "version": "0.1.0",
+      "currency": "IDR",
+      "price_basis": "Indikatif 2026, rumah tapak 1-2 lantai, kota tingkat menengah di luar Jawa; di luar tanah, prasarana kawasan, pajak, PBG, kontingensi.",
+      "CRITICAL_NOTE": "Seluruh angka biaya berstatus ASUMSI. Wajib dikalibrasi dengan HSPK/AHSP daerah setempat (Permen PUPR 8/2023) dan RAB proyek sejenis sebelum menjadi 'angka mengikat' slide 1.2.",
+      "status": "assumption"
+    },
+    "classes": {
+      "standar": {
+        "label": "Standar",
+        "cost_per_m2_idr": {
+          "low": 3800000,
+          "mid": 4400000,
+          "high": 5000000
+        },
+        "efficiency_note": "Layout ringkas, bentang pendek, bentuk massa sederhana.",
+        "spec": {
+          "struktur": "Pondasi batu kali/footplate, kolom-balok beton praktis (min 15x15, ring balok 15x20 mengacu Kepmen 403), pelat lantai beton t=12 cm (lt.2) / lantai kerja t=5 cm",
+          "dinding": "Bata ringan/conblock plester aci, cat emulsi",
+          "lantai": "Keramik 40x40 / 60x60 lokal",
+          "plafon": "Gipsum 9 mm rangka hollow / PVC",
+          "atap": "Rangka baja ringan SNI 7971:2013, genteng beton/metal pasir",
+          "kusen_pintu": "Kusen aluminium / kayu olahan, pintu HPL-flush, jendela aluminium 5 mm",
+          "sanitair": "Closet duduk/jongkok standar, kran lokal",
+          "elektrikal": "Daya 1300-2200 VA, saklar/stopkontak standar, lampu LED",
+          "dapur": "Meja beton + keramik, tanpa kitchen set",
+          "air": "PDAM/sumur bor + toren 500-1000 L, septik + resapan"
+        }
+      },
+      "menengah": {
+        "label": "Menengah",
+        "cost_per_m2_idr": {
+          "low": 5000000,
+          "mid": 6000000,
+          "high": 7000000
+        },
+        "spec": {
+          "struktur": "Footplate + sloof menerus / tiang mini bila tanah lunak/timbunan; kolom 20x20 atau lebih sesuai hitungan",
+          "dinding": "Bata ringan + cat tahan cuaca, aksen fasad",
+          "lantai": "Granit tile/homogeneous tile 60x60, lantai kayu laminat aksen",
+          "plafon": "Gipsum + drop ceiling & cove lighting",
+          "atap": "Baja ringan + genteng metal/keramik, insulasi foil",
+          "kusen_pintu": "Aluminium powder coating, kaca tempered/laminasi, pintu solid",
+          "sanitair": "Closet duduk merk menengah, shower, wastafel",
+          "elektrikal": "Daya 2200-3500 VA, MCB per grup, titik AC siap",
+          "dapur": "Kitchen set minimalis HPL + top table granit",
+          "air": "PDAM + toren + pompa, septik biofilter"
+        }
+      },
+      "atas": {
+        "label": "Atas",
+        "cost_per_m2_idr": {
+          "low": 7000000,
+          "mid": 8500000,
+          "high": 10500000
+        },
+        "spec": {
+          "struktur": "Struktur dihitung penuh (SNI 1726/1727/2847), pondasi tiang bor/pancang sesuai uji tanah",
+          "dinding": "Bata ringan, finishing tekstur/batu alam/ACP aksen",
+          "lantai": "Granit/marmer buatan/ parket, floor heating opsional",
+          "plafon": "Gipsum desain, panel kayu",
+          "atap": "Beton/dak + waterproofing atau baja ringan premium + insulasi",
+          "kusen_pintu": "Aluminium thermal-break / kayu solid, double glazing pada fasad panas",
+          "sanitair": "Sanitair premium, water heater, bathtub opsional",
+          "elektrikal": "Daya 3500-5500 VA, smart-home siap, genset opsional",
+          "dapur": "Kitchen set custom + island + dapur kotor",
+          "air": "PDAM + toren + booster, IPAL/biofilter, panel surya opsional"
+        }
+      }
+    },
+    "cost_breakdown_typical_pct": {
+      "_note": "Komposisi tipikal biaya konstruksi rumah tapak (asumsi untuk pembagian anggaran di pre-design).",
+      "persiapan_dan_tanah": [
+        3,
+        5
+      ],
+      "struktur_pondasi_beton": [
+        24,
+        30
+      ],
+      "dinding_dan_plester": [
+        10,
+        14
+      ],
+      "atap_dan_plafon": [
+        10,
+        14
+      ],
+      "kusen_pintu_jendela": [
+        6,
+        10
+      ],
+      "lantai_dan_finishing": [
+        10,
+        15
+      ],
+      "sanitair_dan_plambing": [
+        4,
+        7
+      ],
+      "elektrikal": [
+        4,
+        7
+      ],
+      "pengecatan": [
+        3,
+        5
+      ],
+      "lain_lain_dan_prelim": [
+        3,
+        5
+      ],
+      "status": "assumption"
+    },
+    "contingency_pct": {
+      "standar": 5,
+      "menengah": 7,
+      "atas": 10,
+      "extra_if_fill_soil": 3,
+      "status": "assumption"
+    },
+    "price_ratio_checks": {
+      "max_land_share_of_price": 0.4,
+      "typical_land_share_range": [
+        0.2,
+        0.4
+      ],
+      "typical_construction_share_range": [
+        0.35,
+        0.55
+      ],
+      "note": "Rasio sehat tipikal harga jual vs komponen biaya (asumsi).",
+      "status": "assumption"
+    }
+  },
+  "form_schema": {
+    "_meta": {
+      "title": "Skema Form Pre-Design (diturunkan dari deck PreDesign.pptx)",
+      "version": "0.1.0",
+      "purpose": "UI/form generator & validator berbasis data. Setiap 'field' memetakan 1:1 ke atribut dataclass di predesign.models.",
+      "field_types": [
+        "int",
+        "float",
+        "money_idr",
+        "text",
+        "enum",
+        "multi_enum",
+        "range",
+        "bool",
+        "compass8",
+        "room_list",
+        "tag_list"
+      ],
+      "decision_levels": {
+        "KRITIS": "Wajib diputuskan pada sesi; tidak boleh kosong (slide 1.2)",
+        "WAJIB": "Wajib diisi",
+        "OPSIONAL": "Boleh kosong"
+      }
+    },
+    "agendas": [
+      {
+        "id": "A01",
+        "order": 1,
+        "title": "Brief Produk & Target Pembeli",
+        "goal": "Menyepakati siapa yang akan membeli dan produk seperti apa yang akan dibangun",
+        "duration_min": 35,
+        "sections": [
+          {
+            "id": "1.1",
+            "title": "Target Pembeli — Konfirmasi Profil",
+            "hint": "Isi berdasarkan data survey. Koreksi jika ada yang tidak sesuai.",
+            "decision_prompt": "Apakah profil buyer di atas sudah sesuai dengan temuan survey? Ada koreksi?",
+            "model": "BuyerPersona",
+            "fields": [
+              {
+                "key": "age_min",
+                "label": "Usia utama — minimum",
+                "type": "int",
+                "unit": "tahun",
+                "level": "WAJIB",
+                "min": 17,
+                "max": 80,
+                "example": 28
+              },
+              {
+                "key": "age_max",
+                "label": "Usia utama — maksimum",
+                "type": "int",
+                "unit": "tahun",
+                "level": "WAJIB",
+                "min": 17,
+                "max": 80,
+                "example": 40
+              },
+              {
+                "key": "household_size",
+                "label": "Jumlah penghuni (jiwa)",
+                "type": "int",
+                "unit": "jiwa",
+                "level": "WAJIB",
+                "min": 1,
+                "max": 12,
+                "example": 4,
+                "hint": "Dipakai untuk standar 9 m2/jiwa, air bersih, septik, listrik."
+              },
+              {
+                "key": "children",
+                "label": "Jumlah anak",
+                "type": "int",
+                "unit": "anak",
+                "level": "WAJIB",
+                "min": 0,
+                "max": 8,
+                "example": 2
+              },
+              {
+                "key": "household_type",
+                "label": "Profil keluarga",
+                "type": "enum",
+                "level": "WAJIB",
+                "options": [
+                  "pasangan_muda",
+                  "keluarga_inti",
+                  "keluarga_besar",
+                  "single",
+                  "lansia"
+                ],
+                "example": "keluarga_inti",
+                "hint": "Contoh: Keluarga inti 2-4 orang, 1-2 anak"
+              },
+              {
+                "key": "occupations",
+                "label": "Status pekerjaan",
+                "type": "multi_enum",
+                "level": "WAJIB",
+                "options": [
+                  "profesional",
+                  "wirausaha",
+                  "pns_asn",
+                  "karyawan_swasta",
+                  "freelancer",
+                  "pekerja_informal"
+                ],
+                "example": [
+                  "profesional",
+                  "wirausaha",
+                  "pns_asn"
+                ]
+              },
+              {
+                "key": "monthly_income_idr",
+                "label": "Penghasilan rumah tangga per bulan",
+                "type": "money_idr",
+                "unit": "Rp/bulan",
+                "level": "OPSIONAL",
+                "hint": "Dari survey; dipakai uji keterjangkauan KPR (DSR)."
+              },
+              {
+                "key": "lifestyle_tags",
+                "label": "Gaya hidup & prioritas",
+                "type": "tag_list",
+                "level": "WAJIB",
+                "options": [
+                  "mobilitas_tinggi",
+                  "wfh",
+                  "butuh_privasi",
+                  "family_time",
+                  "hobi_berkebun",
+                  "tamu_sering",
+                  "ibadah_di_rumah",
+                  "memiliki_hewan"
+                ],
+                "example": [
+                  "mobilitas_tinggi",
+                  "wfh",
+                  "butuh_privasi"
+                ]
+              },
+              {
+                "key": "aesthetic",
+                "label": "Preferensi estetika",
+                "type": "enum",
+                "level": "WAJIB",
+                "options": [
+                  "modern_minimalis",
+                  "tropis_kontemporer",
+                  "skandinavia",
+                  "klasik_modern",
+                  "industrial",
+                  "japandi"
+                ],
+                "example": "tropis_kontemporer"
+              },
+              {
+                "key": "price_sensitivity",
+                "label": "Sensitivitas harga",
+                "type": "enum",
+                "level": "WAJIB",
+                "options": [
+                  "price_sensitive",
+                  "value_driven",
+                  "premium"
+                ],
+                "example": "value_driven",
+                "hint": "Contoh: Mid-segment, value-driven, bukan price-sensitive"
+              },
+              {
+                "key": "cars",
+                "label": "Jumlah mobil",
+                "type": "int",
+                "level": "WAJIB",
+                "min": 0,
+                "max": 4,
+                "example": 1
+              },
+              {
+                "key": "motorcycles",
+                "label": "Jumlah motor",
+                "type": "int",
+                "level": "OPSIONAL",
+                "min": 0,
+                "max": 6,
+                "example": 2
+              }
+            ]
+          },
+          {
+            "id": "1.2",
+            "title": "Parameter Produk — Angka yang Mengikat Tim Arsitek",
+            "hint": "Isi semua kolom. Tiga item oranye WAJIB diputuskan sekarang — tidak bisa dikosongkan.",
+            "decision_prompt": "Isi semua kolom. Tiga item oranye WAJIB diputuskan sekarang — tidak bisa dikosongkan.",
+            "model": "ProductParameters",
+            "fields": [
+              {
+                "key": "target_price_idr",
+                "label": "Harga Jual Target",
+                "type": "money_idr",
+                "unit": "Rp",
+                "level": "WAJIB",
+                "hint": "Range dari FS",
+                "note": "Boleh berupa rentang (target_price_min/max)."
+              },
+              {
+                "key": "max_construction_cost_per_m2_idr",
+                "label": "Biaya Konstruksi Maks./m²",
+                "type": "money_idr",
+                "unit": "Rp/m²",
+                "level": "KRITIS",
+                "hint": "KRITIS — belum ada dari FS",
+                "note": "Jika kosong, modul financial.solve_max_construction_cost() memberi usulan dari harga jual."
+              },
+              {
+                "key": "land_area_m2",
+                "label": "Luas Tanah per Unit",
+                "type": "float",
+                "unit": "m²",
+                "level": "WAJIB",
+                "hint": "Dari master plan",
+                "min": 21
+              },
+              {
+                "key": "target_gfa_m2",
+                "label": "Luas Bangunan Target",
+                "type": "float",
+                "unit": "m²",
+                "level": "WAJIB",
+                "hint": "Korelasi harga jual",
+                "min": 12
+              },
+              {
+                "key": "num_types",
+                "label": "Jumlah Tipe Rumah",
+                "type": "int",
+                "unit": "tipe",
+                "level": "KRITIS",
+                "hint": "KRITIS — 1 tipe atau multi?",
+                "min": 1,
+                "max": 12
+              },
+              {
+                "key": "finishing_class",
+                "label": "Kelas Finishing",
+                "type": "enum",
+                "level": "KRITIS",
+                "options": [
+                  "standar",
+                  "menengah",
+                  "atas"
+                ],
+                "hint": "Standar / Menengah / Atas"
+              },
+              {
+                "key": "lot_width_m",
+                "label": "Lebar muka kavling",
+                "type": "float",
+                "unit": "m",
+                "level": "WAJIB",
+                "hint": "Dari master plan; dipakai hitung envelope bangunan.",
+                "min": 4
+              },
+              {
+                "key": "lot_depth_m",
+                "label": "Kedalaman kavling",
+                "type": "float",
+                "unit": "m",
+                "level": "WAJIB",
+                "hint": "Dari master plan.",
+                "min": 5
+              }
+            ]
+          },
+          {
+            "id": "1.3",
+            "title": "Program Ruang — Setujui atau Revisi",
+            "hint": "Centang = setuju. Coret = tidak perlu. Tambah jika ada yang kurang.",
+            "decision_prompt": "Konfirmasi centang tiap ruang + jawab pertanyaan 'note' untuk setiap item. Tambah baris jika ada ruang yang belum tercantum.",
+            "model": "RoomProgramItem",
+            "fields": [
+              {
+                "key": "rooms",
+                "label": "Daftar ruang",
+                "type": "room_list",
+                "level": "WAJIB",
+                "template": "room_program_template.json"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "A02",
+        "order": 2,
+        "title": "Validasi Tapak & Batasan Regulasi",
+        "goal": "Menetapkan batas-batas absolut yang tidak bisa dilewati dalam desain",
+        "duration_min": 20,
+        "sections": [
+          {
+            "id": "2.1",
+            "title": "Parameter Regulasi — Isi & Konfirmasi",
+            "hint": "Sumber: RDTR/RTRW setempat + IMB eksisting (kini PBG). Wajib dikonfirmasi Tim Teknik.",
+            "decision_prompt": "Isi semua nilai regulasi. Beri tanda 'Dikonfirmasi' untuk setiap parameter yang sudah diverifikasi ke RDTR.",
+            "model": "RegulationParams",
+            "fields": [
+              {
+                "key": "kdb_pct",
+                "label": "KDB — Koef. Dasar Bangunan",
+                "type": "float",
+                "unit": "%",
+                "level": "WAJIB",
+                "min": 1,
+                "max": 100,
+                "example": 50,
+                "hint": "Maks. % dari luas kapling",
+                "confirm_key": "kdb"
+              },
+              {
+                "key": "klb",
+                "label": "KLB — Koef. Lantai Bangunan",
+                "type": "float",
+                "unit": "x luas kapling",
+                "level": "WAJIB",
+                "min": 0.1,
+                "max": 20,
+                "example": 2.4,
+                "confirm_key": "klb"
+              },
+              {
+                "key": "gsb_front_m",
+                "label": "GSB — Garis Sempadan Bangunan (depan)",
+                "type": "float",
+                "unit": "m",
+                "level": "WAJIB",
+                "min": 0,
+                "example": 3.0,
+                "confirm_key": "gsb"
+              },
+              {
+                "key": "gsj_from_axis_m",
+                "label": "GSJ — Garis Sempadan Jalan (dari as jalan)",
+                "type": "float",
+                "unit": "m",
+                "level": "WAJIB",
+                "min": 0,
+                "example": 4.0,
+                "hint": "Rentang contoh 3-5 m dari as jalan",
+                "confirm_key": "gsj"
+              },
+              {
+                "key": "max_floors",
+                "label": "KBG — Jumlah lantai maks.",
+                "type": "int",
+                "unit": "lantai",
+                "level": "WAJIB",
+                "min": 1,
+                "max": 12,
+                "example": 2,
+                "confirm_key": "ktg"
+              },
+              {
+                "key": "max_height_m",
+                "label": "Ketinggian maks.",
+                "type": "float",
+                "unit": "m",
+                "level": "WAJIB",
+                "min": 3,
+                "example": 10.0,
+                "confirm_key": "ktg"
+              },
+              {
+                "key": "kdh_pct",
+                "label": "KDH — Koef. Dasar Hijau",
+                "type": "float",
+                "unit": "%",
+                "level": "WAJIB",
+                "min": 0,
+                "max": 100,
+                "example": 20,
+                "hint": "Min. % ruang terbuka hijau",
+                "confirm_key": "kdh"
+              },
+              {
+                "key": "gsb_side_left_m",
+                "label": "Jarak bebas samping kiri",
+                "type": "float",
+                "unit": "m",
+                "level": "OPSIONAL",
+                "example": 1.0
+              },
+              {
+                "key": "gsb_side_right_m",
+                "label": "Jarak bebas samping kanan",
+                "type": "float",
+                "unit": "m",
+                "level": "OPSIONAL",
+                "example": 1.0
+              },
+              {
+                "key": "gsb_rear_m",
+                "label": "Jarak bebas belakang",
+                "type": "float",
+                "unit": "m",
+                "level": "OPSIONAL",
+                "example": 1.5
+              },
+              {
+                "key": "source",
+                "label": "Sumber (RDTR/RTRW/PBG)",
+                "type": "text",
+                "level": "WAJIB",
+                "example": "RDTR setempat"
+              }
+            ]
+          },
+          {
+            "id": "2.2",
+            "title": "Kondisi Fisik & Non-Negotiable Tapak",
+            "hint": "Item non-negotiable tidak dapat diubah dalam desain.",
+            "decision_prompt": "Konfirmasi kondisi fisik + tambahkan non-negotiable items yang berlaku untuk tapak ini.",
+            "model": "SiteConditions",
+            "fields": [
+              {
+                "key": "front_orientation",
+                "label": "Orientasi lahan (hadap)",
+                "type": "compass8",
+                "level": "WAJIB",
+                "options": [
+                  "U",
+                  "TL",
+                  "T",
+                  "TG",
+                  "S",
+                  "BD",
+                  "B",
+                  "BL"
+                ],
+                "example": "BL",
+                "hint": "Contoh deck: Barat Laut"
+              },
+              {
+                "key": "topography",
+                "label": "Kontur",
+                "type": "enum",
+                "level": "WAJIB",
+                "options": [
+                  "datar",
+                  "landai",
+                  "miring",
+                  "bergelombang"
+                ],
+                "example": "datar"
+              },
+              {
+                "key": "level_difference_m",
+                "label": "Beda tinggi",
+                "type": "float",
+                "unit": "m",
+                "level": "WAJIB",
+                "example": 0.0
+              },
+              {
+                "key": "best_view",
+                "label": "View terbaik (arah / objek)",
+                "type": "text",
+                "level": "OPSIONAL",
+                "example": "Pond/danau buatan"
+              },
+              {
+                "key": "best_view_direction",
+                "label": "Arah view terbaik",
+                "type": "compass8",
+                "level": "OPSIONAL",
+                "options": [
+                  "U",
+                  "TL",
+                  "T",
+                  "TG",
+                  "S",
+                  "BD",
+                  "B",
+                  "BL"
+                ]
+              },
+              {
+                "key": "noise_sources",
+                "label": "Sumber gangguan",
+                "type": "tag_list",
+                "level": "OPSIONAL",
+                "options": [
+                  "jalan",
+                  "tetangga",
+                  "pasar",
+                  "industri",
+                  "rel",
+                  "tempat_ibadah",
+                  "lainnya"
+                ]
+              },
+              {
+                "key": "soil_condition",
+                "label": "Kondisi tanah",
+                "type": "enum",
+                "level": "WAJIB",
+                "options": [
+                  "tanah_asli_keras",
+                  "tanah_asli_lunak",
+                  "timbunan",
+                  "gambut",
+                  "berbatu",
+                  "tidak_diketahui"
+                ],
+                "example": "timbunan"
+              },
+              {
+                "key": "fill_thickness_m",
+                "label": "Tebal timbunan (jika timbunan)",
+                "type": "float",
+                "unit": "m",
+                "level": "OPSIONAL"
+              },
+              {
+                "key": "fill_age_months",
+                "label": "Umur timbunan",
+                "type": "int",
+                "unit": "bulan",
+                "level": "OPSIONAL"
+              },
+              {
+                "key": "soil_tested",
+                "label": "Sudah ada uji tanah (sondir/boring)?",
+                "type": "bool",
+                "level": "OPSIONAL"
+              },
+              {
+                "key": "vehicle_access_from",
+                "label": "Akses kendaraan dari arah",
+                "type": "compass8",
+                "level": "WAJIB",
+                "options": [
+                  "U",
+                  "TL",
+                  "T",
+                  "TG",
+                  "S",
+                  "BD",
+                  "B",
+                  "BL"
+                ]
+              },
+              {
+                "key": "pln_entry_from",
+                "label": "Posisi PLN masuk dari",
+                "type": "compass8",
+                "level": "WAJIB",
+                "options": [
+                  "U",
+                  "TL",
+                  "T",
+                  "TG",
+                  "S",
+                  "BD",
+                  "B",
+                  "BL"
+                ]
+              },
+              {
+                "key": "non_negotiables",
+                "label": "Non-negotiable items",
+                "type": "tag_list",
+                "level": "WAJIB",
+                "default": [
+                  "Tidak boleh melanggar GSB / GSJ",
+                  "Tidak boleh melebihi KDB & KLB"
+                ]
+              },
+              {
+                "key": "latitude",
+                "label": "Lintang tapak (derajat, S negatif)",
+                "type": "float",
+                "unit": "°",
+                "level": "OPSIONAL",
+                "example": -5.14,
+                "hint": "Dipakai posisi matahari & kota SF OTTV."
+              },
+              {
+                "key": "ottv_city",
+                "label": "Kota acuan SF (SNI 6389)",
+                "type": "text",
+                "level": "OPSIONAL",
+                "example": "Makassar"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "ottv_solar_factor": {
+    "_meta": {
+      "title": "Faktor Radiasi Matahari (SF) per kota & orientasi untuk OTTV, SNI 6389:2020",
+      "unit": "W/m2",
+      "verification": "V2",
+      "source": "Tabel SNI 6389:2020 sebagaimana direproduksi tugas akhir Petra (SRC-OTTV). Header sumber 'TGR' dibaca sebagai Tenggara (TG). TRANSKRIPSI SEKUNDER: cek ke dokumen SNI 6389:2020 sebelum dipakai untuk submission/sertifikasi.",
+      "orientation_codes": {
+        "U": "Utara",
+        "TL": "Timur Laut",
+        "T": "Timur",
+        "TG": "Tenggara",
+        "S": "Selatan",
+        "BD": "Barat Daya",
+        "B": "Barat",
+        "BL": "Barat Laut"
+      },
+      "azimuth_deg": {
+        "U": 0,
+        "TL": 45,
+        "T": 90,
+        "TG": 135,
+        "S": 180,
+        "BD": 225,
+        "B": 270,
+        "BL": 315
+      },
+      "ottv_limit_w_m2": 35,
+      "ottv_limit_note": "Batas 35 W/m2 dikutip dari sumber sekunder untuk SNI 6389:2020; edisi 2000/2011 memakai 45 W/m2. Untuk rumah tinggal OTTV bukan syarat wajib - dipakai sebagai indikator kinerja."
+    },
+    "cities": {
+      "Aceh": {
+        "U": 116,
+        "TL": 138,
+        "T": 166,
+        "TG": 154,
+        "S": 142,
+        "BD": 179,
+        "B": 200,
+        "BL": 159,
+        "ATAP": 397
+      },
+      "Lhokseumawe": {
+        "U": 117,
+        "TL": 141,
+        "T": 161,
+        "TG": 142,
+        "S": 120,
+        "BD": 140,
+        "B": 160,
+        "BL": 142,
+        "ATAP": 375
+      },
+      "Medan": {
+        "U": 122,
+        "TL": 150,
+        "T": 177,
+        "TG": 158,
+        "S": 138,
+        "BD": 173,
+        "B": 195,
+        "BL": 158,
+        "ATAP": 393
+      },
+      "Padang": {
+        "U": 131,
+        "TL": 152,
+        "T": 171,
+        "TG": 147,
+        "S": 123,
+        "BD": 153,
+        "B": 181,
+        "BL": 160,
+        "ATAP": 431
+      },
+      "Pekanbaru": {
+        "U": 125,
+        "TL": 135,
+        "T": 152,
+        "TG": 138,
+        "S": 129,
+        "BD": 171,
+        "B": 200,
+        "BL": 166,
+        "ATAP": 428
+      },
+      "Tanjungpinang": {
+        "U": 136,
+        "TL": 150,
+        "T": 169,
+        "TG": 153,
+        "S": 142,
+        "BD": 183,
+        "B": 211,
+        "BL": 175,
+        "ATAP": 405
+      },
+      "Batam": {
+        "U": 125,
+        "TL": 146,
+        "T": 170,
+        "TG": 151,
+        "S": 132,
+        "BD": 170,
+        "B": 196,
+        "BL": 162,
+        "ATAP": 423
+      },
+      "Jambi": {
+        "U": 132,
+        "TL": 136,
+        "T": 147,
+        "TG": 132,
+        "S": 122,
+        "BD": 160,
+        "B": 196,
+        "BL": 173,
+        "ATAP": 412
+      },
+      "Singkep": {
+        "U": 110,
+        "TL": 124,
+        "T": 136,
+        "TG": 123,
+        "S": 109,
+        "BD": 123,
+        "B": 135,
+        "BL": 123,
+        "ATAP": 339
+      },
+      "Bengkulu": {
+        "U": 140,
+        "TL": 152,
+        "T": 165,
+        "TG": 139,
+        "S": 119,
+        "BD": 159,
+        "B": 197,
+        "BL": 175,
+        "ATAP": 439
+      },
+      "Palembang": {
+        "U": 136,
+        "TL": 148,
+        "T": 159,
+        "TG": 135,
+        "S": 119,
+        "BD": 157,
+        "B": 192,
+        "BL": 171,
+        "ATAP": 425
+      },
+      "Pangkalpinang": {
+        "U": 150,
+        "TL": 160,
+        "T": 172,
+        "TG": 147,
+        "S": 131,
+        "BD": 173,
+        "B": 213,
+        "BL": 189,
+        "ATAP": 415
+      },
+      "Belitung": {
+        "U": 135,
+        "TL": 145,
+        "T": 155,
+        "TG": 133,
+        "S": 117,
+        "BD": 152,
+        "B": 187,
+        "BL": 169,
+        "ATAP": 422
+      },
+      "Lampung": {
+        "U": 141,
+        "TL": 148,
+        "T": 156,
+        "TG": 132,
+        "S": 116,
+        "BD": 158,
+        "B": 198,
+        "BL": 179,
+        "ATAP": 422
+      },
+      "Serang": {
+        "U": 162,
+        "TL": 168,
+        "T": 173,
+        "TG": 142,
+        "S": 123,
+        "BD": 172,
+        "B": 224,
+        "BL": 205,
+        "ATAP": 430
+      },
+      "Tangerang": {
+        "U": 146,
+        "TL": 151,
+        "T": 156,
+        "TG": 129,
+        "S": 111,
+        "BD": 152,
+        "B": 197,
+        "BL": 183,
+        "ATAP": 376
+      },
+      "Jakarta": {
+        "U": 148,
+        "TL": 161,
+        "T": 171,
+        "TG": 138,
+        "S": 112,
+        "BD": 152,
+        "B": 197,
+        "BL": 181,
+        "ATAP": 427
+      },
+      "Bandung": {
+        "U": 150,
+        "TL": 157,
+        "T": 164,
+        "TG": 135,
+        "S": 113,
+        "BD": 154,
+        "B": 198,
+        "BL": 183,
+        "ATAP": 426
+      },
+      "Tegal": {
+        "U": 130,
+        "TL": 140,
+        "T": 143,
+        "TG": 121,
+        "S": 105,
+        "BD": 121,
+        "B": 143,
+        "BL": 140,
+        "ATAP": 430
+      },
+      "Cilacap": {
+        "U": 136,
+        "TL": 152,
+        "T": 159,
+        "TG": 131,
+        "S": 107,
+        "BD": 132,
+        "B": 160,
+        "BL": 153,
+        "ATAP": 400
+      },
+      "Yogyakarta": {
+        "U": 152,
+        "TL": 168,
+        "T": 170,
+        "TG": 130,
+        "S": 105,
+        "BD": 139,
+        "B": 178,
+        "BL": 168,
+        "ATAP": 380
+      },
+      "Semarang": {
+        "U": 156,
+        "TL": 170,
+        "T": 177,
+        "TG": 138,
+        "S": 111,
+        "BD": 155,
+        "B": 205,
+        "BL": 191,
+        "ATAP": 434
+      },
+      "Bawean": {
+        "U": 123,
+        "TL": 134,
+        "T": 138,
+        "TG": 119,
+        "S": 104,
+        "BD": 119,
+        "B": 137,
+        "BL": 134,
+        "ATAP": 357
+      },
+      "Surabaya": {
+        "U": 155,
+        "TL": 179,
+        "T": 194,
+        "TG": 149,
+        "S": 110,
+        "BD": 158,
+        "B": 211,
+        "BL": 192,
+        "ATAP": 470
+      },
+      "Madura": {
+        "U": 150,
+        "TL": 166,
+        "T": 167,
+        "TG": 130,
+        "S": 104,
+        "BD": 129,
+        "B": 167,
+        "BL": 166,
+        "ATAP": 366
+      },
+      "Banyuwangi": {
+        "U": 132,
+        "TL": 162,
+        "T": 179,
+        "TG": 144,
+        "S": 108,
+        "BD": 143,
+        "B": 177,
+        "BL": 162,
+        "ATAP": 426
+      },
+      "Denpasar": {
+        "U": 153,
+        "TL": 169,
+        "T": 178,
+        "TG": 141,
+        "S": 111,
+        "BD": 152,
+        "B": 197,
+        "BL": 184,
+        "ATAP": 410
+      },
+      "Pontianak": {
+        "U": 125,
+        "TL": 130,
+        "T": 139,
+        "TG": 125,
+        "S": 120,
+        "BD": 157,
+        "B": 186,
+        "BL": 161,
+        "ATAP": 384
+      },
+      "Banjarmasin": {
+        "U": 140,
+        "TL": 151,
+        "T": 161,
+        "TG": 135,
+        "S": 117,
+        "BD": 161,
+        "B": 203,
+        "BL": 180,
+        "ATAP": 432
+      },
+      "Palangkaraya": {
+        "U": 135,
+        "TL": 139,
+        "T": 150,
+        "TG": 132,
+        "S": 121,
+        "BD": 167,
+        "B": 208,
+        "BL": 181,
+        "ATAP": 371
+      },
+      "Samarinda": {
+        "U": 142,
+        "TL": 154,
+        "T": 172,
+        "TG": 153,
+        "S": 139,
+        "BD": 184,
+        "B": 219,
+        "BL": 187,
+        "ATAP": 413
+      },
+      "Balikpapan": {
+        "U": 128,
+        "TL": 141,
+        "T": 155,
+        "TG": 139,
+        "S": 124,
+        "BD": 157,
+        "B": 185,
+        "BL": 161,
+        "ATAP": 396
+      },
+      "Bulungan": {
+        "U": 131,
+        "TL": 147,
+        "T": 168,
+        "TG": 156,
+        "S": 146,
+        "BD": 179,
+        "B": 197,
+        "BL": 163,
+        "ATAP": 400
+      },
+      "Tarakan": {
+        "U": 116,
+        "TL": 125,
+        "T": 139,
+        "TG": 131,
+        "S": 131,
+        "BD": 169,
+        "B": 188,
+        "BL": 153,
+        "ATAP": 351
+      },
+      "Manado": {
+        "U": 124,
+        "TL": 145,
+        "T": 165,
+        "TG": 145,
+        "S": 129,
+        "BD": 161,
+        "B": 185,
+        "BL": 155,
+        "ATAP": 432
+      },
+      "Gorontalo": {
+        "U": 125,
+        "TL": 140,
+        "T": 161,
+        "TG": 145,
+        "S": 130,
+        "BD": 168,
+        "B": 196,
+        "BL": 164,
+        "ATAP": 443
+      },
+      "Palu": {
+        "U": 133,
+        "TL": 170,
+        "T": 198,
+        "TG": 164,
+        "S": 127,
+        "BD": 164,
+        "B": 198,
+        "BL": 170,
+        "ATAP": 460
+      },
+      "Masamba/Luwu Utara": {
+        "U": 147,
+        "TL": 160,
+        "T": 177,
+        "TG": 154,
+        "S": 135,
+        "BD": 180,
+        "B": 218,
+        "BL": 189,
+        "ATAP": 425
+      },
+      "Majene": {
+        "U": 140,
+        "TL": 161,
+        "T": 179,
+        "TG": 148,
+        "S": 122,
+        "BD": 164,
+        "B": 203,
+        "BL": 178,
+        "ATAP": 444
+      },
+      "Makassar": {
+        "U": 146,
+        "TL": 163,
+        "T": 173,
+        "TG": 138,
+        "S": 112,
+        "BD": 149,
+        "B": 190,
+        "BL": 176,
+        "ATAP": 426
+      },
+      "Kendari": {
+        "U": 140,
+        "TL": 151,
+        "T": 164,
+        "TG": 144,
+        "S": 127,
+        "BD": 160,
+        "B": 190,
+        "BL": 170,
+        "ATAP": 395
+      },
+      "Bau Bau": {
+        "U": 140,
+        "TL": 151,
+        "T": 160,
+        "TG": 133,
+        "S": 114,
+        "BD": 154,
+        "B": 192,
+        "BL": 174,
+        "ATAP": 394
+      },
+      "Banggai": {
+        "U": 131,
+        "TL": 158,
+        "T": 182,
+        "TG": 156,
+        "S": 129,
+        "BD": 164,
+        "B": 192,
+        "BL": 164,
+        "ATAP": 398
+      },
+      "Mataram": {
+        "U": 153,
+        "TL": 171,
+        "T": 172,
+        "TG": 132,
+        "S": 104,
+        "BD": 132,
+        "B": 172,
+        "BL": 171,
+        "ATAP": 431
+      },
+      "Bima": {
+        "U": 128,
+        "TL": 141,
+        "T": 155,
+        "TG": 139,
+        "S": 124,
+        "BD": 157,
+        "B": 185,
+        "BL": 161,
+        "ATAP": 422
+      },
+      "Waingapu": {
+        "U": 154,
+        "TL": 174,
+        "T": 176,
+        "TG": 134,
+        "S": 103,
+        "BD": 134,
+        "B": 176,
+        "BL": 174,
+        "ATAP": 416
+      },
+      "Kupang": {
+        "U": 167,
+        "TL": 177,
+        "T": 175,
+        "TG": 131,
+        "S": 102,
+        "BD": 142,
+        "B": 196,
+        "BL": 194,
+        "ATAP": 428
+      },
+      "Ambon": {
+        "U": 130,
+        "TL": 146,
+        "T": 163,
+        "TG": 142,
+        "S": 122,
+        "BD": 159,
+        "B": 188,
+        "BL": 162,
+        "ATAP": 407
+      },
+      "Ternate": {
+        "U": 126,
+        "TL": 143,
+        "T": 165,
+        "TG": 148,
+        "S": 132,
+        "BD": 166,
+        "B": 191,
+        "BL": 160,
+        "ATAP": 395
+      },
+      "Saumlaki": {
+        "U": 125,
+        "TL": 137,
+        "T": 141,
+        "TG": 121,
+        "S": 105,
+        "BD": 121,
+        "B": 141,
+        "BL": 137,
+        "ATAP": 381
+      },
+      "Fak Fak": {
+        "U": 129,
+        "TL": 144,
+        "T": 159,
+        "TG": 140,
+        "S": 122,
+        "BD": 150,
+        "B": 173,
+        "BL": 152,
+        "ATAP": 343
+      },
+      "Manokwari": {
+        "U": 140,
+        "TL": 151,
+        "T": 167,
+        "TG": 148,
+        "S": 135,
+        "BD": 173,
+        "B": 205,
+        "BL": 178,
+        "ATAP": 406
+      },
+      "Jayapura": {
+        "U": 124,
+        "TL": 140,
+        "T": 152,
+        "TG": 131,
+        "S": 113,
+        "BD": 134,
+        "B": 157,
+        "BL": 143,
+        "ATAP": 405
+      },
+      "Merauke": {
+        "U": 149,
+        "TL": 160,
+        "T": 167,
+        "TG": 135,
+        "S": 111,
+        "BD": 150,
+        "B": 192,
+        "BL": 179,
+        "ATAP": 378
+      }
+    }
+  },
+  "regulation_defaults": {
+    "_meta": {
+      "title": "Default & Batas Kewajaran Parameter Regulasi",
+      "version": "0.1.0",
+      "CRITICAL_NOTE": "Nilai KDB/KLB/GSB/KDH/KBG yang BERLAKU hanya dari RDTR/RTRW, KRK/KKPR, atau PBG setempat. Berkas ini hanya: (1) contoh dari deck PreDesign, (2) batas kewajaran untuk deteksi salah ketik, (3) acuan Kepmen 403 untuk Rs Sehat."
+    },
+    "deck_example": {
+      "kdb_pct": 50.0,
+      "klb": 2.4,
+      "gsb_front_m": 3.0,
+      "gsj_from_axis_m": 4.0,
+      "gsj_range_m": [
+        3,
+        5
+      ],
+      "max_floors": 2,
+      "max_height_m": 10.0,
+      "kdh_pct": 20.0,
+      "confirmed": {
+        "kdb": true,
+        "klb": true,
+        "gsb": true,
+        "gsj": false,
+        "ktg": false,
+        "kdh": true
+      },
+      "source": "Slide 2.1 PreDesign.pptx (RDTR setempat; GSJ & KTG belum dikonfirmasi)"
+    },
+    "sanity_ranges": {
+      "kdb_pct": [
+        10,
+        100
+      ],
+      "klb": [
+        0.1,
+        12.0
+      ],
+      "gsb_front_m": [
+        0,
+        15
+      ],
+      "kdh_pct": [
+        0,
+        60
+      ],
+      "max_floors": [
+        1,
+        8
+      ],
+      "max_height_m": [
+        3,
+        40
+      ],
+      "typical_residential_kdb_pct": [
+        40,
+        70
+      ],
+      "typical_residential_kdh_pct": [
+        10,
+        30
+      ],
+      "note": "Di luar rentang → peringatan 'periksa salah ketik/satuan'. Bukan batas hukum."
+    },
+    "kepmen_403_rs_sehat": {
+      "kdb_max_pct": 60.0,
+      "klb": 1.2,
+      "lot_area_m2": [
+        72,
+        90
+      ],
+      "lot_width_min_m": [
+        6.0,
+        7.5
+      ],
+      "row_length_max_m": 75,
+      "source": "Kepmen Kimpraswil 403/KPTS/M/2002",
+      "status": "verified_secondary"
+    },
+    "setback_defaults_if_unspecified": {
+      "side_each_m": 1.0,
+      "rear_m": 1.5,
+      "note": "ASUMSI penyusun agar envelope bisa dihitung; ganti dengan jarak bebas RDTR/Perda (PP 16/2021 Ps.23: GSB, jarak ke batas persil, jarak antar bangunan).",
+      "status": "assumption"
+    },
+    "confirmation_keys": [
+      "kdb",
+      "klb",
+      "gsb",
+      "gsj",
+      "ktg",
+      "kdh"
+    ]
+  },
+  "room_standards": {
+    "_meta": {
+      "title": "Standar & Template Program Ruang Rumah Tapak",
+      "version": "0.1.0",
+      "units": {
+        "area": "m2",
+        "width": "m",
+        "height": "m",
+        "lux": "lx"
+      },
+      "status_legend": {
+        "verified_secondary": "Angka tertulis pada Kepmen 403/KPTS/M/2002 (dibaca dari salinan teks) atau tabel SNI yang dikutip sumber sekunder.",
+        "practice": "Praktik perancangan/literatur umum (Neufert, DPMB); bukan angka SNI. Dapat disesuaikan oleh arsitek.",
+        "assumption": "Asumsi penyusun modul untuk default; WAJIB dikalibrasi."
+      }
+    },
+    "occupancy_standard": {
+      "area_per_person_threshold_m2": 7.2,
+      "area_per_person_standard_m2": 9.0,
+      "ceiling_height_avg_m": 2.8,
+      "source": "Kepmen Kimpraswil 403/KPTS/M/2002",
+      "status": "verified_secondary"
+    },
+    "openings": {
+      "daylight_opening_min_ratio": 0.1,
+      "ventilation_opening_min_ratio": 0.05,
+      "sill_height_m": [
+        0.7,
+        0.8
+      ],
+      "min_daylight_lux_bedroom": 50,
+      "min_direct_sun_hours": 1,
+      "source": "Kepmen 403/KPTS/M/2002 (lubang cahaya >= 1/10 luas lantai; penghawaan >= 5% luas lantai)",
+      "status": "verified_secondary"
+    },
+    "efficiency_by_class": {
+      "_note": "Efisiensi = luas bersih ruang / luas lantai bruto (sisanya dinding + sirkulasi + tangga/koridor). Asumsi penyusun, kalibrasi dengan denah tipikal.",
+      "standar": 0.82,
+      "menengah": 0.8,
+      "atas": 0.77,
+      "status": "assumption"
+    },
+    "rooms": [
+      {
+        "id": "kt_utama",
+        "name": "Kamar Tidur Utama",
+        "priority": "Wajib",
+        "question": "Berapa unit?",
+        "default_qty": 1,
+        "min_area_m2": 9.0,
+        "min_width_m": 3.0,
+        "rec_area_m2": {
+          "standar": 9.0,
+          "menengah": 12.0,
+          "atas": 16.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "privat",
+        "source": "Kepmen 403 (ruang tidur 3,00 x 3,00 m); rec: praktik",
+        "status": "verified_secondary"
+      },
+      {
+        "id": "kt_anak",
+        "name": "Kamar Tidur Anak/Tamu",
+        "priority": "Wajib",
+        "question": "Berapa unit?",
+        "default_qty": 1,
+        "min_area_m2": 7.2,
+        "min_width_m": 2.4,
+        "rec_area_m2": {
+          "standar": 9.0,
+          "menengah": 10.5,
+          "atas": 12.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "privat",
+        "source": "Kepmen 403: 3x3 m untuk ruang tidur RIT; 7,2 m2 = ambang per jiwa; 2,4 m lebar = praktik",
+        "status": "verified_secondary"
+      },
+      {
+        "id": "km",
+        "name": "Kamar Mandi",
+        "priority": "Wajib",
+        "question": "Berapa & di mana?",
+        "default_qty": 1,
+        "min_area_m2": 1.8,
+        "min_width_m": 1.2,
+        "rec_area_m2": {
+          "standar": 2.4,
+          "menengah": 3.0,
+          "atas": 4.0
+        },
+        "lux": [
+          250,
+          250
+        ],
+        "needs_daylight": false,
+        "needs_cross_vent": false,
+        "wet": true,
+        "zone": "servis",
+        "source": "Kepmen 403: KM/WC/cuci 1,20 x 1,50 m",
+        "status": "verified_secondary"
+      },
+      {
+        "id": "r_tamu",
+        "name": "Ruang Tamu",
+        "priority": "Wajib",
+        "question": "Terpisah atau terbuka?",
+        "default_qty": 1,
+        "min_area_m2": 7.2,
+        "min_width_m": 2.4,
+        "rec_area_m2": {
+          "standar": 9.0,
+          "menengah": 12.0,
+          "atas": 16.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "publik",
+        "source": "Kepmen 403: ruang serbaguna 3x3 m (acuan); lux: SNI 03-6575 (120-250)",
+        "status": "verified_secondary"
+      },
+      {
+        "id": "r_keluarga",
+        "name": "Ruang Keluarga",
+        "priority": "Wajib",
+        "question": "Sama dengan ruang tamu?",
+        "default_qty": 1,
+        "min_area_m2": 9.0,
+        "min_width_m": 2.7,
+        "rec_area_m2": {
+          "standar": 9.0,
+          "menengah": 14.0,
+          "atas": 20.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "semi-privat",
+        "source": "Praktik; lux mengikuti ruang tamu",
+        "status": "practice"
+      },
+      {
+        "id": "r_makan",
+        "name": "Ruang Makan",
+        "priority": "Wajib",
+        "question": "Menyatu dengan dapur/keluarga?",
+        "default_qty": 1,
+        "min_area_m2": 4.5,
+        "min_width_m": 2.1,
+        "rec_area_m2": {
+          "standar": 6.0,
+          "menengah": 9.0,
+          "atas": 12.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "semi-privat",
+        "source": "Praktik (meja 4-6 kursi + sirkulasi); lux SNI 03-6575",
+        "status": "practice"
+      },
+      {
+        "id": "dapur",
+        "name": "Dapur",
+        "priority": "Wajib",
+        "question": "Bersih/kotor terpisah?",
+        "default_qty": 1,
+        "min_area_m2": 4.5,
+        "min_width_m": 1.5,
+        "rec_area_m2": {
+          "standar": 5.0,
+          "menengah": 8.0,
+          "atas": 12.0
+        },
+        "lux": [
+          250,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": true,
+        "zone": "servis",
+        "source": "Kepmen 403 tidak menyebut ukuran dapur; praktik. Lux: SNI 03-6575 (250)",
+        "status": "practice"
+      },
+      {
+        "id": "dapur_kotor",
+        "name": "Dapur Kotor / Area Cuci Piring Berat",
+        "priority": "Sedang",
+        "question": "Perlu dapur kotor terpisah?",
+        "default_qty": 0,
+        "min_area_m2": 3.0,
+        "min_width_m": 1.5,
+        "rec_area_m2": {
+          "standar": 3.0,
+          "menengah": 4.0,
+          "atas": 6.0
+        },
+        "lux": [
+          250,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": true,
+        "zone": "servis",
+        "source": "Praktik",
+        "status": "practice"
+      },
+      {
+        "id": "musholla",
+        "name": "Musholla",
+        "priority": "Tinggi",
+        "question": "Dedicated atau serbaguna?",
+        "default_qty": 1,
+        "min_area_m2": 2.4,
+        "min_width_m": 1.2,
+        "rec_area_m2": {
+          "standar": 3.0,
+          "menengah": 4.5,
+          "atas": 6.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "semi-privat",
+        "source": "Praktik: ruang shalat ~1,2 m2/orang termasuk jarak antar-shaf; arah kiblat harus ditetapkan (lihat orientation_notes)",
+        "status": "practice",
+        "design_note": "Cek arah kiblat tapak; area wudhu/KM dekat tetapi tidak sebaris dengan kiblat (WC tidak menghadap/membelakangi kiblat)."
+      },
+      {
+        "id": "carport",
+        "name": "Carport",
+        "priority": "Tinggi",
+        "question": "Berapa mobil?",
+        "default_qty": 1,
+        "min_area_m2": 12.5,
+        "min_width_m": 2.5,
+        "rec_area_m2": {
+          "standar": 12.5,
+          "menengah": 15.0,
+          "atas": 18.0
+        },
+        "lux": [
+          60,
+          60
+        ],
+        "needs_daylight": false,
+        "needs_cross_vent": false,
+        "wet": false,
+        "zone": "luar",
+        "source": "Satuan ruang parkir mobil penumpang 2,5 x 5,0 m (rec. dengan bukaan pintu +0,5 m untuk menengah/atas); lux garasi 60 (SNI 03-6575)",
+        "status": "practice",
+        "area_per_unit": true,
+        "motorcycle_area_m2": 1.5
+      },
+      {
+        "id": "taman",
+        "name": "Area Outdoor/Taman",
+        "priority": "Sedang",
+        "question": "Taman atau carport extension?",
+        "default_qty": 1,
+        "min_area_m2": 0.0,
+        "min_width_m": 1.0,
+        "rec_area_m2": {
+          "standar": 0.0,
+          "menengah": 0.0,
+          "atas": 0.0
+        },
+        "lux": [
+          60,
+          60
+        ],
+        "needs_daylight": false,
+        "needs_cross_vent": false,
+        "wet": false,
+        "zone": "luar",
+        "source": "Dihitung dari KDH minimum (bukan nilai tetap)",
+        "status": "assumption",
+        "derived": "kdh"
+      },
+      {
+        "id": "r_kerja",
+        "name": "Ruang Kerja/WFH",
+        "priority": "Sedang",
+        "question": "Dedicated atau kamar tidur?",
+        "default_qty": 0,
+        "min_area_m2": 4.5,
+        "min_width_m": 1.8,
+        "rec_area_m2": {
+          "standar": 4.5,
+          "menengah": 6.0,
+          "atas": 9.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "semi-privat",
+        "source": "Praktik; lux SNI 03-6575 ruang kerja (rumah) 120-250; ruang kerja kantor 350",
+        "status": "practice"
+      },
+      {
+        "id": "r_art",
+        "name": "Ruang ART/Servis",
+        "priority": "Sedang",
+        "question": "Ada atau tidak?",
+        "default_qty": 0,
+        "min_area_m2": 7.5,
+        "min_width_m": 2.5,
+        "rec_area_m2": {
+          "standar": 7.5,
+          "menengah": 7.5,
+          "atas": 9.0
+        },
+        "lux": [
+          120,
+          250
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": false,
+        "zone": "servis",
+        "source": "Kepmen 403: ruang servis/pertumbuhan RsS-1 2,50 x 3,00 m (acuan); KM ART dihitung terpisah",
+        "status": "verified_secondary"
+      },
+      {
+        "id": "gudang",
+        "name": "Storage/Gudang",
+        "priority": "Sedang",
+        "question": "Ukuran minimal?",
+        "default_qty": 1,
+        "min_area_m2": 1.5,
+        "min_width_m": 1.0,
+        "rec_area_m2": {
+          "standar": 1.5,
+          "menengah": 2.5,
+          "atas": 4.0
+        },
+        "lux": [
+          60,
+          120
+        ],
+        "needs_daylight": false,
+        "needs_cross_vent": false,
+        "wet": false,
+        "zone": "servis",
+        "source": "Praktik",
+        "status": "practice"
+      },
+      {
+        "id": "r_cuci",
+        "name": "Area Cuci & Jemur (Service Yard)",
+        "priority": "Sedang",
+        "question": "Terbuka atau tertutup?",
+        "default_qty": 1,
+        "min_area_m2": 3.0,
+        "min_width_m": 1.2,
+        "rec_area_m2": {
+          "standar": 3.0,
+          "menengah": 4.5,
+          "atas": 6.0
+        },
+        "lux": [
+          60,
+          120
+        ],
+        "needs_daylight": true,
+        "needs_cross_vent": true,
+        "wet": true,
+        "zone": "servis",
+        "source": "Praktik",
+        "status": "practice"
+      },
+      {
+        "id": "teras",
+        "name": "Teras / Entrance",
+        "priority": "Sedang",
+        "question": "Ukuran teras?",
+        "default_qty": 1,
+        "min_area_m2": 3.0,
+        "min_width_m": 1.5,
+        "rec_area_m2": {
+          "standar": 3.0,
+          "menengah": 6.0,
+          "atas": 10.0
+        },
+        "lux": [
+          60,
+          60
+        ],
+        "needs_daylight": false,
+        "needs_cross_vent": false,
+        "wet": false,
+        "zone": "luar",
+        "source": "SNI 03-6575: teras 60 lux; ukuran praktik",
+        "status": "practice"
+      }
+    ],
+    "priority_levels": [
+      "Wajib",
+      "Tinggi",
+      "Sedang"
+    ],
+    "stairs": {
+      "riser_cm": [
+        15,
+        18
+      ],
+      "tread_cm": [
+        25,
+        30
+      ],
+      "blondel_cm": [
+        61,
+        65
+      ],
+      "min_clear_width_m": 0.9,
+      "headroom_min_m": 2.0,
+      "formula": "2t + a = 61..65 cm (Blondel)",
+      "source": "Rumus Blondel (praktik); lebar bersih & ruang kepala: praktik, bandingkan Permen PUPR 14/2017 untuk bangunan umum",
+      "status": "practice"
+    },
+    "floor_heights": {
+      "ceiling_min_m": 2.8,
+      "slab_thickness_m": 0.12,
+      "floor_to_floor_m": 3.2,
+      "roof_ridge_extra_m": 2.0,
+      "ground_floor_raise_m": 0.4,
+      "note": "Ketinggian total bangunan = peil lantai dasar + n x floor-to-floor + tinggi atap (bergantung RDTR: diukur ke puncak atap atau ke dak). Default asumsi penyusun.",
+      "status": "assumption"
+    }
+  },
+  "site_rules": {
+    "_meta": {
+      "title": "Aturan Tapak (rule base untuk validator tapak slide 2.2)",
+      "version": "0.1.0",
+      "status": "practice",
+      "note": "Rule berbasis praktik rekayasa; rujukan SNI dicantumkan sebagai titik cek, bukan klausul."
+    },
+    "compass8": {
+      "U": {
+        "name": "Utara",
+        "az": 0
+      },
+      "TL": {
+        "name": "Timur Laut",
+        "az": 45
+      },
+      "T": {
+        "name": "Timur",
+        "az": 90
+      },
+      "TG": {
+        "name": "Tenggara",
+        "az": 135
+      },
+      "S": {
+        "name": "Selatan",
+        "az": 180
+      },
+      "BD": {
+        "name": "Barat Daya",
+        "az": 225
+      },
+      "B": {
+        "name": "Barat",
+        "az": 270
+      },
+      "BL": {
+        "name": "Barat Laut",
+        "az": 315
+      }
+    },
+    "qibla": {
+      "note": "Arah kiblat dihitung dengan calc.site.qibla_azimuth(lat, lon) (great-circle initial bearing ke Ka'bah). Untuk Indonesia hasilnya sekitar 290-295° (mendekati Barat, agak ke Utara). Verifikasi di lapangan dengan kompas/ aplikasi kiblat resmi.",
+      "kaaba_lat": 21.4225,
+      "kaaba_lon": 39.8262
+    },
+    "soil_rules": {
+      "timbunan": {
+        "severity": "WARNING",
+        "title": "Tapak di atas timbunan (fill)",
+        "required_actions": [
+          "Penyelidikan tanah: sondir (SNI 2827:2008) + boring/SPT; tentukan tebal timbunan, kepadatan, dan lapisan lunak di bawahnya (SNI 8460:2017).",
+          "Verifikasi kontrol pemadatan timbunan: Proctor (SNI 1742:2008), target >= 95% kepadatan kering maksimum, lapis 20-30 cm.",
+          "Hitung penurunan total & diferensial; tentukan masa tunggu/preloading bila timbunan baru (< 12-24 bulan).",
+          "Pilih pondasi: footplate+sloof menerus/rakit (timbunan padat & tipis) atau tiang mini/bor pile/cerucuk (timbunan tebal/ lunak).",
+          "Lantai dasar: hindari slab on fill tanpa perbaikan tanah bila timbunan > 1,0 m dan umur < 12 bulan; pertimbangkan suspended slab.",
+          "Kelas situs gempa (SNI 1726:2019) ditetapkan dari data tanah, bukan diasumsikan SD."
+        ],
+        "cost_uplift_pct_construction": [
+          3,
+          12
+        ],
+        "tested_flag_required": true
+      },
+      "tanah_asli_lunak": {
+        "severity": "WARNING",
+        "title": "Tanah asli lunak",
+        "required_actions": [
+          "Sondir/boring; pertimbangkan pondasi dalam atau perbaikan tanah.",
+          "Hitung konsolidasi untuk beban rumah 2 lantai."
+        ],
+        "cost_uplift_pct_construction": [
+          3,
+          10
+        ]
+      },
+      "gambut": {
+        "severity": "BLOCKER",
+        "title": "Gambut",
+        "required_actions": [
+          "Pondasi dalam wajib; kaji kelayakan kawasan; muka air tanah & subsiden."
+        ],
+        "cost_uplift_pct_construction": [
+          10,
+          30
+        ]
+      },
+      "tidak_diketahui": {
+        "severity": "WARNING",
+        "title": "Kondisi tanah belum diketahui",
+        "required_actions": [
+          "Lakukan sondir minimal 1 titik per 4-6 unit pada tahap DED; pre-design memakai asumsi daya dukung >= 0,5 kg/cm2 (Kepmen 403) hanya untuk tanah asli baik."
+        ]
+      },
+      "tanah_asli_keras": {
+        "severity": "INFO",
+        "title": "Tanah asli baik",
+        "required_actions": [
+          "Konfirmasi daya dukung >= 0,5 kg/cm2 (Kepmen 403) dengan sondir."
+        ]
+      },
+      "berbatu": {
+        "severity": "INFO",
+        "title": "Tanah berbatu",
+        "required_actions": [
+          "Pondasi dangkal umumnya cukup; perhatikan galian & stabilitas lereng."
+        ]
+      }
+    },
+    "slope_rules": {
+      "datar_max_diff_m": 0.5,
+      "landai_max_diff_m": 1.5,
+      "note": "Beda tinggi per kavling (m). Di atas landai: perlu retaining wall & kajian drainase.",
+      "status": "practice"
+    },
+    "view_rules": {
+      "water_body": {
+        "keywords": [
+          "pond",
+          "danau",
+          "kolam",
+          "situ",
+          "waduk",
+          "sungai",
+          "laut"
+        ],
+        "notes": [
+          "Perhatikan sempadan danau/sungai (Permen PUPR 28/2015) bila badan air alami; pond buatan: konfirmasi status & kepemilikan dengan pengembang.",
+          "Muka air tanah tinggi & timbunan dekat badan air → risiko erosi tepi, penurunan, kelembapan; pertimbangkan peil lantai lebih tinggi.",
+          "Nyamuk/hama: bukaan berkasa; pengelolaan kualitas air pond (aerasi) oleh pengelola kawasan."
+        ]
+      }
+    },
+    "access_utility_rules": {
+      "vehicle_access": "Akses kendaraan harus dari sisi jalan lingkungan; carport berada di sisi akses (hindari manuver melewati zona tamu).",
+      "pln": "Posisi sambungan PLN & meteran di sisi muka/akses (dekat pagar/GSJ); jalur kabel masuk tidak melintasi carport tanpa pelindung; panel utama dekat dapur/servis.",
+      "fire_access": "Lebar jalan lingkungan minimum untuk akses damkar mengacu Permen PU 26/PRT/M/2008 (cek)."
+    },
+    "default_non_negotiables": [
+      "Tidak boleh melanggar GSB / GSJ",
+      "Tidak boleh melebihi KDB & KLB"
+    ]
+  },
+  "sni_registry": {
+    "_meta": {
+      "title": "Registri Landasan Hukum & Standar (SNI) Pre-Design Perumahan Tapak",
+      "version": "0.1.0",
+      "as_of": "2026-10-14",
+      "verification_legend": {
+        "V2": "Isi/angka dibaca dari sumber sekunder (kepmen/jurnal/skripsi yang mengutip) pada sesi penyusunan. Wajib dicek ulang ke dokumen resmi sebelum dipakai sebagai dasar legal.",
+        "V0": "Tidak diverifikasi pada sesi ini (berdasarkan pengetahuan penyusun). Nomor/judul/edisi WAJIB dicek ke JDIH/BSN (jdih.pu.go.id, akses-sni.bsn.go.id) sebelum dikutip di dokumen resmi."
+      },
+      "note": "Edisi SNI sering direvisi/dicabut. Field 'status_note' hanya petunjuk; kolom 'edition_check' berarti cek edisi terbaru."
+    },
+    "documents": [
+      {
+        "id": "UU-1-2011",
+        "type": "UU",
+        "number": "UU No. 1 Tahun 2011",
+        "title": "Perumahan dan Kawasan Permukiman",
+        "domain": "hukum-perumahan",
+        "relevance": "Dasar penyelenggaraan perumahan, PSU, hunian berimbang (diubah sebagian oleh UU 6/2023).",
+        "modules": [
+          "regulation",
+          "program"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "UU-28-2002",
+        "type": "UU",
+        "number": "UU No. 28 Tahun 2002",
+        "title": "Bangunan Gedung (sebagaimana diubah UU 6/2023)",
+        "domain": "hukum-bangunan",
+        "relevance": "Dasar persyaratan tata bangunan, keandalan bangunan, PBG/SLF.",
+        "modules": [
+          "regulation"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "UU-6-2023",
+        "type": "UU",
+        "number": "UU No. 6 Tahun 2023",
+        "title": "Penetapan Perppu 2/2022 tentang Cipta Kerja menjadi Undang-Undang",
+        "domain": "hukum-umum",
+        "relevance": "Mengubah UU 28/2002 dan UU 1/2011; dasar PBG menggantikan IMB.",
+        "modules": [
+          "regulation"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PP-16-2021",
+        "type": "PP",
+        "number": "PP No. 16 Tahun 2021",
+        "title": "Peraturan Pelaksanaan UU 28/2002 tentang Bangunan Gedung",
+        "domain": "hukum-bangunan",
+        "relevance": "Pasal 1 angka 9,11-15: definisi GSB, KBG, KDB, KDH, KLB, KTB. Pasal 14-23: persyaratan tata bangunan, intensitas (kepadatan & ketinggian), jarak bebas (GSB, jarak ke batas persil, jarak antar bangunan). PBG & SLF.",
+        "modules": [
+          "regulation"
+        ],
+        "verification": "V2",
+        "pasal": {
+          "definisi_GSB": "Ps.1 angka 9",
+          "definisi_KBG": "Ps.1 angka 11",
+          "definisi_KDB": "Ps.1 angka 12",
+          "definisi_KDH": "Ps.1 angka 13",
+          "definisi_KLB": "Ps.1 angka 14",
+          "definisi_KTB": "Ps.1 angka 15",
+          "intensitas": "Ps.21-22",
+          "jarak_bebas": "Ps.23 ayat 1",
+          "PBG": "Ps.1 angka 17",
+          "SLF": "Ps.1 angka 18"
+        }
+      },
+      {
+        "id": "PP-14-2016",
+        "type": "PP",
+        "number": "PP No. 14 Tahun 2016 jo. PP No. 12 Tahun 2021",
+        "title": "Penyelenggaraan Perumahan dan Kawasan Permukiman",
+        "domain": "hukum-perumahan",
+        "relevance": "Prasarana, sarana, utilitas umum (PSU) perumahan; hunian berimbang; serah terima PSU.",
+        "modules": [
+          "program",
+          "utilities"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-ATRBPN-11-2021",
+        "type": "Permen",
+        "number": "Permen ATR/BPN No. 11 Tahun 2021",
+        "title": "Tata Cara Penyusunan, Peninjauan Kembali, Revisi, dan Penerbitan Persetujuan Substansi RTR Kab/Kota dan RDTR",
+        "domain": "tata-ruang",
+        "relevance": "Sumber KDB/KLB/KDH/KTB zona dalam RDTR; basis konfirmasi parameter slide 2.1.",
+        "modules": [
+          "regulation"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-PUPR-14-2017",
+        "type": "Permen",
+        "number": "Permen PUPR No. 14/PRT/M/2017",
+        "title": "Persyaratan Kemudahan Bangunan Gedung",
+        "domain": "bangunan",
+        "relevance": "Aksesibilitas, tangga, ramp, hubungan horizontal/vertikal.",
+        "modules": [
+          "program"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-PU-26-2008",
+        "type": "Permen",
+        "number": "Permen PU No. 26/PRT/M/2008",
+        "title": "Persyaratan Teknis Sistem Proteksi Kebakaran pada Bangunan Gedung dan Lingkungan",
+        "domain": "keselamatan",
+        "relevance": "Akses pemadam kebakaran lingkungan perumahan, hidran halaman.",
+        "modules": [
+          "site"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-PU-12-2014",
+        "type": "Permen",
+        "number": "Permen PU No. 12/PRT/M/2014",
+        "title": "Penyelenggaraan Sistem Drainase Perkotaan",
+        "domain": "drainase",
+        "relevance": "Koefisien limpasan (C), metode rasional, kala ulang desain drainase.",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-PUPR-28-2015",
+        "type": "Permen",
+        "number": "Permen PUPR No. 28/PRT/M/2015",
+        "title": "Penetapan Garis Sempadan Sungai dan Garis Sempadan Danau",
+        "domain": "sempadan",
+        "relevance": "Cek sempadan bila tapak berbatasan dengan danau/pond. Danau buatan internal kawasan perlu ditinjau status hukumnya.",
+        "modules": [
+          "site"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-PUPR-21-2021",
+        "type": "Permen",
+        "number": "Permen PUPR No. 21/PRT/M/2021",
+        "title": "Penilaian Kinerja Bangunan Gedung Hijau",
+        "domain": "bangunan-hijau",
+        "relevance": "Acuan opsional strategi hemat energi/air (selubung, pencahayaan alami).",
+        "modules": [
+          "climate"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "PERMEN-PUPR-8-2023",
+        "type": "Permen",
+        "number": "Permen PUPR No. 8 Tahun 2023",
+        "title": "Pedoman Penyusunan Perkiraan Biaya Pekerjaan Konstruksi Bidang PUPR (AHSP)",
+        "domain": "biaya",
+        "relevance": "Acuan analisis harga satuan pekerjaan untuk estimasi biaya konstruksi/m2.",
+        "modules": [
+          "financial"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "KEPMEN-403-2002",
+        "type": "Kepmen",
+        "number": "Kepmen Kimpraswil No. 403/KPTS/M/2002",
+        "title": "Pedoman Teknis Pembangunan Rumah Sederhana Sehat (Rs Sehat)",
+        "domain": "rumah-sehat",
+        "relevance": "Luas per jiwa 7,2 (ambang) / 9,0 m2 (standar); tinggi langit-langit 2,80 m; kavling 72-90 m2; KDB maks 60%; KLB 1,2; lubang cahaya >=1/10 & penghawaan >=5% luas lantai; air bersih 100 L/org/hari; listrik min 100 VA; ukuran ruang minimum RIT/RsS.",
+        "modules": [
+          "program",
+          "daylight",
+          "utilities",
+          "structure"
+        ],
+        "verification": "V2"
+      },
+      {
+        "id": "KEPMEN-PUPR-242-2020",
+        "type": "Kepmen",
+        "number": "Kepmen PUPR No. 242/KPTS/M/2020 (dan perubahan terbaru)",
+        "title": "Batasan Harga Jual Rumah Umum yang Dapat Diperoleh Melalui Kredit/Pembiayaan Pemilikan Rumah Bersubsidi",
+        "domain": "harga",
+        "relevance": "Batas harga rumah subsidi per wilayah. Selalu gunakan keputusan terbaru yang berlaku.",
+        "modules": [
+          "financial"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-03-1733-2004",
+        "type": "SNI",
+        "number": "SNI 03-1733-2004",
+        "title": "Tata Cara Perencanaan Lingkungan Perumahan di Perkotaan",
+        "domain": "lingkungan-perumahan",
+        "relevance": "Hierarki sarana: taman RT 250 m2 (1 m2/jiwa, radius 100 m), taman RW 1.250 m2; mushola/langgar 45 m2 bangunan/100 m2 lahan per 250 penduduk (radius 100 m); jalur hijau 15 m2/100 m panjang jalan; TK 500 m radius.",
+        "modules": [
+          "program",
+          "site"
+        ],
+        "verification": "V2",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-03-2396-2001",
+        "type": "SNI",
+        "number": "SNI 03-2396-2001",
+        "title": "Tata Cara Perancangan Sistem Pencahayaan Alami pada Bangunan Gedung",
+        "domain": "pencahayaan",
+        "relevance": "Faktor langit/daylight factor; dasar luas bukaan cahaya.",
+        "modules": [
+          "daylight"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-03-6575-2001",
+        "type": "SNI",
+        "number": "SNI 03-6575-2001",
+        "title": "Tata Cara Perancangan Sistem Pencahayaan Buatan pada Bangunan Gedung",
+        "domain": "pencahayaan",
+        "relevance": "Tingkat pencahayaan (lux) per fungsi ruang rumah tinggal; metode lumen.",
+        "modules": [
+          "daylight"
+        ],
+        "verification": "V2"
+      },
+      {
+        "id": "SNI-6197-2020",
+        "type": "SNI",
+        "number": "SNI 6197:2020 (sebelumnya SNI 6197:2011)",
+        "title": "Konservasi Energi pada Sistem Pencahayaan",
+        "domain": "pencahayaan",
+        "relevance": "Daya pencahayaan maksimum (LPD), konservasi energi.",
+        "modules": [
+          "daylight"
+        ],
+        "verification": "V2",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-03-6572-2001",
+        "type": "SNI",
+        "number": "SNI 03-6572-2001",
+        "title": "Tata Cara Perancangan Sistem Ventilasi dan Pengkondisian Udara pada Bangunan Gedung",
+        "domain": "ventilasi",
+        "relevance": "Ventilasi alami: bukaan efektif; laju pergantian udara.",
+        "modules": [
+          "daylight"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-6389-2020",
+        "type": "SNI",
+        "number": "SNI 6389:2020",
+        "title": "Konservasi Energi Selubung Bangunan pada Bangunan Gedung",
+        "domain": "selubung",
+        "relevance": "Rumus OTTV; faktor radiasi matahari (SF) per kota & orientasi; batas OTTV maks 35 W/m2 (tertulis pada sumber sekunder).",
+        "modules": [
+          "climate"
+        ],
+        "verification": "V2",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-8153-2015",
+        "type": "SNI",
+        "number": "SNI 8153:2015",
+        "title": "Sistem Plambing pada Bangunan Gedung",
+        "domain": "plambing",
+        "relevance": "Perancangan air bersih & air buangan; menggantikan SNI 03-7065-2005.",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-2398-2017",
+        "type": "SNI",
+        "number": "SNI 2398:2017",
+        "title": "Tata Cara Perencanaan Tangki Septik dengan Pengolahan Lanjutan",
+        "domain": "sanitasi",
+        "relevance": "Volume tangki septik: VA = QA.n.td ; VL = QL.n.PP ; rasio P:L = 2:1 ; td 2-3 hari ; lumpur 30-40 L/org/tahun ; pengurasan 3 tahun (angka dikutip dari sumber sekunder).",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V2",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-03-2453-2002",
+        "type": "SNI",
+        "number": "SNI 03-2453-2002",
+        "title": "Tata Cara Perencanaan Sumur Resapan Air Hujan untuk Lahan Pekarangan",
+        "domain": "drainase",
+        "relevance": "Persyaratan lokasi (lahan relatif datar), permeabilitas tanah >= 2,0 cm/jam; basis perhitungan kedalaman sumur (pendekatan Sunjoto).",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V2"
+      },
+      {
+        "id": "SNI-03-2459-2002",
+        "type": "SNI",
+        "number": "SNI 03-2459-2002",
+        "title": "Spesifikasi Sumur Resapan Air Hujan untuk Lahan Pekarangan",
+        "domain": "drainase",
+        "relevance": "Dimensi: persegi/lingkaran, sisi/diameter min 0,8 m - maks 1,4 m; pipa masuk & pelimpah dia. 110 mm.",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V2"
+      },
+      {
+        "id": "SNI-19-3983-1995",
+        "type": "SNI",
+        "number": "SNI 19-3983-1995",
+        "title": "Spesifikasi Timbulan Sampah untuk Kota Kecil dan Kota Sedang di Indonesia",
+        "domain": "persampahan",
+        "relevance": "Timbulan sampah rumah tangga (L/org/hari).",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-0225-2011",
+        "type": "SNI",
+        "number": "SNI 0225:2011 (PUIL 2011)",
+        "title": "Persyaratan Umum Instalasi Listrik 2011",
+        "domain": "listrik",
+        "relevance": "Instalasi listrik rumah tinggal; proteksi; kapasitas daya.",
+        "modules": [
+          "utilities"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      },
+      {
+        "id": "SNI-1727-2020",
+        "type": "SNI",
+        "number": "SNI 1727:2020",
+        "title": "Beban Desain Minimum dan Kriteria Terkait untuk Bangunan Gedung dan Struktur Lain",
+        "domain": "struktur",
+        "relevance": "Beban hidup, atap, angin, hujan.",
+        "modules": [
+          "structure"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-1726-2019",
+        "type": "SNI",
+        "number": "SNI 1726:2019",
+        "title": "Tata Cara Perencanaan Ketahanan Gempa untuk Struktur Bangunan Gedung dan Non Gedung",
+        "domain": "struktur",
+        "relevance": "Kategori risiko, kelas situs (timbunan = potensi SE/SF), beban gempa.",
+        "modules": [
+          "structure",
+          "site"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-2847-2019",
+        "type": "SNI",
+        "number": "SNI 2847:2019",
+        "title": "Persyaratan Beton Struktural untuk Bangunan Gedung",
+        "domain": "struktur",
+        "relevance": "Tebal minimum pelat & balok (Tabel 7.3.1.1 / 9.3.1.1), selimut beton.",
+        "modules": [
+          "structure"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-8460-2017",
+        "type": "SNI",
+        "number": "SNI 8460:2017",
+        "title": "Persyaratan Perancangan Geoteknik",
+        "domain": "geoteknik",
+        "relevance": "Penyelidikan tanah, daya dukung, penurunan; wajib untuk lahan timbunan.",
+        "modules": [
+          "site",
+          "structure"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-2827-2008",
+        "type": "SNI",
+        "number": "SNI 2827:2008",
+        "title": "Cara Uji Penetrasi Lapangan dengan Alat Sondir",
+        "domain": "geoteknik",
+        "relevance": "Uji sondir (CPT) untuk lahan timbunan.",
+        "modules": [
+          "site"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-1742-2008",
+        "type": "SNI",
+        "number": "SNI 1742:2008",
+        "title": "Cara Uji Kepadatan Ringan untuk Tanah",
+        "domain": "geoteknik",
+        "relevance": "Proctor standar untuk kontrol pemadatan timbunan.",
+        "modules": [
+          "site"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-7971-2013",
+        "type": "SNI",
+        "number": "SNI 7971:2013",
+        "title": "Struktur Baja Canai Dingin",
+        "domain": "struktur",
+        "relevance": "Rangka atap baja ringan.",
+        "modules": [
+          "structure"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-15-2094-2000",
+        "type": "SNI",
+        "number": "SNI 15-2094-2000",
+        "title": "Bata Merah Pejal untuk Pasangan Dinding",
+        "domain": "material",
+        "relevance": "Mutu bata merah; berat pasangan.",
+        "modules": [
+          "structure",
+          "financial"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-03-0349-1989",
+        "type": "SNI",
+        "number": "SNI 03-0349-1989",
+        "title": "Bata Beton untuk Pasangan Dinding",
+        "domain": "material",
+        "relevance": "Conblock/batako; Kepmen 403 menyebut kuat tekan rata-rata 70 kg/cm2.",
+        "modules": [
+          "structure"
+        ],
+        "verification": "V0"
+      },
+      {
+        "id": "SNI-AHSP-2008",
+        "type": "SNI",
+        "number": "SNI 7394:2008; SNI 2835:2008; SNI 6897:2008 (keluarga SNI AHSP 2008)",
+        "title": "Tata Cara Perhitungan Harga Satuan Pekerjaan (beton; tanah; dinding) untuk Konstruksi Bangunan Gedung dan Perumahan",
+        "domain": "biaya",
+        "relevance": "Koefisien bahan/upah per satuan pekerjaan; dasar RAB detail tahap berikutnya.",
+        "modules": [
+          "financial"
+        ],
+        "verification": "V0",
+        "edition_check": true
+      }
+    ],
+    "ref_sources_secondary": [
+      {
+        "id": "SRC-KEPMEN403",
+        "text": "Teks Kepmen Kimpraswil 403/KPTS/M/2002 (salinan Disperkimtan Kab. Kutai Barat)",
+        "url": "https://disperkimtan.kutaibaratkab.go.id/admin/dashboard/production/pusat/regulasi-kepmen/file/Keputusan Menteri PUPR No. 403 Tahun 2002 - Pedoman Teknis Pembangunan Rumah Sehat.pdf"
+      },
+      {
+        "id": "SRC-PP16",
+        "text": "Teks PP 16/2021 (JDIH PKP)",
+        "url": "https://jdih.pkp.go.id/produk-hukum/file/pp-nomor-16-tahun-2021-tanpa-lampiran.pdf"
+      },
+      {
+        "id": "SRC-OTTV",
+        "text": "Kutipan OTTV & tabel SF SNI 6389:2020 pada tugas akhir (Petra)",
+        "url": "https://dewey.petra.ac.id/catalog/digital/get-file/467850"
+      },
+      {
+        "id": "SRC-LUX",
+        "text": "Tabel tingkat pencahayaan SNI 03-6575-2001 / 6197 (Virtuvian, Univ. Mercu Buana; Undip Transient)",
+        "url": "https://publikasi.mercubuana.ac.id/index.php/virtuvian/article/download/22527/pdf"
+      },
+      {
+        "id": "SRC-SNI1733",
+        "text": "Kutipan tabel SNI 03-1733-2004 (UMS)",
+        "url": "https://eprints.ums.ac.id/148299/5/Bab%20II.pdf"
+      },
+      {
+        "id": "SRC-SEPTIK",
+        "text": "Penerapan SNI 2398:2017 pada perencanaan tangki septik (Itenas)",
+        "url": "https://eproceeding.itenas.ac.id/index.php/ftsp/article/download/3668/3017/4236"
+      },
+      {
+        "id": "SRC-RESAPAN",
+        "text": "Kutipan SNI 03-2453/2459-2002 pada studi sumur resapan (Unri)",
+        "url": "https://jom.unri.ac.id/index.php/JOMFTEKNIK/article/download/21876/21170"
+      }
+    ]
+  },
+  "structure_params": {
+    "_meta": {
+      "title": "Parameter Struktur Pre-Design (beban & dimensi awal)",
+      "version": "0.1.0",
+      "CRITICAL_NOTE": "Pre-sizing hanya untuk estimasi biaya & kebutuhan ruang. DED wajib hitungan struktur oleh ahli (SNI 1726/1727/2847/8460). Semua nilai V0 kecuali ditandai.",
+      "status": "V0"
+    },
+    "density_kg_m3": {
+      "beton_bertulang": 2400,
+      "baja": 7850,
+      "kayu_kelas_II": 800,
+      "tanah_timbunan": 1800
+    },
+    "dead_load_kg_m2": {
+      "adukan_per_cm": 21,
+      "penutup_lantai_per_cm": 24,
+      "plafon_penggantung": 18,
+      "atap_genteng_reng_usuk": 50,
+      "atap_baja_ringan_metal": 15,
+      "dinding_bata_1_2": 250,
+      "dinding_bata_ringan_10cm": 100,
+      "dinding_conblock_10cm": 160,
+      "mep_allowance": 25,
+      "source": "PPIUG 1983 (pembebanan Indonesia lama) - nilai klasik yang masih dipakai praktik; cek vs SNI 1727:2020"
+    },
+    "live_load_kN_m2": {
+      "lantai_hunian_umum": 1.92,
+      "ruang_tidur": 1.44,
+      "atap_datar_pekerja": 0.96,
+      "tangga_rumah": 1.92,
+      "source": "SNI 1727:2020 Tabel 4.3-1 (hunian satu & dua keluarga) - V0"
+    },
+    "live_load_kg_m2_ppiug": {
+      "lantai_rumah_tinggal": 200,
+      "atap": 100
+    },
+    "member_min_thickness_ratio": {
+      "_note": "Tebal minimum h tanpa kontrol lendutan (rasio terhadap bentang L), fy=420 MPa. Garis keturunan ACI 318 → SNI 2847:2019 Tabel 7.3.1.1 (pelat satu arah) & 9.3.1.1 (balok). V0 - cek tabel.",
+      "beam": {
+        "simple": 16,
+        "one_end_continuous": 18.5,
+        "both_ends_continuous": 21,
+        "cantilever": 8
+      },
+      "slab_one_way": {
+        "simple": 20,
+        "one_end_continuous": 24,
+        "both_ends_continuous": 28,
+        "cantilever": 10
+      }
+    },
+    "concrete": {
+      "fc_mpa_default": 25,
+      "fy_mpa_default": 420,
+      "cover_mm": {
+        "balok_kolom": 40,
+        "pelat": 20,
+        "pondasi_kontak_tanah": 75
+      },
+      "rho_column_default": 0.015,
+      "phi_tied_column": 0.65,
+      "pn_max_factor": 0.8,
+      "status": "V0"
+    },
+    "min_member_sizes_mm": {
+      "kolom_praktis_lt1": [
+        150,
+        150
+      ],
+      "kolom_2_lantai_min": [
+        200,
+        200
+      ],
+      "ring_balok": [
+        150,
+        200
+      ],
+      "sloof": [
+        150,
+        200
+      ],
+      "pelat_lantai_t_mm": 120,
+      "lantai_kerja_t_mm": 50,
+      "source": "Kepmen 403 (rumah 1 lantai: kolom 15x15, ring 15x20; lantai t>=5 cm); 2 lantai: praktik",
+      "status": "verified_secondary"
+    },
+    "soil": {
+      "min_allowable_bearing_kg_cm2": 0.5,
+      "source": "Kepmen 403/KPTS/M/2002",
+      "status": "verified_secondary"
+    },
+    "roof": {
+      "min_slope_deg": 20,
+      "source": "Kepmen 403 (genteng)",
+      "status": "verified_secondary"
+    }
+  },
+  "utilities_params": {
+    "_meta": {
+      "title": "Parameter Utilitas: air bersih, air limbah, resapan, drainase, listrik, sampah",
+      "version": "0.1.0",
+      "status_legend": {
+        "verified_secondary": "terbaca pada sumber sekunder",
+        "practice": "praktik/literatur",
+        "assumption": "asumsi penyusun",
+        "V0": "belum diverifikasi - cek ke SNI"
+      }
+    },
+    "water": {
+      "per_capita_l_day": 100,
+      "per_capita_source": "Kepmen 403/KPTS/M/2002 (air bersih 100 L/org/hari)",
+      "per_capita_alternatives": {
+        "hunian_kota_sedang_range_l_day": [
+          120,
+          150
+        ],
+        "note": "SNI 8153:2015 / Ditjen Cipta Karya; cek dokumen untuk kategori kota",
+        "status": "V0"
+      },
+      "peak_hour_factor_C1": 1.5,
+      "peak_minute_factor_C2": 3.0,
+      "peak_note": "C1, C2 praktik perancangan plambing (1,5-2,0 ; 3,0-4,0)",
+      "storage_days": 1.0,
+      "min_residual_pressure_kpa": 100,
+      "status": "verified_secondary"
+    },
+    "wastewater": {
+      "return_ratio": 0.8,
+      "return_ratio_note": "asumsi 80% air bersih menjadi air limbah (praktik 60-80%)",
+      "blackwater_l_person_day": 20,
+      "detention_days_range": [
+        2,
+        3
+      ],
+      "sludge_l_person_year_range": [
+        30,
+        40
+      ],
+      "desludge_years_default": 3,
+      "freeboard_m": 0.3,
+      "length_width_ratio": 2.0,
+      "wet_depth_m_default": 1.2,
+      "min_distance_septic_to_well_m": 10,
+      "min_distance_septic_note": "Jarak umum septik-sumur 10 m (SNI 2398 / praktik, V0): pada kavling kecil tidak terpenuhi → gunakan septik kedap + resapan komunal/IPAL komunal; sumber air = PDAM.",
+      "source": "SNI 2398:2017 (angka dari sumber sekunder Itenas)",
+      "status": "verified_secondary"
+    },
+    "infiltration_well": {
+      "min_permeability_cm_per_hour": 2.0,
+      "diameter_min_m": 0.8,
+      "diameter_max_m": 1.4,
+      "pipe_in_out_mm": 110,
+      "formula": "H = Q/(F K) x [1 - exp(-F K T / (pi R^2))] ; F = 5.5 R ; Q = C i A / 3.6e6",
+      "formula_source": "Sunjoto (1988) yang diadopsi SNI 03-2453-2002; koefisien akhir cek dokumen SNI",
+      "default_rain_intensity_mm_h": 100,
+      "default_rain_duration_h": 1.0,
+      "rain_note": "Default 100 mm/jam & 1 jam = placeholder. Gunakan kurva IDF lokal (BMKG/BBWS), kala ulang 2-5 th.",
+      "soil_k_cm_s": {
+        "kerikil": [
+          0.1,
+          1.0
+        ],
+        "pasir_bersih": [
+          0.001,
+          0.1
+        ],
+        "pasir_lanau": [
+          1e-05,
+          0.001
+        ],
+        "lanau": [
+          1e-07,
+          1e-05
+        ],
+        "lempung": [
+          1e-09,
+          1e-07
+        ]
+      },
+      "soil_k_note": "Rentang tipikal geoteknik (praktik).",
+      "fill_soil_warning": "Timbunan: permeabilitas tidak seragam & rawan kolaps; uji infiltrasi in-situ dan hindari sumur resapan dekat pondasi (>= 2-3 m).",
+      "status": "verified_secondary"
+    },
+    "runoff_coefficient": {
+      "atap": 0.9,
+      "perkerasan_beton_aspal": 0.85,
+      "paving_block": 0.6,
+      "tanah_halaman": 0.2,
+      "taman_rumput": 0.15,
+      "kolam_air": 1.0,
+      "source": "Permen PU 12/PRT/M/2014 (kisaran tipikal; nilai tengah dipakai) - V0",
+      "status": "V0"
+    },
+    "electricity": {
+      "min_house_va": 100,
+      "min_house_source": "Kepmen 403/KPTS/M/2002",
+      "va_classes": [
+        450,
+        900,
+        1300,
+        2200,
+        3500,
+        4400,
+        5500,
+        6600
+      ],
+      "va_classes_note": "Golongan daya PLN tipikal; cek tarif/ketersediaan terbaru.",
+      "power_factor": 0.85,
+      "diversity_factor": 0.6,
+      "appliances_w": {
+        "lampu_led_titik": 10,
+        "kipas_angin": 50,
+        "ac_0_5pk": 400,
+        "ac_1pk": 800,
+        "kulkas": 150,
+        "tv": 100,
+        "rice_cooker": 400,
+        "setrika": 350,
+        "mesin_cuci": 350,
+        "water_heater": 400,
+        "pompa_air": 250,
+        "dispenser": 350,
+        "komputer_wfh": 200,
+        "kompor_induksi": 1200,
+        "microwave": 800,
+        "wifi_router": 20
+      },
+      "source": "Daya tipikal peralatan (label produsen); PUIL 2011 untuk instalasi",
+      "status": "practice"
+    },
+    "solid_waste": {
+      "l_person_day": 2.75,
+      "kg_person_day": 0.35,
+      "source": "SNI 19-3983-1995 (kota sedang) - V0",
+      "status": "V0"
+    },
+    "neighborhood_sni_03_1733": {
+      "per_250_residents": {
+        "mushola_building_m2": 45,
+        "mushola_land_m2": 100,
+        "mushola_radius_m": 100,
+        "taman_rt_m2": 250,
+        "taman_rt_radius_m": 100
+      },
+      "green_buffer_m2_per_100m_road": 15,
+      "kindergarten_radius_m": 500,
+      "status": "verified_secondary"
+    }
+  }
+}

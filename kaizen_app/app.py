@@ -16,6 +16,7 @@ from modules.mep import (
     titik_lampu,
     ventilasi,
 )
+from modules.arsitektur import Predesign as predesign_view
 from modules.arsitektur import luas_bangunan_view
 from utils.theme import inject_css
 
@@ -36,11 +37,12 @@ MODUL_MEP = {
 }
 
 MODUL_ARSITEKTUR = {
-    "Modul 1 📐 Luas & Intensitas Bangunan": luas_bangunan_view.render,
-    "Modul 2 🏠 Rekapitulasi Ruangan": None,
-    "Modul 3 🪟 Bukaan & Jendela": ventilasi.render,
-    "Modul 4 ♿ Tangga & Aksesibilitas": None,
-    "Modul 5 📊 Quantity Take-Off": None,
+    "Modul 1 📐 Predesign": predesign_view.render,
+    "Modul 2 📐 Luas & Intensitas Bangunan": luas_bangunan_view.render,
+    "Modul 3 🏠 Rekapitulasi Ruangan": None,
+    "Modul 4 🪟 Bukaan & Jendela": ventilasi.render,
+    "Modul 5 ♿ Tangga & Aksesibilitas": None,
+    "Modul 6 📊 Quantity Take-Off": None,
 }
 
 MODUL_KAWASAN = [
