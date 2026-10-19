@@ -36,6 +36,11 @@ dirujuk; data tersebut perlu dicatat dari dokumen resmi setempat dan tidak diisi
 otomatis. Nilai batas awal pada `data/arsitektur/arsitektur.json` hanya contoh;
 hasil pemeriksaan tidak menyatakan kepatuhan hukum. Input perhitungan tersimpan di
 `data/arsitektur/luas_bangunan_arsitektur.json`.
+Subbagian Program Ruang menyediakan tab dan tombol simpan terpisah untuk setiap
+lantai rencana (1–5). Setiap lantai dapat diisi dan disimpan sebelum berpindah;
+hasil tersimpan tampil di Summary. Simulasi zoning konsep per lantai dapat
+diunduh sebagai PNG dan disertakan sebagai gambar di laporan PDF/Excel. Simulasi
+bersifat indikatif, tidak berskala, dan bukan gambar kerja arsitektur.
 
 Menu Arsitektur **Bukaan & Jendela** menggunakan halaman, perhitungan, data
 standar, dan penyimpanan yang sama dengan modul **Kebutuhan Ventilasi** MEP.

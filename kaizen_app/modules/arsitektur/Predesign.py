@@ -119,6 +119,7 @@ class ProductParameters(_Serializable):
     target_gfa_m2: Optional[float] = None
     num_types: Optional[int] = None                           # KRITIS
     finishing_class: Optional[str] = None                     # KRITIS
+    planned_floors: int = 1
     lot_width_m: Optional[float] = None
     lot_depth_m: Optional[float] = None
 
@@ -207,6 +208,7 @@ class PreDesignProject:
     persona: BuyerPersona = field(default_factory=BuyerPersona)
     product: ProductParameters = field(default_factory=ProductParameters)
     program: list[RoomProgramItem] = field(default_factory=list)
+    floor_programs: dict[int, list[RoomProgramItem]] = field(default_factory=dict)
     regulation: RegulationParams = field(default_factory=RegulationParams)
     site: SiteConditions = field(default_factory=SiteConditions)
     facade: FacadePreferences = field(default_factory=FacadePreferences)
@@ -225,6 +227,14 @@ class PreDesignProject:
 
     def room(self, room_id: str) -> Optional[RoomProgramItem]:
         return next((r for r in self.program if r.room_id == room_id), None)
+
+    def save_floor_program(self, floor: int, items: list[RoomProgramItem]) -> None:
+        self.floor_programs[floor] = items
+        self.program = [
+            item
+            for saved_floor in sorted(self.floor_programs)
+            for item in self.floor_programs[saved_floor]
+        ]
 
     def decision(self, section_id: str) -> DecisionRecord:
         rec = next((d for d in self.decisions if d.section_id == section_id), None)
@@ -307,6 +317,10 @@ class PreDesignProject:
             persona=BuyerPersona.from_dict(d.get("persona", {})),
             product=ProductParameters.from_dict(d.get("product", {})),
             program=[RoomProgramItem.from_dict(x) for x in d.get("program", [])],
+            floor_programs={
+                int(floor): [RoomProgramItem.from_dict(item) for item in items]
+                for floor, items in d.get("floor_programs", {}).items()
+            },
             regulation=RegulationParams.from_dict(d.get("regulation", {})),
             site=SiteConditions.from_dict(d.get("site", {})),
             facade=FacadePreferences.from_dict(d.get("facade", {})),
@@ -967,15 +981,21 @@ def _unit_area(item: RoomProgramItem, spec: dict, finishing: str, persona: Buyer
     return a
 
 
-def compute_program(project: PreDesignProject, floors: Optional[int] = None) -> ProgramResult:
+def compute_program(
+    project: PreDesignProject,
+    floors: Optional[int] = None,
+    *,
+    program_items: Optional[list[RoomProgramItem]] = None,
+) -> ProgramResult:
     finishing = project.product.finishing_class or "menengah"
     cat = room_catalog()
     eff = load("room_standards")["efficiency_by_class"][finishing]
     res = ProgramResult(finishing_class=finishing, efficiency=eff)
     persona = project.persona
     motor_area = cat["carport"].get("motorcycle_area_m2", 1.5)
+    selected_program = project.program if program_items is None else program_items
 
-    for item in project.program:
+    for item in selected_program:
         spec = cat.get(item.room_id)
         if spec is None:           # ruang tambahan buatan pengguna
             spec = {"zone": "semi-privat", "min_area_m2": 0.0, "rec_area_m2": {"standar": item.area_m2 or 0, "menengah": item.area_m2 or 0, "atas": item.area_m2 or 0}}
@@ -1002,7 +1022,7 @@ def compute_program(project: PreDesignProject, floors: Optional[int] = None) -> 
         elif item.room_id in ("carport", "teras"):
             res.covered_outdoor_m2 += total
 
-    floors = floors or (project.regulation.max_floors or 1)
+    floors = floors or project.product.planned_floors or (project.regulation.max_floors or 1)
     n_floors = max(1, floors)
     if n_floors > 1:
         fh = load("room_standards")["floor_heights"]["floor_to_floor_m"]
@@ -1646,6 +1666,16 @@ def _check_regulation(p: PreDesignProject, c: _Collector, env: Optional[creg.Env
     if r.kdb_pct is not None and r.kdb_pct > load("regulation_defaults")["kepmen_403_rs_sehat"]["kdb_max_pct"]:
         c.add("RG-007", Severity.INFO, "1.2", f"KDB {r.kdb_pct:g}% > 60% (batas Rs Sehat Kepmen 403) — acuan RDTR yang berlaku.", cite("KEPMEN-403-2002"))
     if env:
+        max_allowed_floors = env.floors_effective or r.max_floors
+        if max_allowed_floors is not None and pr.planned_floors > max_allowed_floors:
+            c.add(
+                "RG-011",
+                Severity.BLOCKER,
+                "1.2",
+                f"Jumlah lantai rencana ({pr.planned_floors}) melebihi batas efektif regulasi "
+                f"({max_allowed_floors}).",
+                cite("PP-16-2021"),
+            )
         for n in env.notes:
             c.add("RG-005", Severity.INFO, "1.2", n)
         if pr.target_gfa_m2 and env.gfa_cap_m2 is not None:
@@ -1744,9 +1774,8 @@ def validate_project(p: PreDesignProject) -> list[Finding]:
     except ValueError as e:
         c.add("PR-003", Severity.BLOCKER, "1.5", str(e))
     prog: Optional[cprog.ProgramResult] = None
-    if p.program:
-        floors = (env.floors_effective if env and env.floors_effective else None)
-        prog = cprog.compute_program(p, floors=floors)
+    if p.program or p.floor_programs:
+        prog = cprog.compute_program(p, floors=p.product.planned_floors)
     _check_persona(p, c)
     _check_product(p, c, prog)
     _check_program(p, c, prog, env)
@@ -1839,7 +1868,7 @@ def build_report(p: PreDesignProject, *, finishing_override: Optional[str] = Non
 
     w("\n## 1.3 Program Ruang")
     if p.program:
-        pres = cprog.compute_program(p, floors=env.floors_effective if env else None)
+        pres = cprog.compute_program(p, floors=p.product.planned_floors)
         w("| Ruang | Prioritas | Qty | m²/unit | Total m² | Status |")
         w("|---|---|---|---|---|---|")
         for ln in pres.lines:
@@ -1856,6 +1885,7 @@ def build_report(p: PreDesignProject, *, finishing_override: Optional[str] = Non
 
     w("\n## 1.5 Produk")
     w(f"- Submodel bangunan: {p.building_type}")
+    w(f"- Jumlah lantai rencana: {pr.planned_floors}")
     w(f"- Harga jual target: {_idr(pr.target_price_idr)}")
     w(f"- Biaya konstruksi maks./m² (KRITIS): {_idr(pr.max_construction_cost_per_m2_idr)}")
     w(f"- Luas tanah: {_n(pr.land_area_m2, 1, ' m²')} ({_n(pr.lot_width_m,1)} x {_n(pr.lot_depth_m,1)} m) · GFA target: {_n(pr.target_gfa_m2, 1, ' m²')}")
@@ -2086,6 +2116,8 @@ def render() -> None:
     t11, t12, t13, t14, t15, t16 = st.tabs(
         ["1.1 Tapak", "1.2 Regulasi", "1.3 Program ruang", "1.4 Fasad", "1.5 Produk", "1.6 Summary"]
     )
+    program_result = None
+    layout_images = []
 
     with t15:
         pe = p.persona
@@ -2195,38 +2227,126 @@ def render() -> None:
 
     with t13:
         st.caption("Template program ruang yang tersedia saat ini masih berorientasi perumahan. Gunakan tanda tanya pada nama ruang, jumlah, dan jawaban untuk melihat panduan.")
-        for r_ in p.program:
-            c1, c2, c3 = st.columns([4, 1, 2])
-            catalog_room = room_catalog().get(r_.room_id, {})
-            room_source = catalog_room.get("source", "")
-            room_minimum = catalog_room.get("min_area_m2")
-            room_help = ROOM_QUESTION_HELP.get(
-                r_.room_id,
-                "Tentukan apakah ruang ini termasuk dalam brief dan estimasi kebutuhan hunian.",
+        p.product.planned_floors = st.selectbox(
+            "Jumlah lantai rencana",
+            options=list(range(1, 6)),
+            index=max(0, min(4, p.product.planned_floors - 1)),
+            key=K + "planned_floors",
+            help="Menentukan pembagian zona dan luas sirkulasi pada simulasi. Jumlah lantai tetap harus sesuai batas regulasi.",
+        )
+        floor_tabs = st.tabs([f"Lantai {floor}" for floor in range(1, p.product.planned_floors + 1)])
+        existing_program = {item.room_id: item for item in p.program}
+        room_templates = [
+            RoomProgramItem(
+                room_id=room["id"],
+                name=room["name"],
+                priority=room["priority"],
+                qty=existing_program[room["id"]].qty if room["id"] in existing_program else room.get("default_qty", 1),
+                question=room["question"],
+                approved=None,
             )
-            if room_minimum:
-                room_help += f" Minimum katalog {room_minimum:g} m²/unit. "
-            if room_source:
-                room_help += f"Basis katalog: {room_source}. "
-            if r_.question:
-                room_help += f"Pertanyaan keputusan: {r_.question}"
-            ok = c1.checkbox(
-                f"{r_.name}  ·  {r_.priority}",
-                value=bool(r_.approved),
-                key=K + "ap_" + r_.room_id,
-                help=room_help,
-            )
-            r_.approved = ok
-            r_.qty = int(_num(
-                "qty", "q_" + r_.room_id, r_.qty, container=c2, decimals=0,
-                min_value=0, max_value=10,
-            ) or 0)
-            r_.answer = c3.text_input(
-                "Jawaban",
-                r_.answer,
-                key=K + "an_" + r_.room_id,
-                placeholder=r_.question,
-                help=f"Catat keputusan untuk ruang ini. Pertanyaan panduan: {r_.question or 'jelaskan kebutuhan khusus atau asumsi ruang.'}",
+            for room in load("room_standards")["rooms"]
+        ]
+        room_templates.extend(
+            item for item in p.program if item.room_id not in room_catalog()
+        )
+        for floor, floor_tab in enumerate(floor_tabs, start=1):
+            with floor_tab:
+                saved_rooms = p.floor_programs.get(floor, [])
+                saved_by_id = {item.room_id: item for item in saved_rooms}
+                legacy_by_id = {
+                    item.room_id: item
+                    for item in room_templates
+                    if floor == 1 and not p.floor_programs and item.approved
+                }
+                with st.form(K + f"floor_program_{floor}"):
+                    st.caption(f"Pilih dan atur ruang untuk lantai {floor}, lalu simpan sebelum berpindah lantai.")
+                    for template in room_templates:
+                        c1, c2, c3 = st.columns([4, 1, 2])
+                        catalog_room = room_catalog().get(template.room_id, {})
+                        existing = saved_by_id.get(template.room_id) or legacy_by_id.get(template.room_id)
+                        room_help = ROOM_QUESTION_HELP.get(
+                            template.room_id,
+                            "Tentukan apakah ruang ini termasuk dalam program lantai.",
+                        )
+                        if catalog_room.get("min_area_m2"):
+                            room_help += f" Minimum katalog {catalog_room['min_area_m2']:g} m²/unit. "
+                        if catalog_room.get("source"):
+                            room_help += f"Basis katalog: {catalog_room['source']}. "
+                        if template.question:
+                            room_help += f"Pertanyaan keputusan: {template.question}"
+                        c1.checkbox(
+                            f"{template.name} · {template.priority}",
+                            value=existing is not None,
+                            key=K + f"floor_{floor}_room_{template.room_id}",
+                            help=room_help,
+                        )
+                        c2.number_input(
+                            "Jumlah",
+                            min_value=0,
+                            max_value=10,
+                            value=existing.qty if existing else template.qty,
+                            step=1,
+                            key=K + f"floor_{floor}_qty_{template.room_id}",
+                        )
+                        c3.text_input(
+                            "Catatan",
+                            value=existing.answer if existing else "",
+                            placeholder=template.question,
+                            key=K + f"floor_{floor}_answer_{template.room_id}",
+                            help="Catatan khusus ruang pada lantai ini.",
+                        )
+                    save_floor = st.form_submit_button(
+                        f"Simpan program lantai {floor}",
+                        type="primary",
+                    )
+                if save_floor:
+                    floor_items = []
+                    for template in room_templates:
+                        room_id = template.room_id
+                        if not st.session_state[K + f"floor_{floor}_room_{room_id}"]:
+                            continue
+                        floor_items.append(
+                            RoomProgramItem(
+                                room_id=room_id,
+                                name=template.name,
+                                priority=template.priority,
+                                approved=True,
+                                qty=st.session_state[K + f"floor_{floor}_qty_{room_id}"],
+                                area_m2=(saved_by_id.get(room_id) or legacy_by_id.get(room_id)).area_m2
+                                if saved_by_id.get(room_id) or legacy_by_id.get(room_id)
+                                else None,
+                                question=template.question,
+                                answer=st.session_state[K + f"floor_{floor}_answer_{room_id}"],
+                            )
+                        )
+                    p.save_floor_program(floor, floor_items)
+                    st.success(f"Program lantai {floor} tersimpan. Hasilnya tersedia di tab 1.6 Summary.")
+                if floor in p.floor_programs:
+                    st.caption(f"{len(p.floor_programs[floor])} ruang tersimpan pada lantai {floor}.")
+
+        if p.floor_programs:
+            p.program = [
+                item
+                for floor, items in sorted(p.floor_programs.items())
+                if floor <= p.product.planned_floors
+                for item in items
+            ]
+
+        if p.program or p.floor_programs:
+            from modules.arsitektur.room_layout import build_floor_plans
+
+            program_result = cprog.compute_program(p, floors=p.product.planned_floors)
+            floor_results = {
+                floor: cprog.compute_program(p, floors=1, program_items=items)
+                for floor, items in p.floor_programs.items()
+                if floor <= p.product.planned_floors and items
+            }
+            layout_images = build_floor_plans(
+                program_result,
+                p.product.planned_floors,
+                p.site.front_orientation or "",
+                floor_programs=floor_results,
             )
 
     with t12:
@@ -2368,6 +2488,27 @@ def render() -> None:
 
     with t16:
         fnd = validate_project(p)
+        st.markdown("### Simulasi ruang")
+        if layout_images:
+            for floor_plan in layout_images:
+                st.image(
+                    floor_plan.png,
+                    caption=f"Konsep zoning — lantai {floor_plan.floor}",
+                    width="stretch",
+                    alt=f"Diagram zoning konsep untuk lantai {floor_plan.floor}",
+                )
+                st.download_button(
+                    f"Unduh PNG lantai {floor_plan.floor}",
+                    floor_plan.png,
+                    file_name=f"Simulasi_Ruang_Lantai_{floor_plan.floor}.png",
+                    mime="image/png",
+                    key=K + f"dl_layout_{floor_plan.floor}",
+                )
+            st.caption(
+                "Skema konsep otomatis, tidak berskala, dan bukan pengganti denah/gambar kerja arsitek."
+            )
+        else:
+            st.info("Lengkapi program ruang untuk membuat simulasi penempatan ruang.")
         sev = {"BLOCKER": 0, "WARNING": 0, "INFO": 0}
         for f in fnd:
             sev[f.severity.value] += 1
@@ -2390,16 +2531,12 @@ def render() -> None:
             env = creg.analyze(p.product, p.regulation, p.site)
         except ValueError:
             pass
-        program_result = (
-            cprog.compute_program(
-                p,
-                floors=env.floors_effective if env and env.floors_effective else None,
-            )
-            if p.program
-            else None
+        xlsx = predesign_export.build_excel(
+            p, fnd, completeness, env, program_result, layout_images=layout_images
         )
-        xlsx = predesign_export.build_excel(p, fnd, completeness, env, program_result)
-        pdf = predesign_export.build_pdf(p, fnd, completeness, env, program_result)
+        pdf = predesign_export.build_pdf(
+            p, fnd, completeness, env, program_result, layout_images=layout_images
+        )
         st.markdown("### Unduh laporan")
         excel_col, pdf_col, _ = st.columns([1, 1, 2])
         excel_col.download_button(
