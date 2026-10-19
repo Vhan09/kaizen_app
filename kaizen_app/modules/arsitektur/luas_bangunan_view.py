@@ -38,13 +38,21 @@ def _floor_areas(frame: pd.DataFrame) -> list[float]:
     return [-1.0 if pd.isna(value) else float(value) for value in values]
 
 
-def render() -> None:
+def render(
+    *,
+    embedded: bool = False,
+    land_area_m2: float | None = None,
+    regulation_limits: dict[str, float | None] | None = None,
+    project_name: str = "",
+    project_location: str = "",
+) -> None:
     data = _load_data()
     saved = _load_saved()
     limits_default = data.get("example_limits", {})
     project_default = saved.get("project", {})
 
-    st.title("Luas & Intensitas Bangunan")
+    if not embedded:
+        st.title("Luas & Intensitas Bangunan")
     st.caption(
         "Perhitungan luas lahan, luas tapak, luas lantai, KDB, KLB, dan KDH. "
         "Gunakan batas yang telah diverifikasi untuk lokasi dan jenis bangunan."
@@ -58,10 +66,14 @@ def render() -> None:
         c1, c2, c3 = st.columns(3)
         project = {
             "pekerjaan": c1.text_input(
-                "Pekerjaan", project_default.get("pekerjaan", ""), key="ars_luas_pekerjaan"
+                "Pekerjaan",
+                project_default.get("pekerjaan", project_name),
+                key="ars_luas_pekerjaan",
             ),
             "lokasi": c2.text_input(
-                "Lokasi", project_default.get("lokasi", ""), key="ars_luas_lokasi"
+                "Lokasi",
+                project_default.get("lokasi", project_location),
+                key="ars_luas_lokasi",
             ),
             "tahun": c3.text_input(
                 "Tahun", project_default.get("tahun", ""), key="ars_luas_tahun"
@@ -74,7 +86,7 @@ def render() -> None:
         land_area = st.number_input(
             "Luas lahan (m²)",
             min_value=0.0,
-            value=float(saved.get("land_area_m2", 0.0)),
+            value=float(saved.get("land_area_m2", land_area_m2 or 0.0)),
             step=1.0,
             key="ars_luas_lahan",
         )
@@ -139,13 +151,18 @@ def render() -> None:
         "Perbandingan hasil hanya terhadap nilai yang Anda masukkan."
     )
     b1, b2, b3 = st.columns(3)
+    saved_limits = saved.get("limits", {})
+    regulation_limits = regulation_limits or {}
     limits = {
         "max_kdb_percent": b1.number_input(
             "Batas maksimum KDB (%)",
             min_value=0.0,
             max_value=100.0,
-            value=float(saved.get("limits", {}).get(
-                "max_kdb_percent", limits_default.get("max_kdb_percent", 60.0)
+            value=float(saved_limits.get(
+                "max_kdb_percent",
+                regulation_limits.get("max_kdb_percent")
+                if regulation_limits.get("max_kdb_percent") is not None
+                else limits_default.get("max_kdb_percent", 60.0),
             )),
             step=1.0,
             key="ars_luas_batas_kdb",
@@ -153,8 +170,11 @@ def render() -> None:
         "max_klb": b2.number_input(
             "Batas maksimum KLB",
             min_value=0.0,
-            value=float(saved.get("limits", {}).get(
-                "max_klb", limits_default.get("max_klb", 1.2)
+            value=float(saved_limits.get(
+                "max_klb",
+                regulation_limits.get("max_klb")
+                if regulation_limits.get("max_klb") is not None
+                else limits_default.get("max_klb", 1.2),
             )),
             step=0.1,
             key="ars_luas_batas_klb",
@@ -163,8 +183,11 @@ def render() -> None:
             "Batas minimum KDH (%)",
             min_value=0.0,
             max_value=100.0,
-            value=float(saved.get("limits", {}).get(
-                "min_kdh_percent", limits_default.get("min_kdh_percent", 10.0)
+            value=float(saved_limits.get(
+                "min_kdh_percent",
+                regulation_limits.get("min_kdh_percent")
+                if regulation_limits.get("min_kdh_percent") is not None
+                else limits_default.get("min_kdh_percent", 10.0),
             )),
             step=1.0,
             key="ars_luas_batas_kdh",

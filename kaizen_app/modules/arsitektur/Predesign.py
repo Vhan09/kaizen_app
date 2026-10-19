@@ -91,7 +91,7 @@ class _Serializable:
         return cls(**{k: v for k, v in (data or {}).items() if k in names})
 
 
-# ---------------------------------------------------------------- 1.1
+# ---------------------------------------------------------------- 1.5
 @dataclass
 class BuyerPersona(_Serializable):
     age_min: Optional[int] = None
@@ -108,7 +108,7 @@ class BuyerPersona(_Serializable):
     motorcycles: Optional[int] = None
 
 
-# ---------------------------------------------------------------- 1.2
+# ---------------------------------------------------------------- 1.5
 @dataclass
 class ProductParameters(_Serializable):
     target_price_idr: Optional[float] = None
@@ -142,7 +142,7 @@ class RoomProgramItem(_Serializable):
     note: str = ""
 
 
-# ---------------------------------------------------------------- 2.1
+# ---------------------------------------------------------------- 1.2
 @dataclass
 class RegulationParams(_Serializable):
     kdb_pct: Optional[float] = None
@@ -156,17 +156,18 @@ class RegulationParams(_Serializable):
     gsb_side_right_m: Optional[float] = None
     gsb_rear_m: Optional[float] = None
     source: str = ""
+    region: str = ""
+    regional_regulation: str = ""
+    regional_sni_references: str = ""
     confirmed: dict[str, bool] = field(default_factory=dict)  # kunci: kdb, klb, gsb, gsj, ktg, kdh
 
 
-# ---------------------------------------------------------------- 2.2
+# ---------------------------------------------------------------- 1.1
 @dataclass
 class SiteConditions(_Serializable):
     front_orientation: Optional[str] = None
     topography: Optional[str] = None
     level_difference_m: Optional[float] = None
-    best_view: str = ""
-    best_view_direction: Optional[str] = None
     noise_sources: list[str] = field(default_factory=list)
     soil_condition: Optional[str] = None
     fill_thickness_m: Optional[float] = None
@@ -179,6 +180,12 @@ class SiteConditions(_Serializable):
     longitude: Optional[float] = None
     ottv_city: Optional[str] = None
     front_boundary_from_axis_m: Optional[float] = None  # jarak batas kavling depan ke as jalan (untuk cek GSJ)
+
+
+@dataclass
+class FacadePreferences(_Serializable):
+    reference_type: str = ""
+    reference_notes: str = ""
 
 
 @dataclass
@@ -195,12 +202,14 @@ class DecisionRecord(_Serializable):
 class PreDesignProject:
     name: str = "Proyek Baru"
     location: str = ""
+    building_type: str = "Perumahan Tapak"
     session_date: str = field(default_factory=lambda: date.today().isoformat())
     persona: BuyerPersona = field(default_factory=BuyerPersona)
     product: ProductParameters = field(default_factory=ProductParameters)
     program: list[RoomProgramItem] = field(default_factory=list)
     regulation: RegulationParams = field(default_factory=RegulationParams)
     site: SiteConditions = field(default_factory=SiteConditions)
+    facade: FacadePreferences = field(default_factory=FacadePreferences)
     decisions: list[DecisionRecord] = field(default_factory=list)
     schema_version: str = "0.1.0"
 
@@ -233,7 +242,8 @@ class PreDesignProject:
     # ---- kelengkapan form
     def _section_model(self, model_name: str):
         return {"BuyerPersona": self.persona, "ProductParameters": self.product,
-                "RegulationParams": self.regulation, "SiteConditions": self.site}.get(model_name)
+                "RegulationParams": self.regulation, "SiteConditions": self.site,
+                "FacadePreferences": self.facade}.get(model_name)
 
     @staticmethod
     def _filled(v: Any) -> bool:
@@ -242,6 +252,7 @@ class PreDesignProject:
     def completeness(self) -> dict[str, dict[str, Any]]:
         """Persentase kelengkapan per seksi + daftar field kosong (khusus WAJIB & KRITIS)."""
         out: dict[str, dict[str, Any]] = {}
+        section_order = {"1.1": 0, "1.2": 1, "1.3": 2, "1.4": 3, "1.5": 4}
         for agenda in load("form_schema")["agendas"]:
             for sec in agenda["sections"]:
                 obj = self._section_model(sec["model"])
@@ -259,13 +270,20 @@ class PreDesignProject:
                     if obj is None or not self._filled(getattr(obj, f["key"], None)):
                         missing.append(f["key"])
                 done = req_total - len(missing)
-                out[sec["id"]] = {
-                    "title": sec["title"], "required": req_total, "filled": done,
-                    "pct": round(100 * done / req_total, 1) if req_total else 100.0,
-                    "missing": missing, "decided": self.decision(sec["id"]).decided if any(
-                        d.section_id == sec["id"] for d in self.decisions) else False,
-                }
-        return out
+                section_id = sec["id"]
+                entry = out.setdefault(section_id, {
+                    "title": "Produk & profil pembeli" if section_id == "1.5" else sec["title"],
+                    "required": 0,
+                    "filled": 0,
+                    "pct": 0.0,
+                    "missing": [],
+                    "decided": any(d.section_id == section_id and d.decided for d in self.decisions),
+                })
+                entry["required"] += req_total
+                entry["filled"] += done
+                entry["missing"].extend(missing)
+                entry["pct"] = round(100 * entry["filled"] / entry["required"], 1) if entry["required"] else 100.0
+        return dict(sorted(out.items(), key=lambda item: section_order.get(item[0], len(section_order))))
 
     def critical_missing(self) -> list[str]:
         """Field KRITIS (oranye di slide 1.2) yang masih kosong."""
@@ -284,12 +302,14 @@ class PreDesignProject:
     def from_dict(cls, d: dict[str, Any]) -> "PreDesignProject":
         return cls(
             name=d.get("name", "Proyek Baru"), location=d.get("location", ""),
+            building_type=d.get("building_type", "Perumahan Tapak"),
             session_date=d.get("session_date", date.today().isoformat()),
             persona=BuyerPersona.from_dict(d.get("persona", {})),
             product=ProductParameters.from_dict(d.get("product", {})),
             program=[RoomProgramItem.from_dict(x) for x in d.get("program", [])],
             regulation=RegulationParams.from_dict(d.get("regulation", {})),
             site=SiteConditions.from_dict(d.get("site", {})),
+            facade=FacadePreferences.from_dict(d.get("facade", {})),
             decisions=[DecisionRecord.from_dict(x) for x in d.get("decisions", [])],
             schema_version=d.get("schema_version", "0.1.0"),
         )
@@ -362,12 +382,6 @@ def terrain_class(level_diff_m: float) -> str:
 def soil_rule(soil_condition: Optional[str]) -> dict:
     return load("site_rules")["soil_rules"].get(soil_condition or "tidak_diketahui",
                                                 load("site_rules")["soil_rules"]["tidak_diketahui"])
-
-
-def view_is_water(view_text: str) -> bool:
-    kws = load("site_rules")["view_rules"]["water_body"]["keywords"]
-    t = (view_text or "").lower()
-    return any(k in t for k in kws)
 
 
 def angular_difference(a: float, b: float) -> float:
@@ -537,7 +551,7 @@ def overhang_effectiveness(*, lat_deg: float, facade_orientation: str, overhang_
 
 
 # ------------------------------------------------------------------ Rekomendasi
-def zoning_advice(front: str, city: Optional[str] = None, view_direction: Optional[str] = None) -> list[str]:
+def zoning_advice(front: str, city: Optional[str] = None) -> list[str]:
     notes = load("building_physics")["orientation_notes"]
     out = []
     fac = facade_orientations(front)
@@ -550,10 +564,6 @@ def zoning_advice(front: str, city: Optional[str] = None, view_direction: Option
     hot = [o for o in ("B", "BL", "BD") if o in fac.values()]
     if hot:
         out.append("Taruh zona servis (dapur, KM, tangga, gudang, carport) pada muka sisi barat sebagai buffer; ruang tidur/ruang tinggal di sisi U/S/T.")
-    if view_direction:
-        vd = view_direction
-        if vd in ("B", "BL", "BD"):
-            out.append(f"View terbaik ke {vd} bertabrakan dengan beban matahari sore: bukaan view lebar perlu overhang dalam/ sirip vertikal/ kaca low-E dan vegetasi pelindung.")
     return out
 
 
@@ -1505,16 +1515,16 @@ def _fmt(x: float) -> str:
 def _check_persona(p: PreDesignProject, c: _Collector) -> None:
     ps = p.persona
     if ps.age_min is not None and ps.age_max is not None and ps.age_min > ps.age_max:
-        c.add("P-001", Severity.BLOCKER, "1.1", f"Usia minimum ({ps.age_min}) > maksimum ({ps.age_max}).")
+        c.add("P-001", Severity.BLOCKER, "1.5", f"Usia minimum ({ps.age_min}) > maksimum ({ps.age_max}).")
     if ps.household_size and ps.children is not None and ps.children >= ps.household_size:
-        c.add("P-002", Severity.BLOCKER, "1.1", "Jumlah anak ≥ jumlah penghuni; periksa data profil keluarga.")
+        c.add("P-002", Severity.BLOCKER, "1.5", "Jumlah anak ≥ jumlah penghuni; periksa data profil keluarga.")
     if ps.monthly_income_idr is None:
-        c.add("P-003", Severity.INFO, "1.1", "Penghasilan rumah tangga belum diisi: uji keterjangkauan KPR (DSR) dilewati.",
+        c.add("P-003", Severity.INFO, "1.5", "Penghasilan rumah tangga belum diisi: uji keterjangkauan KPR (DSR) dilewati.",
               sug="Isi dari data survey agar harga target dapat diuji.")
     elif p.product.target_price_idr:
         k = cfin.kpr(p.product.target_price_idr, monthly_income_idr=ps.monthly_income_idr)
         if k.income_ok is False:
-            c.add("P-004", Severity.WARNING, "1.1",
+            c.add("P-004", Severity.WARNING, "1.5",
                   f"Angsuran KPR ≈ Rp {_fmt(k.monthly_payment_idr)}/bln = {k.dsr_actual:.0%} penghasilan > DSR {k.dsr_used:.0%}. "
                   f"Penghasilan minimal ≈ Rp {_fmt(k.min_monthly_income_idr)}/bln.",
                   "Praktik perbankan (DSR 30–40%)",
@@ -1522,38 +1532,38 @@ def _check_persona(p: PreDesignProject, c: _Collector) -> None:
     if ps.cars and p.program:
         cp = p.room("carport")
         if cp is None or cp.approved is False or cp.qty < ps.cars:
-            c.add("P-005", Severity.WARNING, "1.1/1.3", f"Persona memiliki {ps.cars} mobil tetapi carport belum menampung.",
+            c.add("P-005", Severity.WARNING, "1.5/1.3", f"Persona memiliki {ps.cars} mobil tetapi carport belum menampung.",
                   "Satuan ruang parkir 2,5 x 5,0 m")
     if "wfh" in (ps.lifestyle_tags or []) and p.program:
         rk = p.room("r_kerja")
         if rk is None or rk.approved is False or rk.qty == 0:
-            c.add("P-006", Severity.INFO, "1.1/1.3", "Gaya hidup WFH tetapi Ruang Kerja belum masuk program.",
+            c.add("P-006", Severity.INFO, "1.5/1.3", "Gaya hidup WFH tetapi Ruang Kerja belum masuk program.",
                   sug="Putuskan: ruang kerja dedicated (≥ 4,5 m²) atau dalam kamar tidur.")
 
 
 def _check_product(p: PreDesignProject, c: _Collector, prog: Optional[cprog.ProgramResult]) -> None:
     pr = p.product
     for k in p.critical_missing():
-        label = {"max_construction_cost_per_m2_idr": "Biaya Konstruksi Maks./m²", "num_types": "Jumlah Tipe Rumah",
+        label = {"max_construction_cost_per_m2_idr": "Biaya Konstruksi Maks./m²", "num_types": "Jumlah Tipe Bangunan",
                  "finishing_class": "Kelas Finishing"}.get(k, k)
-        c.add("PR-001", Severity.BLOCKER, "1.2", f"Field KRITIS '{label}' kosong — wajib diputuskan sekarang.",
-              "Slide 1.2 (KRITIS)", "Putuskan pada sesi; untuk biaya/m² gunakan solve_max_construction_cost() sebagai usulan awal.")
+        c.add("PR-001", Severity.BLOCKER, "1.5", f"Field KRITIS '{label}' kosong — wajib diputuskan sekarang.",
+              "Seksi 1.5 (KRITIS)", "Putuskan pada sesi; untuk biaya/m² gunakan solve_max_construction_cost() sebagai usulan awal.")
     if pr.finishing_class and pr.finishing_class not in FINISHING:
-        c.add("PR-002", Severity.BLOCKER, "1.2", f"Kelas finishing '{pr.finishing_class}' tidak valid ({', '.join(FINISHING)}).")
+        c.add("PR-002", Severity.BLOCKER, "1.5", f"Kelas finishing '{pr.finishing_class}' tidak valid ({', '.join(FINISHING)}).")
     lo, hi = pr.price_range()
     if lo and hi and lo > hi:
-        c.add("PR-009", Severity.BLOCKER, "1.2", "Harga minimum > maksimum.")
+        c.add("PR-009", Severity.BLOCKER, "1.5", "Harga minimum > maksimum.")
     if pr.lot_width_m and pr.lot_depth_m and pr.land_area_m2:
         dev = abs(pr.lot_width_m * pr.lot_depth_m - pr.land_area_m2) / pr.land_area_m2
         if dev > 0.05:
-            c.add("PR-007", Severity.WARNING, "1.2", f"Lebar x kedalaman = {pr.lot_width_m * pr.lot_depth_m:.1f} m² ≠ luas tanah {pr.land_area_m2:.1f} m².")
+            c.add("PR-007", Severity.WARNING, "1.5", f"Lebar x kedalaman = {pr.lot_width_m * pr.lot_depth_m:.1f} m² ≠ luas tanah {pr.land_area_m2:.1f} m².")
     if pr.num_types and pr.num_types > 1:
-        c.add("PR-010", Severity.INFO, "1.2", f"{pr.num_types} tipe: setiap tipe butuh program ruang, GFA, dan RAB sendiri; pre-design ini dihitung untuk tipe acuan.")
+        c.add("PR-010", Severity.INFO, "1.5", f"{pr.num_types} tipe: setiap tipe butuh program ruang, GFA, dan RAB sendiri; pre-design ini dihitung untuk tipe acuan.")
     # biaya
     if pr.max_construction_cost_per_m2_idr and pr.finishing_class in FINISHING:
         bench = load("finishing_classes")["classes"][pr.finishing_class]["cost_per_m2_idr"]
         if pr.max_construction_cost_per_m2_idr < bench["low"]:
-            c.add("PR-004", Severity.WARNING, "1.2",
+            c.add("PR-004", Severity.WARNING, "1.5",
                   f"Biaya maks Rp {_fmt(pr.max_construction_cost_per_m2_idr)}/m² di bawah rentang kelas {pr.finishing_class} "
                   f"(Rp {_fmt(bench['low'])}–{_fmt(bench['high'])}/m², asumsi).",
                   "Predesign.json:finishing_classes (asumsi)", "Turunkan kelas finishing atau naikkan anggaran; kalibrasi dengan AHSP/HSPK lokal.")
@@ -1561,19 +1571,19 @@ def _check_product(p: PreDesignProject, c: _Collector, prog: Optional[cprog.Prog
     if gfa and pr.target_price_idr and pr.max_construction_cost_per_m2_idr:
         share = gfa * pr.max_construction_cost_per_m2_idr / pr.target_price_idr
         if share > 0.80:
-            c.add("PR-005", Severity.BLOCKER, "1.2", f"Biaya konstruksi maksimum = {share:.0%} harga jual — tidak menyisakan ruang untuk tanah, prasarana, dan margin.")
+            c.add("PR-005", Severity.BLOCKER, "1.5", f"Biaya konstruksi maksimum = {share:.0%} harga jual — tidak menyisakan ruang untuk tanah, prasarana, dan margin.")
         elif share > 0.55:
-            c.add("PR-005", Severity.WARNING, "1.2", f"Biaya konstruksi = {share:.0%} harga jual (tipikal 35–55%).")
+            c.add("PR-005", Severity.WARNING, "1.5", f"Biaya konstruksi = {share:.0%} harga jual (tipikal 35–55%).")
     if pr.target_price_idr and pr.land_area_m2 and gfa:
-        c.add("PR-008", Severity.INFO, "1.2", f"Harga/m² bangunan ≈ Rp {_fmt(pr.target_price_idr / gfa)}; harga/m² tanah ≈ Rp {_fmt(pr.target_price_idr / pr.land_area_m2)} (indikator awal).")
+        c.add("PR-008", Severity.INFO, "1.5", f"Harga/m² bangunan ≈ Rp {_fmt(pr.target_price_idr / gfa)}; harga/m² tanah ≈ Rp {_fmt(pr.target_price_idr / pr.land_area_m2)} (indikator awal).")
     # luas per jiwa
     if gfa and p.persona.household_size:
         std = load("room_standards")["occupancy_standard"]
         a = gfa / p.persona.household_size
         if a < std["area_per_person_threshold_m2"]:
-            c.add("PR-011", Severity.WARNING, "1.2", f"GFA target {gfa:.0f} m² = {a:.1f} m²/jiwa < ambang {std['area_per_person_threshold_m2']} m²/jiwa.", cite("KEPMEN-403-2002"))
+            c.add("PR-011", Severity.WARNING, "1.5", f"GFA target {gfa:.0f} m² = {a:.1f} m²/jiwa < ambang {std['area_per_person_threshold_m2']} m²/jiwa.", cite("KEPMEN-403-2002"))
         elif a < std["area_per_person_standard_m2"]:
-            c.add("PR-011", Severity.INFO, "1.2", f"GFA target {gfa:.0f} m² = {a:.1f} m²/jiwa (standar {std['area_per_person_standard_m2']} m²/jiwa).", cite("KEPMEN-403-2002"))
+            c.add("PR-011", Severity.INFO, "1.5", f"GFA target {gfa:.0f} m² = {a:.1f} m²/jiwa (standar {std['area_per_person_standard_m2']} m²/jiwa).", cite("KEPMEN-403-2002"))
 
 
 def _check_program(p: PreDesignProject, c: _Collector, prog: Optional[cprog.ProgramResult],
@@ -1612,62 +1622,62 @@ def _check_regulation(p: PreDesignProject, c: _Collector, env: Optional[creg.Env
     need = {"kdb_pct": "KDB", "klb": "KLB", "gsb_front_m": "GSB", "kdh_pct": "KDH", "max_floors": "KBG (jumlah lantai)"}
     for k, label in need.items():
         if getattr(r, k) is None:
-            c.add("RG-001", Severity.BLOCKER, "2.1", f"Parameter {label} belum diisi.", cite("PP-16-2021"), "Ambil dari RDTR/KRK/PBG setempat.")
+            c.add("RG-001", Severity.BLOCKER, "1.2", f"Parameter {label} belum diisi.", cite("PP-16-2021"), "Ambil dari RDTR/KRK/PBG setempat.")
     if r.gsj_from_axis_m is None:
-        c.add("RG-001", Severity.WARNING, "2.1", "GSJ (jarak dari as jalan) belum diisi.")
+        c.add("RG-001", Severity.WARNING, "1.2", "GSJ (jarak dari as jalan) belum diisi.")
     if r.max_height_m is None:
-        c.add("RG-001", Severity.WARNING, "2.1", "Ketinggian maksimum belum diisi.")
+        c.add("RG-001", Severity.WARNING, "1.2", "Ketinggian maksimum belum diisi.")
     sr = load("regulation_defaults")["sanity_ranges"]
     for key, label in (("kdb_pct", "KDB"), ("klb", "KLB"), ("gsb_front_m", "GSB"), ("kdh_pct", "KDH"), ("max_floors", "KBG"), ("max_height_m", "Tinggi")):
         v = getattr(r, key)
         if v is not None:
             lo, hi = sr[key]
             if not lo <= v <= hi:
-                c.add("RG-002", Severity.WARNING, "2.1", f"{label} = {v:g} di luar rentang kewajaran [{lo}, {hi}] — cek salah ketik/satuan.")
+                c.add("RG-002", Severity.WARNING, "1.2", f"{label} = {v:g} di luar rentang kewajaran [{lo}, {hi}] — cek salah ketik/satuan.")
     if r.kdb_pct is not None and r.kdh_pct is not None and r.kdb_pct + r.kdh_pct > 100:
-        c.add("RG-004", Severity.BLOCKER, "2.1", f"KDB {r.kdb_pct:g}% + KDH {r.kdh_pct:g}% > 100%.")
+        c.add("RG-004", Severity.BLOCKER, "1.2", f"KDB {r.kdb_pct:g}% + KDH {r.kdh_pct:g}% > 100%.")
     keys = load("regulation_defaults")["confirmation_keys"]
     unconf = [k.upper() for k in keys if not r.confirmed.get(k)]
     if unconf:
-        c.add("RG-003", Severity.WARNING, "2.1", "Belum dikonfirmasi ke RDTR/PBG: " + ", ".join(unconf) + ".",
+        c.add("RG-003", Severity.WARNING, "1.2", "Belum dikonfirmasi ke RDTR/PBG: " + ", ".join(unconf) + ".",
               cite("PERMEN-ATRBPN-11-2021"), "Tim Teknik wajib verifikasi sebelum keputusan desain.")
     if not r.source:
-        c.add("RG-010", Severity.WARNING, "2.1", "Sumber parameter regulasi (RDTR/KRK/PBG) belum dicatat.")
+        c.add("RG-010", Severity.WARNING, "1.2", "Sumber parameter regulasi (RDTR/KRK/PBG) belum dicatat.")
     if r.kdb_pct is not None and r.kdb_pct > load("regulation_defaults")["kepmen_403_rs_sehat"]["kdb_max_pct"]:
-        c.add("RG-007", Severity.INFO, "2.1", f"KDB {r.kdb_pct:g}% > 60% (batas Rs Sehat Kepmen 403) — acuan RDTR yang berlaku.", cite("KEPMEN-403-2002"))
+        c.add("RG-007", Severity.INFO, "1.2", f"KDB {r.kdb_pct:g}% > 60% (batas Rs Sehat Kepmen 403) — acuan RDTR yang berlaku.", cite("KEPMEN-403-2002"))
     if env:
         for n in env.notes:
-            c.add("RG-005", Severity.INFO, "2.1", n)
+            c.add("RG-005", Severity.INFO, "1.2", n)
         if pr.target_gfa_m2 and env.gfa_cap_m2 is not None:
             chk = creg.check_target(env, pr.target_gfa_m2)
             if not chk["gfa_ok"]:
-                c.add("RG-008", Severity.BLOCKER, "1.2/2.1",
+                c.add("RG-008", Severity.BLOCKER, "1.2",
                       f"GFA target {pr.target_gfa_m2:.1f} m² > batas {env.gfa_cap_m2:.1f} m² ({env.binding_gfa}).",
                       cite("PP-16-2021"), f"Kurangi GFA ≤ {env.gfa_cap_m2:.0f} m² atau tinjau lantai/KDB.")
             if not chk["footprint_ok"]:
-                c.add("RG-008", Severity.BLOCKER, "1.2/2.1",
+                c.add("RG-008", Severity.BLOCKER, "1.2",
                       f"Footprint yang dibutuhkan {chk['required_footprint_m2']} m² > batas {env.footprint_cap_m2:.1f} m² ({env.binding_footprint}). "
                       f"Butuh ≥ {chk['min_floors_needed']} lantai.", cite("PP-16-2021"))
             elif chk["footprint_utilization"] and chk["footprint_utilization"] > 0.95:
-                c.add("RG-008", Severity.WARNING, "2.1", f"Pemakaian footprint {chk['footprint_utilization']:.0%} dari batas — nyaris tanpa toleransi desain.")
+                c.add("RG-008", Severity.WARNING, "1.2", f"Pemakaian footprint {chk['footprint_utilization']:.0%} dari batas — nyaris tanpa toleransi desain.")
         if env.hardscape_allowance_m2 is not None and env.hardscape_allowance_m2 < 0:
-            c.add("RG-004", Severity.BLOCKER, "2.1", "Tidak ada sisa lahan untuk hardscape setelah KDB maks + KDH min.")
+            c.add("RG-004", Severity.BLOCKER, "1.2", "Tidak ada sisa lahan untuk hardscape setelah KDB maks + KDH min.")
     gs = creg.check_gsj(r, p.site)
     if gs is False:
-        c.add("RG-009", Severity.BLOCKER, "2.1/2.2", "Batas kavling depan berada di dalam GSJ (lebih dekat ke as jalan dari GSJ).", cite("PP-16-2021"))
+        c.add("RG-009", Severity.BLOCKER, "1.2/1.1", "Batas kavling depan berada di dalam GSJ (lebih dekat ke as jalan dari GSJ).", cite("PP-16-2021"))
 
 
 def _check_site(p: PreDesignProject, c: _Collector, env: Optional[creg.EnvelopeResult]) -> None:
     s = p.site
-    labels = {"front_orientation": "orientasi hadap", "topography": "kontur", "soil_condition": "kondisi tanah",
+    labels = {"front_orientation": "orientasi matahari", "topography": "kontur", "soil_condition": "kondisi tanah",
               "vehicle_access_from": "arah akses kendaraan", "pln_entry_from": "posisi PLN masuk"}
     for k, lab in labels.items():
         if not getattr(s, k):
-            c.add("ST-001", Severity.WARNING, "2.2", f"Belum diisi: {lab}.")
-    for k in ("front_orientation", "best_view_direction", "vehicle_access_from", "pln_entry_from"):
+            c.add("ST-001", Severity.WARNING, "1.1", f"Belum diisi: {lab}.")
+    for k in ("front_orientation", "vehicle_access_from", "pln_entry_from"):
         v = getattr(s, k)
         if v and v not in COMPASS8:
-            c.add("ST-000", Severity.BLOCKER, "2.2", f"{k}='{v}' bukan kode kompas valid ({', '.join(COMPASS8)}).")
+            c.add("ST-000", Severity.BLOCKER, "1.1", f"{k}='{v}' bukan kode kompas valid ({', '.join(COMPASS8)}).")
     if s.front_orientation in COMPASS8:
         city = s.ottv_city if s.ottv_city and s.ottv_city in load("ottv_solar_factor")["cities"] else None
         hot = {"B", "BL", "BD"}
@@ -1676,59 +1686,53 @@ def _check_site(p: PreDesignProject, c: _Collector, env: Optional[creg.EnvelopeR
             if city:
                 ranks = dict(cclim.orientation_ranking(city))
                 msg += f" SF {city}: {ranks[s.front_orientation]:.0f} W/m² (rentang {min(ranks.values()):.0f}–{max(ranks.values()):.0f})."
-            c.add("ST-002", Severity.WARNING, "2.2", msg, cite("SNI-6389-2020"),
+            c.add("ST-002", Severity.WARNING, "1.1", msg, cite("SNI-6389-2020"),
                   "Minimalkan WWR sisi barat, overhang dalam/sirip vertikal, buffer servis, warna fasad cerah.")
-        for line in cclim.zoning_advice(s.front_orientation, city, s.best_view_direction)[-2:]:
-            c.add("ST-002b", Severity.INFO, "2.2", line)
-    if s.best_view_direction in ("B", "BL", "BD"):
-        c.add("ST-005", Severity.WARNING, "2.2", f"View terbaik ({s.best_view or s.best_view_direction}) ke arah barat: konflik dengan matahari sore.",
-              cite("SNI-6389-2020"), "Bukaan view dengan kaca low-E/ overhang/ vegetasi; teras sebagai buffer.")
-    if csite.view_is_water(s.best_view):
-        for n in load("site_rules")["view_rules"]["water_body"]["notes"]:
-            c.add("ST-006", Severity.INFO, "2.2", n, cite("PERMEN-PUPR-28-2015"))
+        for line in cclim.zoning_advice(s.front_orientation, city)[-2:]:
+            c.add("ST-002b", Severity.INFO, "1.1", line)
     # tanah
     sr = csite.soil_rule(s.soil_condition)
     sev = Severity[sr["severity"]]
     if s.soil_condition:
         if s.soil_condition == "timbunan":
-            c.add("ST-003", Severity.WARNING, "2.2", "Tapak di atas timbunan: " + " ".join(sr["required_actions"][:2]),
+            c.add("ST-003", Severity.WARNING, "1.1", "Tapak di atas timbunan: " + " ".join(sr["required_actions"][:2]),
                   cite("SNI-8460-2017", "SNI-2827-2008", "SNI-1742-2008"), sr["required_actions"][3])
             if s.soil_tested is not True:
-                c.add("ST-003b", Severity.WARNING, "2.2", "Uji tanah (sondir/boring) belum ada — daya dukung & penurunan belum terverifikasi.", cite("SNI-8460-2017"))
+                c.add("ST-003b", Severity.WARNING, "1.1", "Uji tanah (sondir/boring) belum ada — daya dukung & penurunan belum terverifikasi.", cite("SNI-8460-2017"))
             if s.fill_thickness_m is None:
-                c.add("ST-010", Severity.WARNING, "2.2", "Tebal timbunan belum diisi.")
+                c.add("ST-010", Severity.WARNING, "1.1", "Tebal timbunan belum diisi.")
             elif s.fill_age_months is not None and s.fill_age_months < 12:
-                c.add("ST-010b", Severity.WARNING, "2.2", f"Timbunan baru ({s.fill_age_months} bln): risiko penurunan; pertimbangkan preloading/pondasi dalam.")
+                c.add("ST-010b", Severity.WARNING, "1.1", f"Timbunan baru ({s.fill_age_months} bln): risiko penurunan; pertimbangkan preloading/pondasi dalam.")
             lo, hi = sr["cost_uplift_pct_construction"]
-            c.add("ST-003c", Severity.INFO, "2.2", f"Tambahkan biaya pondasi/perbaikan tanah ±{lo}–{hi}% biaya konstruksi (asumsi) pada anggaran.")
+            c.add("ST-003c", Severity.INFO, "1.1", f"Tambahkan biaya pondasi/perbaikan tanah ±{lo}–{hi}% biaya konstruksi (asumsi) pada anggaran.")
         else:
-            c.add("ST-003", sev, "2.2", sr["title"] + ": " + sr["required_actions"][0])
+            c.add("ST-003", sev, "1.1", sr["title"] + ": " + sr["required_actions"][0])
     if s.level_difference_m is not None and s.topography:
         cls = csite.terrain_class(s.level_difference_m)
         if cls != s.topography:
-            c.add("ST-004", Severity.INFO, "2.2", f"Beda tinggi {s.level_difference_m:g} m setara kontur '{cls}', tetapi dicatat '{s.topography}'.")
+            c.add("ST-004", Severity.INFO, "1.1", f"Beda tinggi {s.level_difference_m:g} m setara kontur '{cls}', tetapi dicatat '{s.topography}'.")
     if s.vehicle_access_from and s.front_orientation in COMPASS8:
         fac = csite.facade_orientations(s.front_orientation)
         if s.vehicle_access_from == fac["belakang"]:
-            c.add("ST-007", Severity.WARNING, "2.2", "Akses kendaraan dari sisi belakang kavling, bukan sisi muka: periksa jalan & GSJ.")
+            c.add("ST-007", Severity.WARNING, "1.1", "Akses kendaraan dari sisi belakang kavling, bukan sisi muka: periksa jalan & GSJ.")
     if s.pln_entry_from and s.vehicle_access_from and s.pln_entry_from != s.vehicle_access_from:
-        c.add("ST-008", Severity.INFO, "2.2", "Posisi PLN masuk berbeda dari akses kendaraan: rencanakan jalur kabel & panel agar tidak melintasi carport.")
+        c.add("ST-008", Severity.INFO, "1.1", "Posisi PLN masuk berbeda dari akses kendaraan: rencanakan jalur kabel & panel agar tidak melintasi carport.")
     nn = s.non_negotiables or []
     for d in load("site_rules")["default_non_negotiables"]:
         if d not in nn:
-            c.add("ST-009", Severity.INFO, "2.2", f"Non-negotiable standar belum tercantum: '{d}'.")
+            c.add("ST-009", Severity.INFO, "1.1", f"Non-negotiable standar belum tercantum: '{d}'.")
     if s.latitude is None:
-        c.add("ST-011", Severity.INFO, "2.2", "Lintang belum diisi: analisis matahari/ kiblat memakai asumsi.")
+        c.add("ST-011", Severity.INFO, "1.1", "Lintang belum diisi: analisis matahari/ kiblat memakai asumsi.")
 
 
 def _check_utilities(p: PreDesignProject, c: _Collector) -> None:
     n = p.persona.household_size
     L = p.product.land_area_m2
     if n and L and L < 150:
-        c.add("UT-001", Severity.INFO, "2.2", f"Kavling {L:.0f} m²: jarak septik–sumur ≥ 10 m sulit dipenuhi; gunakan PDAM + septik kedap/biofilter atau IPAL komunal.",
+        c.add("UT-001", Severity.INFO, "1.1", f"Kavling {L:.0f} m²: jarak septik–sumur ≥ 10 m sulit dipenuhi; gunakan PDAM + septik kedap/biofilter atau IPAL komunal.",
               cite("SNI-2398-2017"))
     if p.site.soil_condition == "timbunan":
-        c.add("UT-002", Severity.INFO, "2.2", "Sumur resapan di timbunan: uji infiltrasi in-situ; jauhkan ≥ 2–3 m dari pondasi.", cite("SNI-03-2453-2002"))
+        c.add("UT-002", Severity.INFO, "1.1", "Sumur resapan di timbunan: uji infiltrasi in-situ; jauhkan ≥ 2–3 m dari pondasi.", cite("SNI-03-2453-2002"))
 
 
 def validate_project(p: PreDesignProject) -> list[Finding]:
@@ -1738,7 +1742,7 @@ def validate_project(p: PreDesignProject) -> list[Finding]:
     try:
         env = creg.analyze(p.product, p.regulation, p.site)
     except ValueError as e:
-        c.add("PR-003", Severity.BLOCKER, "1.2", str(e))
+        c.add("PR-003", Severity.BLOCKER, "1.5", str(e))
     prog: Optional[cprog.ProgramResult] = None
     if p.program:
         floors = (env.floors_effective if env and env.floors_effective else None)
@@ -1750,7 +1754,7 @@ def validate_project(p: PreDesignProject) -> list[Finding]:
     _check_site(p, c, env)
     _check_utilities(p, c)
     # keputusan
-    for sec in ("1.1", "1.2", "1.3", "2.1", "2.2"):
+    for sec in ("1.1", "1.2", "1.3", "1.4", "1.5"):
         if not any(d.section_id == sec and d.decided for d in p.decisions):
             c.add("DC-001", Severity.INFO, sec, f"Keputusan seksi {sec} belum dicatat (⚑ KEPUTUSAN).")
     c.items.sort(key=lambda f: (_ORDER[f.severity], f.section, f.rule_id))
@@ -1794,23 +1798,29 @@ def build_report(p: PreDesignProject, *, finishing_override: Optional[str] = Non
     for sid, v in p.completeness().items():
         w(f"| {sid} | {v['title']} | {v['filled']}/{v['required']} | {v['pct']:.0f}% | {'✔' if v['decided'] else '—'} | {', '.join(v['missing']) or '—'} |")
 
-    pr = p.product
-    w("\n## 1.2 Parameter Produk")
-    w(f"- Harga jual target: {_idr(pr.target_price_idr)}")
-    w(f"- Biaya konstruksi maks./m² (KRITIS): {_idr(pr.max_construction_cost_per_m2_idr)}")
-    w(f"- Luas tanah: {_n(pr.land_area_m2, 1, ' m²')} ({_n(pr.lot_width_m,1)} x {_n(pr.lot_depth_m,1)} m) · GFA target: {_n(pr.target_gfa_m2, 1, ' m²')}")
-    w(f"- Jumlah tipe (KRITIS): {pr.num_types or '—'} · Kelas finishing (KRITIS): {pr.finishing_class or '—'}")
-    if pr.target_price_idr:
-        k = cfin.kpr(pr.target_price_idr, monthly_income_idr=p.persona.monthly_income_idr)
-        w(f"- Keterjangkauan KPR (DP {k.down_payment_idr/pr.target_price_idr:.0%}, default bunga/tenor): angsuran ≈ {_idr(k.monthly_payment_idr)}/bln · penghasilan minimum ≈ {_idr(k.min_monthly_income_idr)}/bln"
-          + (f" · DSR aktual {k.dsr_actual:.0%} ({'OK' if k.income_ok else 'LEBIH'})" if k.dsr_actual else ""))
+    s = p.site
+    w("\n## 1.1 Tapak")
+    w(f"- Orientasi matahari: {s.front_orientation or '—'} · Kontur: {s.topography or '—'} (Δ {_n(s.level_difference_m,1,' m')}) · Tanah: {s.soil_condition or '—'}"
+      + (f" (timbunan {_n(s.fill_thickness_m,1,' m')}, uji tanah: {'ya' if s.soil_tested else 'belum'})" if s.soil_condition == 'timbunan' else ""))
+    w(f"- Akses kendaraan: {s.vehicle_access_from or '—'} · PLN: {s.pln_entry_from or '—'}")
+    if s.front_orientation in csite.load("ottv_solar_factor")["_meta"]["azimuth_deg"]:
+        w("- Orientasi fasad: " + ", ".join(f"{k} {v}" for k, v in csite.facade_orientations(s.front_orientation).items()))
+        if s.latitude is not None:
+            w("- Arah kiblat (perkiraan): lihat calc.site.qibla_azimuth")
+    w("- Non-negotiable: " + "; ".join(s.non_negotiables or ["—"]))
 
+    pr, rg = p.product, p.regulation
+    w("\n## 1.2 Regulasi dan intensitas bangunan")
+    w(f"- Wilayah regulasi: {rg.region or '—'}")
+    w(f"- Perda/regulasi daerah: {rg.regional_regulation or '—'}")
+    w(f"- SNI rujukan daerah: {rg.regional_sni_references or '—'}")
+    w(f"- Sumber parameter: {rg.source or '—'}")
+    w(f"- KDB: {_n(rg.kdb_pct,1,'%')} · KLB: {_n(rg.klb,2)} · KDH: {_n(rg.kdh_pct,1,'%')} · GSJ: {_n(rg.gsj_from_axis_m,1,' m')}")
     env = None
     try:
-        env = creg.analyze(p.product, p.regulation, p.site)
+        env = creg.analyze(pr, rg, s)
     except ValueError:
         pass
-    w("\n## 2.1 Intensitas Bangunan (turunan regulasi)")
     if env:
         w("| Parameter | Nilai |")
         w("|---|---|")
@@ -1840,18 +1850,22 @@ def build_report(p: PreDesignProject, *, finishing_override: Optional[str] = Non
     else:
         w("_Belum ada program ruang._")
 
-    s = p.site
-    w("\n## 2.2 Tapak")
-    w(f"- Hadap: {s.front_orientation or '—'} · Kontur: {s.topography or '—'} (Δ {_n(s.level_difference_m,1,' m')}) · Tanah: {s.soil_condition or '—'}"
-      + (f" (timbunan {_n(s.fill_thickness_m,1,' m')}, uji tanah: {'ya' if s.soil_tested else 'belum'})" if s.soil_condition == 'timbunan' else ""))
-    w(f"- View: {s.best_view or '—'} ({s.best_view_direction or '—'}) · Akses kendaraan: {s.vehicle_access_from or '—'} · PLN: {s.pln_entry_from or '—'}")
-    if s.front_orientation in csite.load("ottv_solar_factor")["_meta"]["azimuth_deg"]:
-        w("- Orientasi muka: " + ", ".join(f"{k} {v}" for k, v in csite.facade_orientations(s.front_orientation).items()))
-        if s.latitude is not None:
-            w(f"- Arah kiblat (perkiraan, lon belum tentu diisi): lihat calc.site.qibla_azimuth")
-    w("- Non-negotiable: " + "; ".join(s.non_negotiables or ["—"]))
+    w("\n## 1.4 Fasad")
+    w(f"- Tipe referensi: {p.facade.reference_type or '—'}")
+    w(f"- Catatan/referensi: {p.facade.reference_notes or '—'}")
 
-    w("\n## Temuan Validasi")
+    w("\n## 1.5 Produk")
+    w(f"- Submodel bangunan: {p.building_type}")
+    w(f"- Harga jual target: {_idr(pr.target_price_idr)}")
+    w(f"- Biaya konstruksi maks./m² (KRITIS): {_idr(pr.max_construction_cost_per_m2_idr)}")
+    w(f"- Luas tanah: {_n(pr.land_area_m2, 1, ' m²')} ({_n(pr.lot_width_m,1)} x {_n(pr.lot_depth_m,1)} m) · GFA target: {_n(pr.target_gfa_m2, 1, ' m²')}")
+    w(f"- Jumlah tipe (KRITIS): {pr.num_types or '—'} · Kelas finishing (KRITIS): {pr.finishing_class or '—'}")
+    if pr.target_price_idr:
+        k = cfin.kpr(pr.target_price_idr, monthly_income_idr=p.persona.monthly_income_idr)
+        w(f"- Keterjangkauan KPR (DP {k.down_payment_idr/pr.target_price_idr:.0%}, default bunga/tenor): angsuran ≈ {_idr(k.monthly_payment_idr)}/bln · penghasilan minimum ≈ {_idr(k.min_monthly_income_idr)}/bln"
+          + (f" · DSR aktual {k.dsr_actual:.0%} ({'OK' if k.income_ok else 'LEBIH'})" if k.dsr_actual else ""))
+
+    w("\n## 1.6 Summary — Temuan Validasi")
     w("| Sev | Rule | Seksi | Temuan | Rujukan | Saran |")
     w("|---|---|---|---|---|---|")
     icon = {Severity.BLOCKER: "⛔", Severity.WARNING: "⚠️", Severity.INFO: "ℹ️"}
@@ -2058,12 +2072,22 @@ def _int(v):
 
 def render() -> None:
     p = _p()
-    st.subheader("Pre-Design Perumahan Tapak")
-    st.caption("Brief produk, parameter regulasi, dan kondisi tapak. Nilai KDB/KLB/GSB/GSJ/KTG/KDH wajib dari RDTR setempat.")
+    st.caption("Nilai KDB/KLB/GSB/GSJ/KTG/KDH dan rujukan SNI wajib diverifikasi terhadap dokumen daerah yang berlaku.")
     st.caption("Format angka: titik untuk pemisah ribuan dan koma untuk desimal, misalnya 1.000.000.000,00.")
-    t11, t12, t13, t21, t22, thasil = st.tabs(["1.1 Pembeli", "1.2 Produk", "1.3 Program Ruang", "2.1 Regulasi", "2.2 Tapak", "Hasil"])
+    building_types = ["Perumahan Tapak", "Komersil", "Mesjid", "Gardu"]
+    p.building_type = st.selectbox(
+        "Submodel bangunan",
+        building_types,
+        index=building_types.index(p.building_type) if p.building_type in building_types else 0,
+        key=K + "building_type",
+        help="Memilih jenis proyek untuk identifikasi predesign. Katalog program ruang yang tersedia saat ini masih berupa template perumahan.",
+    )
+    st.subheader(f"Pre-Design {p.building_type}")
+    t11, t12, t13, t14, t15, t16 = st.tabs(
+        ["1.1 Tapak", "1.2 Regulasi", "1.3 Program ruang", "1.4 Fasad", "1.5 Produk", "1.6 Summary"]
+    )
 
-    with t11:
+    with t15:
         pe = p.persona
         c1, c2 = st.columns(2)
         pe.age_min = _int(_num("Usia min", "age_min", pe.age_min, decimals=0, step=1.0))
@@ -2093,7 +2117,7 @@ def render() -> None:
             help="Ringkas tingkat prioritas harga dibanding luas, lokasi, dan spesifikasi berdasarkan sasaran pasar.",
         ) or None
 
-    with t12:
+    with t15:
         pr = p.product
         pr.target_price_idr = _num("Harga jual target (Rp)", "price", pr.target_price_idr, step=10_000_000.0)
         pr.land_area_m2 = _num("Luas tanah (m²)", "lt", pr.land_area_m2, step=1.0)
@@ -2144,8 +2168,33 @@ def render() -> None:
         if pr.max_construction_cost_per_m2_idr:
             st.success(f"Keputusan biaya konstruksi maks.: Rp {pr.max_construction_cost_per_m2_idr:,.0f}/m²".replace(",", "."))
 
+    with t14:
+        facade_types = [
+            "Modern minimalis",
+            "Tropis kontemporer",
+            "Klasik modern",
+            "Industrial",
+            "Japandi",
+            "Lainnya",
+        ]
+        p.facade.reference_type = st.selectbox(
+            "Tipe referensi fasad yang diinginkan",
+            facade_types,
+            index=facade_types.index(p.facade.reference_type)
+            if p.facade.reference_type in facade_types
+            else 0,
+            key=K + "facade_type",
+            help="Pilih karakter fasad sebagai referensi desain awal, bukan persyaratan regulasi.",
+        )
+        p.facade.reference_notes = st.text_area(
+            "Catatan/referensi fasad",
+            p.facade.reference_notes,
+            key=K + "facade_notes",
+            help="Cantumkan tautan, nama proyek, material, warna, atau karakter visual fasad yang ingin dijadikan acuan.",
+        )
+
     with t13:
-        st.caption("Gunakan tanda tanya pada nama ruang, jumlah, dan jawaban untuk melihat panduan. Centang memasukkan ruang ke estimasi; kosong berarti belum disetujui.")
+        st.caption("Template program ruang yang tersedia saat ini masih berorientasi perumahan. Gunakan tanda tanya pada nama ruang, jumlah, dan jawaban untuk melihat panduan.")
         for r_ in p.program:
             c1, c2, c3 = st.columns([4, 1, 2])
             catalog_room = room_catalog().get(r_.room_id, {})
@@ -2180,7 +2229,7 @@ def render() -> None:
                 help=f"Catat keputusan untuk ruang ini. Pertanyaan panduan: {r_.question or 'jelaskan kebutuhan khusus atau asumsi ruang.'}",
             )
 
-    with t21:
+    with t12:
         rg = p.regulation
         c1, c2, c3 = st.columns(3)
         with c1:
@@ -2202,6 +2251,24 @@ def render() -> None:
             key=K + "src",
             help="Cantumkan nama dokumen, wilayah, nomor/tanggal, dan pasal atau lampiran tempat angka regulasi ditemukan.",
         )
+        rg.region = st.text_input(
+            "Wilayah regulasi (kabupaten/kota/provinsi)",
+            rg.region,
+            key=K + "region",
+            help="Isi wilayah administrasi yang dokumen tata ruang dan peraturan daerahnya menjadi acuan proyek.",
+        )
+        rg.regional_regulation = st.text_input(
+            "Nomor/judul Perda atau regulasi daerah",
+            rg.regional_regulation,
+            key=K + "regional_regulation",
+            help="Masukkan nomor, tahun, judul, dan pasal/lampiran regulasi daerah yang menetapkan ketentuan proyek.",
+        )
+        rg.regional_sni_references = st.text_area(
+            "SNI yang dirujuk/ditetapkan dalam regulasi daerah",
+            rg.regional_sni_references,
+            key=K + "regional_sni_references",
+            help="Catat nomor dan judul SNI sesuai dokumen daerah yang telah diperiksa. Aplikasi tidak menyimpulkan SNI daerah secara otomatis.",
+        )
         st.markdown("**Dikonfirmasi ke RDTR?**")
         cols = st.columns(6)
         for col, k in zip(cols, load("regulation_defaults")["confirmation_keys"]):
@@ -2220,13 +2287,28 @@ def render() -> None:
             except ValueError as ex:
                 st.warning(str(ex))
 
-    with t22:
+        from modules.arsitektur import luas_bangunan_view
+
+        st.markdown("### Luas & intensitas bangunan")
+        luas_bangunan_view.render(
+            embedded=True,
+            land_area_m2=pr.land_area_m2,
+            regulation_limits={
+                "max_kdb_percent": rg.kdb_pct,
+                "max_klb": rg.klb,
+                "min_kdh_percent": rg.kdh_pct,
+            },
+            project_name=p.name,
+            project_location=p.location,
+        )
+
+    with t11:
         s = p.site
         c1, c2 = st.columns(2)
         with c1:
-            s.front_orientation = st.selectbox("Hadap lahan", COMPASS8, index=COMPASS8.index(s.front_orientation) if s.front_orientation in COMPASS8 else 7, key=K + "fo",
+            s.front_orientation = st.selectbox("Orientasi matahari", COMPASS8, index=COMPASS8.index(s.front_orientation) if s.front_orientation in COMPASS8 else 7, key=K + "fo",
                                                format_func=lambda c: {"U": "Utara", "TL": "Timur Laut", "T": "Timur", "TG": "Tenggara", "S": "Selatan", "BD": "Barat Daya", "B": "Barat", "BL": "Barat Laut"}[c],
-                                               help="Pilih arah sisi depan kavling. Arah ini membantu analisis orientasi fasad dan paparan matahari.")
+                                               help="Pilih orientasi sisi muka lahan terhadap mata angin untuk analisis paparan matahari pada fasad.")
             tops = ["datar", "landai", "miring"]
             s.topography = st.selectbox(
                 "Kontur",
@@ -2236,12 +2318,6 @@ def render() -> None:
                 help="Klasifikasikan bentuk permukaan lahan dari survei/topografi. Untuk lahan miring, ukur beda elevasi.",
             )
             s.level_difference_m = _num("Beda tinggi (m)", "dz", s.level_difference_m, step=0.1)
-            s.best_view = st.text_input(
-                "View terbaik",
-                s.best_view,
-                key=K + "view",
-                help="Sebutkan objek/pemandangan yang ingin diprioritaskan, misalnya taman atau pegunungan.",
-            )
             s.latitude = _num("Lintang (negatif = selatan)", "lat", s.latitude, step=0.01, format="%.4f")
             s.longitude = _num("Bujur", "lon", s.longitude, step=0.01, format="%.4f")
         with c2:
@@ -2290,7 +2366,7 @@ def render() -> None:
             )
             s.non_negotiables = [x.strip() for x in nn.splitlines() if x.strip()]
 
-    with thasil:
+    with t16:
         fnd = validate_project(p)
         sev = {"BLOCKER": 0, "WARNING": 0, "INFO": 0}
         for f in fnd:

@@ -597,8 +597,8 @@
         "duration_min": 35,
         "sections": [
           {
-            "id": "1.1",
-            "title": "Target Pembeli — Konfirmasi Profil",
+            "id": "1.5",
+            "title": "Profil pembeli — brief produk",
             "hint": "Isi berdasarkan data survey. Koreksi jika ada yang tidak sesuai.",
             "decision_prompt": "Apakah profil buyer di atas sudah sesuai dengan temuan survey? Ada koreksi?",
             "model": "BuyerPersona",
@@ -756,7 +756,7 @@
             ]
           },
           {
-            "id": "1.2",
+            "id": "1.5",
             "title": "Parameter Produk — Angka yang Mengikat Tim Arsitek",
             "hint": "Isi semua kolom. Tiga item oranye WAJIB diputuskan sekarang — tidak bisa dikosongkan.",
             "decision_prompt": "Isi semua kolom. Tiga item oranye WAJIB diputuskan sekarang — tidak bisa dikosongkan.",
@@ -800,7 +800,7 @@
               },
               {
                 "key": "num_types",
-                "label": "Jumlah Tipe Rumah",
+                "label": "Jumlah Tipe Bangunan",
                 "type": "int",
                 "unit": "tipe",
                 "level": "KRITIS",
@@ -856,6 +856,28 @@
               }
             ]
           }
+          ,
+          {
+            "id": "1.4",
+            "title": "Referensi Tipe Fasad",
+            "hint": "Pilih karakter fasad sebagai referensi desain awal; verifikasi kesesuaian teknis dan regulasinya secara terpisah.",
+            "decision_prompt": "Konfirmasi tipe dan catatan referensi fasad.",
+            "model": "FacadePreferences",
+            "fields": [
+              {
+                "key": "reference_type",
+                "label": "Tipe referensi fasad",
+                "type": "text",
+                "level": "WAJIB"
+              },
+              {
+                "key": "reference_notes",
+                "label": "Catatan/referensi fasad",
+                "type": "text",
+                "level": "OPSIONAL"
+              }
+            ]
+          }
         ]
       },
       {
@@ -866,8 +888,8 @@
         "duration_min": 20,
         "sections": [
           {
-            "id": "2.1",
-            "title": "Parameter Regulasi — Isi & Konfirmasi",
+            "id": "1.2",
+            "title": "Regulasi Daerah & Parameter Intensitas — Isi & Konfirmasi",
             "hint": "Sumber: RDTR/RTRW setempat + IMB eksisting (kini PBG). Wajib dikonfirmasi Tim Teknik.",
             "decision_prompt": "Isi semua nilai regulasi. Beri tanda 'Dikonfirmasi' untuk setiap parameter yang sudah diverifikasi ke RDTR.",
             "model": "RegulationParams",
@@ -979,19 +1001,40 @@
                 "type": "text",
                 "level": "WAJIB",
                 "example": "RDTR setempat"
+              },
+              {
+                "key": "region",
+                "label": "Wilayah regulasi",
+                "type": "text",
+                "level": "WAJIB",
+                "hint": "Isi kabupaten/kota/provinsi sesuai dokumen daerah."
+              },
+              {
+                "key": "regional_regulation",
+                "label": "Perda/regulasi daerah",
+                "type": "text",
+                "level": "WAJIB",
+                "hint": "Cantumkan nomor, tahun, judul, serta pasal/lampiran yang berlaku."
+              },
+              {
+                "key": "regional_sni_references",
+                "label": "SNI yang dirujuk regulasi daerah",
+                "type": "text",
+                "level": "WAJIB",
+                "hint": "Cantumkan nomor/judul SNI berdasarkan dokumen daerah yang telah diperiksa."
               }
             ]
           },
           {
-            "id": "2.2",
-            "title": "Kondisi Fisik & Non-Negotiable Tapak",
+            "id": "1.1",
+            "title": "Tapak — Orientasi Matahari & Kondisi Lahan",
             "hint": "Item non-negotiable tidak dapat diubah dalam desain.",
             "decision_prompt": "Konfirmasi kondisi fisik + tambahkan non-negotiable items yang berlaku untuk tapak ini.",
             "model": "SiteConditions",
             "fields": [
               {
                 "key": "front_orientation",
-                "label": "Orientasi lahan (hadap)",
+                "label": "Orientasi matahari",
                 "type": "compass8",
                 "level": "WAJIB",
                 "options": [
@@ -1005,7 +1048,7 @@
                   "BL"
                 ],
                 "example": "BL",
-                "hint": "Contoh deck: Barat Laut"
+                "hint": "Orientasi sisi muka lahan terhadap mata angin untuk analisis paparan matahari."
               },
               {
                 "key": "topography",
@@ -1027,29 +1070,6 @@
                 "unit": "m",
                 "level": "WAJIB",
                 "example": 0.0
-              },
-              {
-                "key": "best_view",
-                "label": "View terbaik (arah / objek)",
-                "type": "text",
-                "level": "OPSIONAL",
-                "example": "Pond/danau buatan"
-              },
-              {
-                "key": "best_view_direction",
-                "label": "Arah view terbaik",
-                "type": "compass8",
-                "level": "OPSIONAL",
-                "options": [
-                  "U",
-                  "TL",
-                  "T",
-                  "TG",
-                  "S",
-                  "BD",
-                  "B",
-                  "BL"
-                ]
               },
               {
                 "key": "noise_sources",
@@ -2464,24 +2484,6 @@
       "landai_max_diff_m": 1.5,
       "note": "Beda tinggi per kavling (m). Di atas landai: perlu retaining wall & kajian drainase.",
       "status": "practice"
-    },
-    "view_rules": {
-      "water_body": {
-        "keywords": [
-          "pond",
-          "danau",
-          "kolam",
-          "situ",
-          "waduk",
-          "sungai",
-          "laut"
-        ],
-        "notes": [
-          "Perhatikan sempadan danau/sungai (Permen PUPR 28/2015) bila badan air alami; pond buatan: konfirmasi status & kepemilikan dengan pengembang.",
-          "Muka air tanah tinggi & timbunan dekat badan air → risiko erosi tepi, penurunan, kelembapan; pertimbangkan peil lantai lebih tinggi.",
-          "Nyamuk/hama: bukaan berkasa; pengelolaan kualitas air pond (aerasi) oleh pengelola kawasan."
-        ]
-      }
     },
     "access_utility_rules": {
       "vehicle_access": "Akses kendaraan harus dari sisi jalan lingkungan; carport berada di sisi akses (hindari manuver melewati zona tamu).",
